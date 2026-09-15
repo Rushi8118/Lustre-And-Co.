@@ -2,17 +2,17 @@ import { Injectable, UnauthorizedException, Inject } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-google-oauth20';
 import { ConfigService } from '@nestjs/config';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
 import * as bcrypt from 'bcryptjs';
-import { User, UserDocument } from '../../users/schemas/user.schema.js';
+import type { UserDocument } from '../../users/schemas/user.schema.js';
 import { UsersService } from '../../users/users.service.js';
+import { SupabaseService } from '../../../database/supabase.service.js';
+import { toDoc, unwrap } from '../../../common/utils/db.js';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy) {
   constructor(
     @Inject(ConfigService) private readonly configService: ConfigService,
-    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    @Inject(SupabaseService) private readonly db: SupabaseService,
     private readonly usersService: UsersService,
   ) {
     super({
@@ -34,29 +34,32 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException('Google account email not found.');
     }
 
-    let user = await this.userModel.findOne({ googleId }).select('+googleId');
+    const now = new Date().toISOString();
 
-    if (user) {
-      user.lastLoginAt = new Date();
-      await user.save();
-      return user;
+    const byGoogleId = unwrap(await this.db.from('users').select('*').eq('googleId', googleId).maybeSingle());
+    if (byGoogleId) {
+      return toDoc(
+        unwrap(await this.db.from('users').update({ lastLoginAt: now }).eq('id', byGoogleId.id).select().single()),
+      );
     }
 
     const existingByEmail = await this.usersService.findByEmail(email);
     if (existingByEmail) {
-      existingByEmail.googleId = googleId;
-      existingByEmail.provider = 'google';
-      existingByEmail.lastLoginAt = new Date();
-      await existingByEmail.save();
-      return existingByEmail;
+      return toDoc(
+        unwrap(
+          await this.db
+            .from('users')
+            .update({ googleId, provider: 'google', lastLoginAt: now })
+            .eq('id', existingByEmail.id)
+            .select()
+            .single(),
+        ),
+      );
     }
 
-    const hashedPassword = await bcrypt.hash(
-      `${googleId}-${Date.now()}`,
-      10,
-    );
+    const hashedPassword = await bcrypt.hash(`${googleId}-${Date.now()}`, 10);
 
-    user = new this.userModel({
+    return this.usersService.create({
       name: name || `${firstName} ${lastName}`.trim(),
       email: email.toLowerCase().trim(),
       googleId,
@@ -64,10 +67,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
       password: hashedPassword,
       role: 'customer',
       addresses: [],
-      lastLoginAt: new Date(),
+      lastLoginAt: now,
     });
-    await user.save();
-
-    return user;
   }
 }

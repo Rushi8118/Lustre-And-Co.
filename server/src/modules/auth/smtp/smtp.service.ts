@@ -1,9 +1,7 @@
 import { Injectable, Logger, Inject } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
 import * as nodemailer from 'nodemailer';
-import { User, UserDocument } from '../../users/schemas/user.schema.js';
+import { SupabaseService } from '../../../database/supabase.service.js';
 
 @Injectable()
 export class SmtpService {
@@ -12,7 +10,7 @@ export class SmtpService {
 
   constructor(
     @Inject(ConfigService) private readonly configService: ConfigService,
-    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    @Inject(SupabaseService) private readonly db: SupabaseService,
   ) {
     this.transporter = nodemailer.createTransport({
       host: this.configService.get<string>('SMTP_HOST') || 'smtp.gmail.com',
@@ -46,7 +44,7 @@ export class SmtpService {
       .trim();
     const resetUrl = `${frontendUrl}/account/reset-password?token=${token}`;
 
-    const user = await this.userModel.findOne({ email: userEmail });
+    const { data: user } = await this.db.from('users').select('name').eq('email', userEmail).maybeSingle();
     const userName = user?.name || 'Customer';
 
     try {
@@ -66,13 +64,15 @@ export class SmtpService {
       });
       this.logger.log(`Password reset email sent to ${userEmail}`);
     } catch (err: any) {
+      // Not rethrown: an error response here would reveal which emails have accounts.
       this.logger.error(`Failed to send password reset email to ${userEmail}: ${err.message}`);
-      throw err;
     }
   }
 
   async sendWelcomeEmail(userEmail: string, userName: string): Promise<void> {
-    const frontendUrl = this.configService.get<string>('FRONTEND_URL') || 'http://localhost:5177';
+    const frontendUrl = (this.configService.get<string>('FRONTEND_URL') || 'http://localhost:5177')
+      .split(',')[0]
+      .trim();
     try {
       await this.getTransporter().sendMail({
         to: userEmail,

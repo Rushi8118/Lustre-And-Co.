@@ -2,15 +2,15 @@ import { Injectable, UnauthorizedException, Inject } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { User, UserDocument, PRIVATE_USER_FIELDS } from '../../users/schemas/user.schema.js';
+import { SupabaseService } from '../../../database/supabase.service.js';
+import { USER_PUBLIC_COLUMNS } from '../../users/schemas/user.schema.js';
+import { isUuid, toDoc, unwrap } from '../../../common/utils/db.js';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     @Inject(ConfigService) private readonly configService: ConfigService,
-    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    @Inject(SupabaseService) private readonly db: SupabaseService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -22,10 +22,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: { sub: string; email: string }) {
-    const user = await this.userModel.findById(payload.sub).select(PRIVATE_USER_FIELDS);
-    if (!user || user.isActive === false) {
+    // Tokens issued before the Supabase migration carry non-uuid ids and are rejected.
+    const user = isUuid(payload.sub)
+      ? unwrap(await this.db.from('users').select(USER_PUBLIC_COLUMNS).eq('id', payload.sub).maybeSingle())
+      : null;
+    if (!user || (user as any).isActive === false) {
       throw new UnauthorizedException('User session has expired or no longer exists.');
     }
-    return user;
+    return toDoc(user);
   }
 }

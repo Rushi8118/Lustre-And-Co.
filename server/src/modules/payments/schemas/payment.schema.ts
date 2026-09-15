@@ -1,36 +1,19 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Schema as MongooseSchema, Types } from 'mongoose';
+import type { Doc } from '../../../common/utils/db.js';
 
-export type PaymentDocument = Payment & Document;
-
-@Schema({ timestamps: true })
-export class Payment {
-  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Order', required: true, index: true })
-  order: Types.ObjectId;
-
-  @Prop({ type: String, required: true, unique: true, index: true })
+export interface Payment {
+  /** Id of the order row. */
+  order: string;
   orderId: string;
-
-  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User' })
-  user?: Types.ObjectId;
-
-  @Prop({ type: Number, required: true, min: 0 })
+  user?: string | null;
   amount: number;
-
-  @Prop({ type: String, default: 'INR' })
   currency: string;
-
-  @Prop({ type: String, required: true, enum: ['card', 'wallet', 'cod', 'netbanking', 'razorpay'] })
-  method: string;
-
-  @Prop({ type: String, required: true, enum: ['pending', 'paid', 'failed', 'refunded'], default: 'pending' })
-  status: string;
-
-  @Prop({ type: String }) transactionId?: string;
-  @Prop({ type: String }) razorpayOrderId?: string;
-  @Prop({ type: String }) razorpayPaymentId?: string;
-  @Prop({ type: String }) razorpaySignature?: string;
-  @Prop({ type: Date }) paidAt?: Date;
+  method: 'card' | 'wallet' | 'cod' | 'netbanking' | 'razorpay' | string;
+  status: 'pending' | 'paid' | 'failed' | 'refunded' | string;
+  transactionId?: string | null;
+  razorpayOrderId?: string | null;
+  razorpayPaymentId?: string | null;
+  razorpaySignature?: string | null;
+  paidAt?: string | null;
 }
 
-export const PaymentSchema = SchemaFactory.createForClass(Payment);
+export type PaymentDocument = Doc<Payment>;

@@ -1,58 +1,52 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
-import { User, UserDocument } from '../users/schemas/user.schema.js';
-import { Product, ProductDocument } from '../products/schemas/product.schema.js';
-import { idOrField } from '../../common/utils/object-id.js';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { SupabaseService } from '../../database/supabase.service.js';
+import { idOrColumn, isUuid, toDoc, toDocs, unwrap } from '../../common/utils/db.js';
 
 @Injectable()
 export class WishlistService {
-  constructor(
-    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
-    @InjectModel(Product.name) private readonly productModel: Model<ProductDocument>,
-  ) {}
+  constructor(@Inject(SupabaseService) private readonly db: SupabaseService) {}
 
-  async getWishlist(userId: string | Types.ObjectId) {
-    const user = await this.userModel.findById(userId).populate('wishlist').exec();
-
+  private async getWishlistIds(userId: string): Promise<string[]> {
+    const user = isUuid(userId)
+      ? unwrap(await this.db.from('users').select('wishlist').eq('id', userId).maybeSingle())
+      : null;
     if (!user) {
       throw new NotFoundException('User not found.');
     }
-
-    // Deleted or hidden products drop out of the list.
-    return ((user.wishlist || []) as any[]).filter((p) => p && p.isActive !== false);
+    return user.wishlist || [];
   }
 
-  async toggleWishlist(userId: string | Types.ObjectId, productIdOrSlug: string) {
-    const product = await this.productModel.findOne(idOrField(productIdOrSlug, 'slug')).exec();
+  async getWishlist(userId: string) {
+    const ids = await this.getWishlistIds(userId);
+    if (!ids.length) return [];
+
+    const products = toDocs<any>(unwrap(await this.db.from('products').select('*').in('id', ids)));
+    const byId = new Map(products.map((p) => [p.id, p]));
+
+    // Deleted or hidden products drop out of the list; saved order is kept.
+    return ids.map((id) => byId.get(id)).filter((p) => p && p.isActive !== false);
+  }
+
+  async toggleWishlist(userId: string, productIdOrSlug: string) {
+    const product = unwrap(
+      await this.db.from('products').select('*').or(idOrColumn(productIdOrSlug, 'slug')).limit(1).maybeSingle(),
+    );
     if (!product) {
       throw new NotFoundException(`Product '${productIdOrSlug}' not found.`);
     }
 
-    const user = await this.userModel.findById(userId).exec();
-    if (!user) {
-      throw new NotFoundException('User not found.');
-    }
+    const ids = await this.getWishlistIds(userId);
+    const inWishlist = !ids.includes(product.id);
+    const next = inWishlist ? [...ids, product.id] : ids.filter((id) => id !== product.id);
 
-    const existingIndex = user.wishlist.findIndex(
-      (id) => id.toString() === product._id.toString(),
-    );
-
-    const inWishlist = existingIndex === -1;
-    if (inWishlist) {
-      user.wishlist.push(product._id as any);
-    } else {
-      user.wishlist.splice(existingIndex, 1);
-    }
-
-    await user.save();
+    unwrap(await this.db.from('users').update({ wishlist: next }).eq('id', userId));
 
     return {
       inWishlist,
       message: inWishlist
         ? `${product.name} added to your wishlist.`
         : `${product.name} removed from your wishlist.`,
-      product,
+      product: toDoc(product),
       wishlist: await this.getWishlist(userId),
     };
   }

@@ -1,18 +1,27 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Product, ProductDocument } from './schemas/product.schema.js';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import type { ProductDocument } from './schemas/product.schema.js';
 import { FilterProductsDto } from './dto/filter-products.dto.js';
-import { containsMatch, exactMatch } from '../../common/utils/regex.js';
-import { idOrField } from '../../common/utils/object-id.js';
+import { SupabaseService } from '../../database/supabase.service.js';
+import {
+  containsAny,
+  escapeLike,
+  idOrColumn,
+  quoteFilterValue,
+  toDoc,
+  toDocs,
+  unwrap,
+} from '../../common/utils/db.js';
 
-const VISIBLE = { isActive: { $ne: false } };
+const SORTS: Record<string, { column: string; ascending: boolean }> = {
+  'price-asc': { column: 'price', ascending: true },
+  'price-desc': { column: 'price', ascending: false },
+  rating: { column: 'rating', ascending: false },
+  popular: { column: 'salesCount', ascending: false },
+};
 
 @Injectable()
 export class ProductsService {
-  constructor(
-    @InjectModel(Product.name) private readonly productModel: Model<ProductDocument>,
-  ) {}
+  constructor(@Inject(SupabaseService) private readonly db: SupabaseService) {}
 
   async findAll(query: FilterProductsDto) {
     const {
@@ -30,56 +39,34 @@ export class ProductsService {
       limit = 12,
     } = query;
 
-    const filter: Record<string, any> = { ...VISIBLE };
+    let filter = this.db.from('products').select('*', { count: 'exact' }).eq('isActive', true);
 
-    if (category) filter.category = category.toLowerCase().trim();
-    if (collection) filter.collectionName = collection.toLowerCase().trim();
-    if (occasion) filter.occasion = occasion.toLowerCase().trim();
-    if (finish) filter.finish = exactMatch(finish);
-    if (tag) filter.tags = tag.toLowerCase().trim();
-    if (featured) filter.isFeatured = true;
-
-    if (minPrice !== undefined || maxPrice !== undefined) {
-      filter.price = {};
-      if (minPrice !== undefined) filter.price.$gte = Number(minPrice);
-      if (maxPrice !== undefined) filter.price.$lte = Number(maxPrice);
-    }
+    if (category) filter = filter.eq('category', category.toLowerCase().trim());
+    if (collection) filter = filter.eq('collectionName', collection.toLowerCase().trim());
+    if (occasion) filter = filter.eq('occasion', occasion.toLowerCase().trim());
+    if (finish) filter = filter.ilike('finish', escapeLike(finish));
+    if (tag) filter = filter.contains('tags', [tag.toLowerCase().trim()]);
+    if (featured) filter = filter.eq('isFeatured', true);
+    if (minPrice !== undefined) filter = filter.gte('price', Number(minPrice));
+    if (maxPrice !== undefined) filter = filter.lte('price', Number(maxPrice));
 
     if (search && search.trim()) {
-      const searchRegex = containsMatch(search);
-      filter.$or = [
-        { name: searchRegex },
-        { description: searchRegex },
-        { tags: searchRegex },
-        { category: searchRegex },
-        { material: searchRegex },
-      ];
+      const tagMatch = `tags.cs.{${quoteFilterValue(search.trim().toLowerCase())}}`;
+      filter = filter.or(`${containsAny(['name', 'description', 'category', 'material'], search)},${tagMatch}`);
     }
 
-    const sortOptions: Record<string, 1 | -1> = {};
-    if (sort === 'price-asc') {
-      sortOptions.price = 1;
-    } else if (sort === 'price-desc') {
-      sortOptions.price = -1;
-    } else if (sort === 'rating') {
-      sortOptions.rating = -1;
-    } else if (sort === 'popular') {
-      sortOptions.salesCount = -1;
-    } else {
-      sortOptions.createdAt = -1;
-    }
+    const { column, ascending } = SORTS[sort as string] || { column: 'createdAt', ascending: false };
 
     const currentPage = Math.max(1, Number(page));
     const currentLimit = Math.min(200, Math.max(1, Number(limit)));
     const skip = (currentPage - 1) * currentLimit;
 
-    const [items, total] = await Promise.all([
-      this.productModel.find(filter).sort(sortOptions).skip(skip).limit(currentLimit).exec(),
-      this.productModel.countDocuments(filter).exec(),
-    ]);
+    const result = await filter.order(column, { ascending }).range(skip, skip + currentLimit - 1);
+    const items = unwrap(result);
+    const total = result.count || 0;
 
     return {
-      items,
+      items: toDocs(items),
       total,
       page: currentPage,
       limit: currentLimit,
@@ -88,36 +75,54 @@ export class ProductsService {
   }
 
   async findBySlug(slug: string): Promise<ProductDocument> {
-    const product = await this.productModel.findOne({ slug: slug.trim(), ...VISIBLE }).exec();
+    const product = unwrap(
+      await this.db.from('products').select('*').eq('slug', slug.trim()).eq('isActive', true).maybeSingle(),
+    );
     if (!product) {
       throw new NotFoundException(`Product with slug '${slug}' not found.`);
     }
-    return product;
+    return toDoc(product);
   }
 
   async findById(id: string): Promise<ProductDocument> {
-    const product = await this.productModel.findOne({ ...idOrField(id, 'slug'), ...VISIBLE }).exec();
+    const product = unwrap(
+      await this.db.from('products').select('*').or(idOrColumn(id, 'slug')).eq('isActive', true).limit(1).maybeSingle(),
+    );
     if (!product) {
       throw new NotFoundException(`Product not found.`);
     }
-    return product;
+    return toDoc(product);
   }
 
   async findRelated(idOrSlug: string): Promise<ProductDocument[]> {
     const current = await this.findById(idOrSlug);
 
-    const related = await this.productModel
-      .find({ _id: { $ne: current._id }, category: current.category, ...VISIBLE })
-      .sort({ salesCount: -1 })
-      .limit(4)
-      .exec();
+    const related = toDocs<any>(
+      unwrap(
+        await this.db
+          .from('products')
+          .select('*')
+          .neq('id', current.id)
+          .eq('category', current.category)
+          .eq('isActive', true)
+          .order('salesCount', { ascending: false })
+          .limit(4),
+      ),
+    ) as ProductDocument[];
 
     if (related.length < 4) {
-      const topUps = await this.productModel
-        .find({ _id: { $nin: [current._id, ...related.map((r) => r._id)] }, ...VISIBLE })
-        .sort({ salesCount: -1 })
-        .limit(4 - related.length)
-        .exec();
+      const excluded = [current.id, ...related.map((r) => r.id)];
+      const topUps = toDocs<any>(
+        unwrap(
+          await this.db
+            .from('products')
+            .select('*')
+            .not('id', 'in', `(${excluded.join(',')})`)
+            .eq('isActive', true)
+            .order('salesCount', { ascending: false })
+            .limit(4 - related.length),
+        ),
+      ) as ProductDocument[];
       return [...related, ...topUps];
     }
 

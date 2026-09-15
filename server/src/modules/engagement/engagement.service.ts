@@ -1,25 +1,25 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
-import { ContactMessage, ContactMessageDocument } from './schemas/contact-message.schema.js';
-import { Subscriber, SubscriberDocument } from './schemas/subscriber.schema.js';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import {
   CreateContactMessageDto,
   SubscribeDto,
   UpdateContactMessageDto,
 } from './dto/engagement.dto.js';
-import { containsMatch } from '../../common/utils/regex.js';
+import { SupabaseService } from '../../database/supabase.service.js';
+import { containsAny, escapeLike, isUuid, toDoc, toDocs, unwrap } from '../../common/utils/db.js';
 
 @Injectable()
 export class EngagementService {
-  constructor(
-    @InjectModel(ContactMessage.name)
-    private readonly messageModel: Model<ContactMessageDocument>,
-    @InjectModel(Subscriber.name) private readonly subscriberModel: Model<SubscriberDocument>,
-  ) {}
+  constructor(@Inject(SupabaseService) private readonly db: SupabaseService) {}
 
-  async createMessage(dto: CreateContactMessageDto, userId?: Types.ObjectId) {
-    await this.messageModel.create({ ...dto, user: userId });
+  async createMessage(dto: CreateContactMessageDto, userId?: string) {
+    unwrap(
+      await this.db.from('contact_messages').insert({
+        ...dto,
+        name: dto.name.trim(),
+        email: dto.email.toLowerCase().trim(),
+        user: userId ?? null,
+      }),
+    );
     return {
       success: true,
       message: 'Thank you. Your message has been received — we will reply by email.',
@@ -27,62 +27,67 @@ export class EngagementService {
   }
 
   async findMessages(status?: string, search?: string) {
-    const filter: Record<string, any> = {};
-    if (status && status !== 'all') filter.status = status;
-    if (search?.trim()) {
-      const rx = containsMatch(search);
-      filter.$or = [{ name: rx }, { email: rx }, { message: rx }, { orderId: rx }];
-    }
+    let query = this.db.from('contact_messages').select('*');
+    if (status && status !== 'all') query = query.eq('status', status);
+    if (search?.trim()) query = query.or(containsAny(['name', 'email', 'message', 'orderId'], search));
+
     const [messages, counts] = await Promise.all([
-      this.messageModel.find(filter).sort({ createdAt: -1 }).limit(500).exec(),
-      this.messageModel.aggregate([{ $group: { _id: '$status', count: { $sum: 1 } } }]).exec(),
+      query.order('createdAt', { ascending: false }).limit(500).then(unwrap),
+      this.db.rpc<any[]>('count_by', { p_table: 'contact_messages', p_column: 'status' }),
     ]);
-    return { messages, counts: Object.fromEntries(counts.map((c: any) => [c._id, c.count])) };
+    return {
+      messages: toDocs(messages),
+      counts: Object.fromEntries((counts || []).map((c) => [c.key, Number(c.count)])),
+    };
   }
 
   async updateMessage(id: string, dto: UpdateContactMessageDto) {
-    if (!Types.ObjectId.isValid(id)) throw new NotFoundException('Message not found.');
-    const message = await this.messageModel
-      .findByIdAndUpdate(id, { $set: dto }, { returnDocument: 'after' })
-      .exec();
+    if (!isUuid(id)) throw new NotFoundException('Message not found.');
+    const message = unwrap(await this.db.from('contact_messages').update(dto).eq('id', id).select().maybeSingle());
     if (!message) throw new NotFoundException('Message not found.');
-    return message;
+    return toDoc(message);
   }
 
   async removeMessage(id: string) {
-    if (!Types.ObjectId.isValid(id)) throw new NotFoundException('Message not found.');
-    const message = await this.messageModel.findByIdAndDelete(id).exec();
+    if (!isUuid(id)) throw new NotFoundException('Message not found.');
+    const message = unwrap(await this.db.from('contact_messages').delete().eq('id', id).select().maybeSingle());
     if (!message) throw new NotFoundException('Message not found.');
     return { success: true, message: 'Message deleted.' };
   }
 
   async subscribe(dto: SubscribeDto) {
     const email = dto.email.toLowerCase().trim();
-    await this.subscriberModel.updateOne(
-      { email },
-      { $set: { isActive: true }, $setOnInsert: { email, source: dto.source || 'footer' } },
-      { upsert: true },
-    );
+    const existing = unwrap(await this.db.from('subscribers').select('id').eq('email', email).maybeSingle());
+    if (existing) {
+      unwrap(await this.db.from('subscribers').update({ isActive: true }).eq('id', existing.id));
+    } else {
+      unwrap(
+        await this.db
+          .from('subscribers')
+          .upsert({ email, isActive: true, source: dto.source || 'footer' }, { onConflict: 'email' }),
+      );
+    }
     return { success: true, message: 'You are subscribed to our newsletter.' };
   }
 
-  findSubscribers(search?: string) {
-    const filter = search?.trim() ? { email: containsMatch(search) } : {};
-    return this.subscriberModel.find(filter).sort({ createdAt: -1 }).exec();
+  async findSubscribers(search?: string) {
+    let query = this.db.from('subscribers').select('*');
+    if (search?.trim()) query = query.ilike('email', `%${escapeLike(search)}%`);
+    return toDocs(unwrap(await query.order('createdAt', { ascending: false })));
   }
 
   async updateSubscriber(id: string, isActive: boolean) {
-    if (!Types.ObjectId.isValid(id)) throw new NotFoundException('Subscriber not found.');
-    const subscriber = await this.subscriberModel
-      .findByIdAndUpdate(id, { isActive }, { returnDocument: 'after' })
-      .exec();
+    if (!isUuid(id)) throw new NotFoundException('Subscriber not found.');
+    const subscriber = unwrap(
+      await this.db.from('subscribers').update({ isActive }).eq('id', id).select().maybeSingle(),
+    );
     if (!subscriber) throw new NotFoundException('Subscriber not found.');
-    return subscriber;
+    return toDoc(subscriber);
   }
 
   async removeSubscriber(id: string) {
-    if (!Types.ObjectId.isValid(id)) throw new NotFoundException('Subscriber not found.');
-    const subscriber = await this.subscriberModel.findByIdAndDelete(id).exec();
+    if (!isUuid(id)) throw new NotFoundException('Subscriber not found.');
+    const subscriber = unwrap(await this.db.from('subscribers').delete().eq('id', id).select().maybeSingle());
     if (!subscriber) throw new NotFoundException('Subscriber not found.');
     return { success: true, message: 'Subscriber removed.' };
   }
