@@ -29,7 +29,7 @@ async function bootstrap() {
   // 4. Interactive Swagger Documentation
   const config = new DocumentBuilder()
     .setTitle('Lustre & Co. API')
-    .setDescription('NestJS + MongoDB E-Commerce API for Imitation Jewelry')
+    .setDescription('NestJS + Supabase E-Commerce API for Imitation Jewelry')
     .setVersion('1.0')
     .addBearerAuth()
     .build();

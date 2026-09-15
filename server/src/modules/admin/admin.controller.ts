@@ -54,7 +54,7 @@ export class AdminController {
   }
 
   @Get('products/:id')
-  @ApiParam({ name: 'id', description: 'Product slug or MongoDB ObjectId' })
+  @ApiParam({ name: 'id', description: 'Product slug or id' })
   getProduct(@Param('id') id: string) {
     return this.adminService.getProduct(id);
   }
@@ -66,13 +66,13 @@ export class AdminController {
   }
 
   @Put('products/:id')
-  @ApiParam({ name: 'id', description: 'Product slug or MongoDB ObjectId' })
+  @ApiParam({ name: 'id', description: 'Product slug or id' })
   updateProduct(@Param('id') id: string, @Body() dto: AdminUpdateProductDto) {
     return this.adminService.updateProduct(id, dto);
   }
 
   @Delete('products/:id')
-  @ApiParam({ name: 'id', description: 'Product slug or MongoDB ObjectId' })
+  @ApiParam({ name: 'id', description: 'Product slug or id' })
   deleteProduct(@Param('id') id: string) {
     return this.adminService.deleteProduct(id);
   }
@@ -85,7 +85,7 @@ export class AdminController {
   }
 
   @Get('orders/:id')
-  @ApiParam({ name: 'id', description: 'Order ID (e.g. LST-89421056) or ObjectId' })
+  @ApiParam({ name: 'id', description: 'Order ID (e.g. LST-89421056) or id' })
   getOrder(@Param('id') id: string) {
     return this.adminService.getOrder(id);
   }
@@ -115,13 +115,13 @@ export class AdminController {
   }
 
   @Put('discounts/:id')
-  @ApiParam({ name: 'id', description: 'Coupon code or MongoDB ObjectId' })
+  @ApiParam({ name: 'id', description: 'Coupon code or id' })
   updateDiscount(@Param('id') id: string, @Body() dto: AdminUpdateDiscountDto) {
     return this.adminService.updateDiscount(id, dto);
   }
 
   @Delete('discounts/:id')
-  @ApiParam({ name: 'id', description: 'Coupon code or MongoDB ObjectId' })
+  @ApiParam({ name: 'id', description: 'Coupon code or id' })
   deleteDiscount(@Param('id') id: string) {
     return this.adminService.deleteDiscount(id);
   }

@@ -1,36 +1,17 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types, Schema as MongooseSchema } from 'mongoose';
-import { Product } from '../../products/schemas/product.schema.js';
+import type { Doc } from '../../../common/utils/db.js';
 
-export type CartDocument = Cart & Document;
-
-@Schema()
-export class CartItem {
-  @Prop({ type: String, required: true })
-  id: string; // compositeId, e.g. 'aurora-gold-plated-necklace-gold'
-
-  @Prop({ type: MongooseSchema.Types.ObjectId, ref: Product.name, required: true })
-  product: Types.ObjectId;
-
-  @Prop({ type: Number, required: true, min: 1, default: 1 })
+export interface CartItem {
+  id: string; // compositeId, e.g. 'aurora-gold-plated-necklace-gold-standard'
+  /** Product id. */
+  product: string;
   quantity: number;
-
-  @Prop({ type: String, default: 'Gold' })
   selectedColor: string;
-
-  @Prop({ type: String, default: 'Standard (16" + 2")' })
   selectedSize: string;
 }
 
-export const CartItemSchema = SchemaFactory.createForClass(CartItem);
-
-@Schema({ timestamps: true })
-export class Cart {
-  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User', required: true, unique: true, index: true })
-  user: Types.ObjectId;
-
-  @Prop({ type: [CartItemSchema], default: [] })
+export interface Cart {
+  user: string;
   items: CartItem[];
 }
 
-export const CartSchema = SchemaFactory.createForClass(Cart);
+export type CartDocument = Doc<Cart>;

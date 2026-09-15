@@ -1,81 +1,72 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
-import { Page, PageDocument } from './schemas/page.schema.js';
-import { Faq, FaqDocument } from './schemas/faq.schema.js';
+import { ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateFaqDto, CreatePageDto, UpdateFaqDto, UpdatePageDto } from './dto/cms.dto.js';
+import { SupabaseService } from '../../database/supabase.service.js';
+import { countOf, isUuid, toDoc, toDocs, unwrap } from '../../common/utils/db.js';
 
 @Injectable()
 export class CmsService {
-  constructor(
-    @InjectModel(Page.name) private readonly pageModel: Model<PageDocument>,
-    @InjectModel(Faq.name) private readonly faqModel: Model<FaqDocument>,
-  ) {}
+  constructor(@Inject(SupabaseService) private readonly db: SupabaseService) {}
 
   async findPublishedPage(slug: string) {
-    const page = await this.pageModel
-      .findOne({ slug: slug.toLowerCase(), isPublished: true })
-      .exec();
+    const page = unwrap(
+      await this.db.from('pages').select('*').eq('slug', slug.toLowerCase()).eq('isPublished', true).maybeSingle(),
+    );
     if (!page) throw new NotFoundException(`Page '${slug}' is not published.`);
-    return page;
+    return toDoc(page);
   }
 
-  findAllPages() {
-    return this.pageModel.find().sort({ slug: 1 }).exec();
+  async findAllPages() {
+    return toDocs(unwrap(await this.db.from('pages').select('*').order('slug')));
   }
 
   async createPage(dto: CreatePageDto) {
-    if (await this.pageModel.exists({ slug: dto.slug })) {
+    const slug = dto.slug.toLowerCase().trim();
+    if (await countOf(this.db.from('pages').select('id', { count: 'exact', head: true }).eq('slug', slug))) {
       throw new ConflictException(`Page '${dto.slug}' already exists.`);
     }
-    return this.pageModel.create(dto);
+    return toDoc(unwrap(await this.db.from('pages').insert({ ...dto, slug }).select().single()));
   }
 
   async updatePage(slug: string, dto: UpdatePageDto) {
-    const page = await this.pageModel
-      .findOneAndUpdate(
-        { slug: slug.toLowerCase() },
-        { $set: dto },
-        { returnDocument: 'after', runValidators: true },
-      )
-      .exec();
+    const page = unwrap(
+      await this.db.from('pages').update(dto).eq('slug', slug.toLowerCase()).select().maybeSingle(),
+    );
     if (!page) throw new NotFoundException(`Page '${slug}' not found.`);
-    return page;
+    return toDoc(page);
   }
 
   async removePage(slug: string) {
-    const page = await this.pageModel.findOneAndDelete({ slug: slug.toLowerCase() }).exec();
+    const page = unwrap(await this.db.from('pages').delete().eq('slug', slug.toLowerCase()).select().maybeSingle());
     if (!page) throw new NotFoundException(`Page '${slug}' not found.`);
     return { success: true, message: `Page '${page.title}' deleted.` };
   }
 
-  findActiveFaqs() {
-    return this.faqModel
-      .find({ isActive: true })
-      .sort({ group: 1, sortOrder: 1, createdAt: 1 })
-      .exec();
+  async findActiveFaqs() {
+    return toDocs(
+      unwrap(
+        await this.db.from('faqs').select('*').eq('isActive', true).order('group').order('sortOrder').order('createdAt'),
+      ),
+    );
   }
 
-  findAllFaqs() {
-    return this.faqModel.find().sort({ group: 1, sortOrder: 1, createdAt: 1 }).exec();
+  async findAllFaqs() {
+    return toDocs(unwrap(await this.db.from('faqs').select('*').order('group').order('sortOrder').order('createdAt')));
   }
 
-  createFaq(dto: CreateFaqDto) {
-    return this.faqModel.create(dto);
+  async createFaq(dto: CreateFaqDto) {
+    return toDoc(unwrap(await this.db.from('faqs').insert(dto).select().single()));
   }
 
   async updateFaq(id: string, dto: UpdateFaqDto) {
-    if (!Types.ObjectId.isValid(id)) throw new NotFoundException('FAQ not found.');
-    const faq = await this.faqModel
-      .findByIdAndUpdate(id, { $set: dto }, { returnDocument: 'after' })
-      .exec();
+    if (!isUuid(id)) throw new NotFoundException('FAQ not found.');
+    const faq = unwrap(await this.db.from('faqs').update(dto).eq('id', id).select().maybeSingle());
     if (!faq) throw new NotFoundException('FAQ not found.');
-    return faq;
+    return toDoc(faq);
   }
 
   async removeFaq(id: string) {
-    if (!Types.ObjectId.isValid(id)) throw new NotFoundException('FAQ not found.');
-    const faq = await this.faqModel.findByIdAndDelete(id).exec();
+    if (!isUuid(id)) throw new NotFoundException('FAQ not found.');
+    const faq = unwrap(await this.db.from('faqs').delete().eq('id', id).select().maybeSingle());
     if (!faq) throw new NotFoundException('FAQ not found.');
     return { success: true, message: 'FAQ deleted.' };
   }

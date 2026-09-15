@@ -1,13 +1,10 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Settings, SettingsDocument } from './schemas/settings.schema.js';
 import { DEFAULT_SETTINGS, SETTINGS_SECTIONS, StoreSettings } from './settings.defaults.js';
 import { UpdateSettingsDto } from './dto/update-settings.dto.js';
 import { getRazorpayCredentials } from '../../common/utils/payments.js';
-import { User, UserDocument } from '../users/schemas/user.schema.js';
-import { Review, ReviewDocument } from '../reviews/schemas/review.schema.js';
+import { SupabaseService } from '../../database/supabase.service.js';
+import { countOf, unwrap } from '../../common/utils/db.js';
 
 function isPlainObject(value: unknown): value is Record<string, any> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -30,26 +27,26 @@ function deepMerge<T>(base: T, override: unknown): T {
 @Injectable()
 export class SettingsService implements OnModuleInit {
   constructor(
-    @InjectModel(Settings.name) private readonly settingsModel: Model<SettingsDocument>,
-    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
-    @InjectModel(Review.name) private readonly reviewModel: Model<ReviewDocument>,
+    @Inject(SupabaseService) private readonly db: SupabaseService,
     @Inject(ConfigService) private readonly configService: ConfigService,
   ) {}
 
   async onModuleInit() {
-    await this.settingsModel.updateOne(
-      { key: 'store' },
-      { $setOnInsert: { key: 'store', ...DEFAULT_SETTINGS } },
-      { upsert: true },
+    unwrap(
+      await this.db
+        .from('settings')
+        .upsert({ key: 'store', ...DEFAULT_SETTINGS }, { onConflict: 'key', ignoreDuplicates: true }),
     );
   }
 
   /** Full settings with defaults filled in for any section or field not yet saved. */
   async get(): Promise<StoreSettings> {
-    const doc = await this.settingsModel.findOne({ key: 'store' }).lean().exec();
+    const row: Record<string, any> | null = unwrap(
+      await this.db.from('settings').select('*').eq('key', 'store').maybeSingle(),
+    );
     const saved: Record<string, any> = {};
     for (const section of SETTINGS_SECTIONS) {
-      if (doc?.[section]) saved[section] = doc[section];
+      if (row?.[section]) saved[section] = row[section];
     }
     return deepMerge(DEFAULT_SETTINGS, saved);
   }
@@ -61,16 +58,12 @@ export class SettingsService implements OnModuleInit {
   async getPublic() {
     const [settings, customerCount, ratingStats] = await Promise.all([
       this.get(),
-      this.userModel.countDocuments({ role: 'customer' }).exec(),
-      this.reviewModel
-        .aggregate([
-          { $match: { status: 'approved' } },
-          { $group: { _id: null, average: { $avg: '$rating' }, count: { $sum: 1 } } },
-        ])
-        .exec(),
+      countOf(this.db.from('users').select('id', { count: 'exact', head: true }).eq('role', 'customer')),
+      this.db.rpc<any[]>('review_stats'),
     ]);
 
     const { configured, keyId } = getRazorpayCredentials(this.configService);
+    const stats = ratingStats?.[0];
 
     return {
       ...settings,
@@ -81,8 +74,8 @@ export class SettingsService implements OnModuleInit {
       },
       stats: {
         customerCount,
-        reviewCount: ratingStats[0]?.count || 0,
-        averageRating: ratingStats[0]?.average ? Number(ratingStats[0].average.toFixed(1)) : null,
+        reviewCount: Number(stats?.count || 0),
+        averageRating: stats?.average ? Number(Number(stats.average).toFixed(1)) : null,
       },
     };
   }
@@ -90,7 +83,7 @@ export class SettingsService implements OnModuleInit {
   async update(dto: UpdateSettingsDto): Promise<StoreSettings> {
     const current = await this.get();
     const next = deepMerge(current, dto);
-    await this.settingsModel.updateOne({ key: 'store' }, { $set: next }, { upsert: true }).exec();
+    unwrap(await this.db.from('settings').upsert({ key: 'store', ...next }, { onConflict: 'key' }));
     return next;
   }
 }

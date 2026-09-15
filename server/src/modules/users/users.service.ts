@@ -1,57 +1,67 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Inject, Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
-import { User, UserDocument, Address, PRIVATE_USER_FIELDS } from './schemas/user.schema.js';
+import crypto from 'crypto';
+import { type Address, type User, type UserDocument, USER_PUBLIC_COLUMNS } from './schemas/user.schema.js';
 import { UpdateProfileDto } from './dto/update-profile.dto.js';
 import { CreateAddressDto } from './dto/create-address.dto.js';
 import { ChangePasswordDto } from './dto/change-password.dto.js';
+import { SupabaseService } from '../../database/supabase.service.js';
+import { isUuid, toDoc, unwrap } from '../../common/utils/db.js';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
-  ) {}
+  constructor(@Inject(SupabaseService) private readonly db: SupabaseService) {}
 
-  async findById(id: string | Types.ObjectId): Promise<UserDocument | null> {
-    return this.userModel.findById(id);
+  async findById(id: string): Promise<UserDocument | null> {
+    if (!isUuid(id)) return null;
+    const user = unwrap(await this.db.from('users').select('*').eq('id', id).maybeSingle());
+    return user ? toDoc(user) : null;
   }
 
   async findByEmail(email: string): Promise<UserDocument | null> {
-    return this.userModel.findOne({ email: email.toLowerCase().trim() });
+    const user = unwrap(
+      await this.db.from('users').select('*').eq('email', email.toLowerCase().trim()).maybeSingle(),
+    );
+    return user ? toDoc(user) : null;
   }
 
   async create(userData: Partial<User>): Promise<UserDocument> {
-    const newUser = new this.userModel({
-      ...userData,
-      email: userData.email?.toLowerCase().trim(),
-    });
-    return newUser.save();
+    const user = unwrap(
+      await this.db
+        .from('users')
+        .insert({ ...userData, email: userData.email?.toLowerCase().trim() })
+        .select()
+        .single(),
+    );
+    return toDoc(user);
   }
 
-  async getProfile(userId: string | Types.ObjectId): Promise<UserDocument> {
-    const user = await this.userModel.findById(userId).select(PRIVATE_USER_FIELDS);
+  async touchLastLogin(userId: string) {
+    unwrap(await this.db.from('users').update({ lastLoginAt: new Date().toISOString() }).eq('id', userId));
+  }
+
+  async getProfile(userId: string) {
+    const user = isUuid(userId)
+      ? unwrap(await this.db.from('users').select(USER_PUBLIC_COLUMNS).eq('id', userId).maybeSingle())
+      : null;
     if (!user) {
       throw new NotFoundException('User profile not found.');
     }
-    return user;
+    return toDoc(user);
   }
 
-  async updateProfile(
-    userId: string | Types.ObjectId,
-    updateDto: UpdateProfileDto,
-  ): Promise<UserDocument> {
-    const user = await this.userModel
-      .findByIdAndUpdate(userId, { $set: updateDto }, { returnDocument: 'after' })
-      .select(PRIVATE_USER_FIELDS);
+  async updateProfile(userId: string, updateDto: UpdateProfileDto) {
+    const user = unwrap(
+      await this.db.from('users').update(updateDto).eq('id', userId).select(USER_PUBLIC_COLUMNS).maybeSingle(),
+    );
     if (!user) {
       throw new NotFoundException('User not found.');
     }
-    return user;
+    return toDoc(user);
   }
 
-  async changePassword(userId: string | Types.ObjectId, dto: ChangePasswordDto) {
-    const user = await this.userModel.findById(userId);
+  async changePassword(userId: string, dto: ChangePasswordDto) {
+    const user = await this.findById(userId);
     if (!user) {
       throw new NotFoundException('User not found.');
     }
@@ -61,75 +71,75 @@ export class UsersService {
       throw new BadRequestException('Your current password is incorrect.');
     }
 
-    user.password = await bcrypt.hash(dto.newPassword, 10);
-    await user.save();
+    unwrap(
+      await this.db.from('users').update({ password: await bcrypt.hash(dto.newPassword, 10) }).eq('id', user.id),
+    );
     return { success: true, message: 'Your password has been updated.' };
   }
 
-  async addAddress(
-    userId: string | Types.ObjectId,
-    dto: CreateAddressDto,
-  ): Promise<Address[]> {
-    const user = await this.userModel.findById(userId);
+  private async getAddresses(userId: string): Promise<Address[]> {
+    const user = await this.findById(userId);
     if (!user) {
       throw new NotFoundException('User not found.');
     }
+    return user.addresses || [];
+  }
+
+  private async saveAddresses(userId: string, addresses: Address[]): Promise<Address[]> {
+    unwrap(await this.db.from('users').update({ addresses }).eq('id', userId));
+    return addresses;
+  }
+
+  async addAddress(userId: string, dto: CreateAddressDto): Promise<Address[]> {
+    const addresses = await this.getAddresses(userId);
 
     if (dto.isDefault) {
-      user.addresses.forEach((addr) => {
+      addresses.forEach((addr) => {
         addr.isDefault = false;
       });
-    } else if (user.addresses.length === 0) {
+    } else if (addresses.length === 0) {
       dto.isDefault = true;
     }
 
-    user.addresses.push(dto as Address);
-    await user.save();
-    return user.addresses;
+    addresses.push({
+      country: 'India',
+      isDefault: false,
+      ...dto,
+      _id: crypto.randomUUID(),
+    } as Address);
+    return this.saveAddresses(userId, addresses);
   }
 
-  async setDefaultAddress(userId: string | Types.ObjectId, addressId: string): Promise<Address[]> {
-    const user = await this.userModel.findById(userId);
-    if (!user) {
-      throw new NotFoundException('User not found.');
-    }
+  async setDefaultAddress(userId: string, addressId: string): Promise<Address[]> {
+    const addresses = await this.getAddresses(userId);
 
-    const target = user.addresses.find((addr: any) => addr._id?.toString() === addressId);
+    const target = addresses.find((addr) => addr._id === addressId);
     if (!target) {
       throw new NotFoundException('Address not found.');
     }
 
-    user.addresses.forEach((addr: any) => {
-      addr.isDefault = addr._id?.toString() === addressId;
+    addresses.forEach((addr) => {
+      addr.isDefault = addr._id === addressId;
     });
-    await user.save();
-    return user.addresses;
+    return this.saveAddresses(userId, addresses);
   }
 
-  async removeAddress(
-    userId: string | Types.ObjectId,
-    addressId: string,
-  ): Promise<Address[]> {
-    const user = await this.userModel.findById(userId);
-    if (!user) {
-      throw new NotFoundException('User not found.');
-    }
+  async removeAddress(userId: string, addressId: string): Promise<Address[]> {
+    const addresses = await this.getAddresses(userId);
 
-    const initialLength = user.addresses.length;
-    user.addresses = user.addresses.filter(
-      (addr: any) => addr._id?.toString() !== addressId && addr.id !== addressId,
+    const remaining = addresses.filter(
+      (addr: any) => addr._id !== addressId && addr.id !== addressId,
     );
 
-    if (user.addresses.length === initialLength) {
+    if (remaining.length === addresses.length) {
       throw new NotFoundException('Address not found.');
     }
 
     // Ensure at least one address is default if any remain
-    if (user.addresses.length > 0 && !user.addresses.some((a) => a.isDefault)) {
-      user.addresses[0].isDefault = true;
+    if (remaining.length > 0 && !remaining.some((a) => a.isDefault)) {
+      remaining[0].isDefault = true;
     }
 
-    await user.save();
-    return user.addresses;
+    return this.saveAddresses(userId, remaining);
   }
 }

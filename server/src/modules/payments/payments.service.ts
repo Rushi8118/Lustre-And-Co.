@@ -6,18 +6,16 @@ import {
   Inject,
   Logger,
 } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
 import { ConfigService } from '@nestjs/config';
 import crypto from 'crypto';
 import Razorpay from 'razorpay';
-import { Order, OrderDocument } from '../orders/schemas/order.schema.js';
+import type { OrderDocument } from '../orders/schemas/order.schema.js';
 import { CreatePaymentIntentDto } from './dto/create-intent.dto.js';
 import { VerifyPaymentDto } from './dto/verify-payment.dto.js';
 import { CodPaymentDto } from './dto/cod-payment.dto.js';
-import { Payment, PaymentDocument } from './schemas/payment.schema.js';
 import { getRazorpayCredentials } from '../../common/utils/payments.js';
-import { exactMatch } from '../../common/utils/regex.js';
+import { SupabaseService } from '../../database/supabase.service.js';
+import { escapeLike, toDoc, unwrap } from '../../common/utils/db.js';
 
 @Injectable()
 export class PaymentsService {
@@ -26,8 +24,7 @@ export class PaymentsService {
   private readonly credentials: ReturnType<typeof getRazorpayCredentials>;
 
   constructor(
-    @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
-    @InjectModel(Payment.name) private readonly paymentModel: Model<PaymentDocument>,
+    @Inject(SupabaseService) private readonly db: SupabaseService,
     @Inject(ConfigService) private readonly configService: ConfigService,
   ) {
     this.credentials = getRazorpayCredentials(this.configService);
@@ -58,12 +55,14 @@ export class PaymentsService {
     }
   }
 
-  private async findOrder(orderId: string) {
-    const order = await this.orderModel.findOne({ orderId: exactMatch(orderId) }).exec();
+  private async findOrder(orderId: string): Promise<OrderDocument> {
+    const order = unwrap(
+      await this.db.from('orders').select('*').ilike('orderId', escapeLike(orderId || '')).limit(1).maybeSingle(),
+    );
     if (!order) {
       throw new NotFoundException(`Order '${orderId}' was not found.`);
     }
-    return order;
+    return toDoc(order);
   }
 
   async createPaymentIntent(dto: CreatePaymentIntentDto) {
@@ -80,7 +79,7 @@ export class PaymentsService {
       throw new BadRequestException('This order has been cancelled.');
     }
 
-    const amountInPaise = Math.round(order.total * 100);
+    const amountInPaise = Math.round(Number(order.total) * 100);
 
     let razorpayOrderId: string;
     try {
@@ -96,13 +95,18 @@ export class PaymentsService {
       throw new BadGatewayException('The payment gateway is unavailable. Please try again shortly.');
     }
 
-    order.payment = { ...order.payment, razorpayOrderId };
-    order.markModified('payment');
-    await order.save();
+    unwrap(
+      await this.db
+        .from('orders')
+        .update({ payment: { ...order.payment, razorpayOrderId } })
+        .eq('id', order.id),
+    );
 
-    await this.paymentModel.updateOne(
-      { orderId: order.orderId },
-      { $set: { razorpayOrderId, status: 'pending', method: 'razorpay' } },
+    unwrap(
+      await this.db
+        .from('payments')
+        .update({ razorpayOrderId, status: 'pending', method: 'razorpay' })
+        .eq('orderId', order.orderId),
     );
 
     return {
@@ -139,31 +143,36 @@ export class PaymentsService {
       throw new BadRequestException('Payment signature verification failed.');
     }
 
-    const paidAt = new Date();
-    order.payment = {
-      ...order.payment,
-      status: 'paid',
-      transactionId: dto.razorpayPaymentId,
-      razorpayPaymentId: dto.razorpayPaymentId,
-      razorpaySignature: dto.razorpaySignature,
-      paidAt,
-    };
-    order.statusHistory = [...(order.statusHistory || []), { status: order.status, note: 'Payment received', at: paidAt }];
-    order.markModified('payment');
-    await order.save();
+    const paidAt = new Date().toISOString();
+    unwrap(
+      await this.db
+        .from('orders')
+        .update({
+          payment: {
+            ...order.payment,
+            status: 'paid',
+            transactionId: dto.razorpayPaymentId,
+            razorpayPaymentId: dto.razorpayPaymentId,
+            razorpaySignature: dto.razorpaySignature,
+            paidAt,
+          },
+          statusHistory: [...(order.statusHistory || []), { status: order.status, note: 'Payment received', at: paidAt }],
+        })
+        .eq('id', order.id),
+    );
 
-    await this.paymentModel.updateOne(
-      { orderId: order.orderId },
-      {
-        $set: {
+    unwrap(
+      await this.db
+        .from('payments')
+        .update({
           status: 'paid',
           transactionId: dto.razorpayPaymentId,
           razorpayOrderId: dto.razorpayOrderId,
           razorpayPaymentId: dto.razorpayPaymentId,
           razorpaySignature: dto.razorpaySignature,
           paidAt,
-        },
-      },
+        })
+        .eq('orderId', order.orderId),
     );
 
     return {

@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { MongooseModule } from '@nestjs/mongoose';
+import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { AuthModule } from './modules/auth/auth.module.js';
@@ -18,6 +17,7 @@ import { ReviewsModule } from './modules/reviews/reviews.module.js';
 import { CmsModule } from './modules/cms/cms.module.js';
 import { EngagementModule } from './modules/engagement/engagement.module.js';
 import { DatabaseModule } from './database/database.module.js';
+import { SupabaseModule } from './database/supabase.module.js';
 
 @Module({
   imports: [
@@ -25,13 +25,7 @@ import { DatabaseModule } from './database/database.module.js';
       isGlobal: true,
       envFilePath: '.env',
     }),
-    MongooseModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        uri: configService.get<string>('MONGODB_URI') || 'mongodb://localhost:27017/lustre-and-co',
-      }),
-      inject: [ConfigService],
-    }),
+    SupabaseModule,
     SettingsModule,
     AuthModule,
     UsersModule,

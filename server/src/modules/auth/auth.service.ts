@@ -9,8 +9,6 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
 import * as bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { UsersService } from '../users/users.service.js';
@@ -18,8 +16,10 @@ import { RegisterDto } from './dto/register.dto.js';
 import { LoginDto } from './dto/login.dto.js';
 import { ForgotPasswordDto } from './dto/forgot-password.dto.js';
 import { ResetPasswordDto } from './dto/reset-password.dto.js';
-import { User, UserDocument } from '../users/schemas/user.schema.js';
+import type { UserDocument } from '../users/schemas/user.schema.js';
 import { SmtpService } from './smtp/smtp.service.js';
+import { SupabaseService } from '../../database/supabase.service.js';
+import { toDoc, unwrap } from '../../common/utils/db.js';
 
 const RESET_TOKEN_TTL_MS = 60 * 60 * 1000;
 
@@ -33,17 +33,13 @@ export class AuthService {
     @Inject(UsersService) private readonly usersService: UsersService,
     @Inject(JwtService) private readonly jwtService: JwtService,
     @Inject(ConfigService) private readonly configService: ConfigService,
-    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    @Inject(SupabaseService) private readonly db: SupabaseService,
     private readonly smtpService: SmtpService,
   ) {}
 
   sanitizeUser(user: UserDocument) {
-    const obj = user.toObject ? user.toObject() : (user as any);
-    delete obj.password;
-    delete obj.resetPasswordTokenHash;
-    delete obj.resetPasswordExpires;
-    obj.id = obj._id;
-    return obj;
+    const { password, resetPasswordTokenHash, resetPasswordExpires, ...safe } = user as any;
+    return { ...safe, _id: user.id, id: user.id };
   }
 
   async register(dto: RegisterDto) {
@@ -60,7 +56,7 @@ export class AuthService {
       password: hashedPassword,
       role: 'customer',
       addresses: [],
-      lastLoginAt: new Date(),
+      lastLoginAt: new Date().toISOString(),
     });
 
     await this.smtpService.sendWelcomeEmail(user.email, user.name);
@@ -83,8 +79,7 @@ export class AuthService {
       throw new ForbiddenException('This account has been deactivated. Please contact support.');
     }
 
-    user.lastLoginAt = new Date();
-    await user.save();
+    await this.usersService.touchLastLogin(user.id);
 
     return {
       message: 'Welcome back.',
@@ -94,14 +89,17 @@ export class AuthService {
   }
 
   async googleLogin(profile: any): Promise<{ user: any; token: string }> {
-    const user = await this.userModel.findOne({ googleId: profile.id });
+    const googleId = profile?.googleId || profile?.id;
+    const row = googleId
+      ? unwrap(await this.db.from('users').select('*').eq('googleId', googleId).maybeSingle())
+      : null;
+    const user = toDoc<any>(row) as UserDocument | null;
 
     if (!user || user.isActive === false) {
       throw new UnauthorizedException('Google account not found or deactivated.');
     }
 
-    user.lastLoginAt = new Date();
-    await user.save();
+    await this.usersService.touchLastLogin(user.id);
 
     return {
       user: this.sanitizeUser(user),
@@ -114,9 +112,15 @@ export class AuthService {
 
     if (user && user.isActive !== false) {
       const token = crypto.randomBytes(32).toString('hex');
-      user.resetPasswordTokenHash = hashToken(token);
-      user.resetPasswordExpires = new Date(Date.now() + RESET_TOKEN_TTL_MS);
-      await user.save();
+      unwrap(
+        await this.db
+          .from('users')
+          .update({
+            resetPasswordTokenHash: hashToken(token),
+            resetPasswordExpires: new Date(Date.now() + RESET_TOKEN_TTL_MS).toISOString(),
+          })
+          .eq('id', user.id),
+      );
 
       await this.smtpService.sendPasswordResetEmail(user.email, token);
     }
@@ -128,26 +132,36 @@ export class AuthService {
   }
 
   async resetPassword(dto: ResetPasswordDto) {
-    const user = await this.userModel.findOne({
-      resetPasswordTokenHash: hashToken(dto.token.trim()),
-      resetPasswordExpires: { $gt: new Date() },
-    });
+    const user = unwrap(
+      await this.db
+        .from('users')
+        .select('id')
+        .eq('resetPasswordTokenHash', hashToken(dto.token.trim()))
+        .gt('resetPasswordExpires', new Date().toISOString())
+        .maybeSingle(),
+    );
 
     if (!user) {
       throw new BadRequestException('This reset link is invalid or has expired. Please request a new one.');
     }
 
-    user.password = await bcrypt.hash(dto.password, 10);
-    user.resetPasswordTokenHash = undefined;
-    user.resetPasswordExpires = undefined;
-    await user.save();
+    unwrap(
+      await this.db
+        .from('users')
+        .update({
+          password: await bcrypt.hash(dto.password, 10),
+          resetPasswordTokenHash: null,
+          resetPasswordExpires: null,
+        })
+        .eq('id', user.id),
+    );
 
     return { success: true, message: 'Your password has been reset. You can now sign in.' };
   }
 
   private generateToken(user: UserDocument): string {
     const payload = {
-      sub: user._id.toString(),
+      sub: user.id,
       email: user.email,
       name: user.name,
       role: user.role,
