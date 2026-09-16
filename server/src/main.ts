@@ -7,10 +7,14 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // 1. Enable CORS for Vite Frontend
+  // Browsers send an Origin with no trailing slash, so normalise configured values.
+  const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:5177')
+    .split(',')
+    .map((origin) => origin.trim().replace(/\/+$/, ''))
+    .filter(Boolean);
+
   app.enableCors({
-    origin: (process.env.FRONTEND_URL || 'http://localhost:5177')
-      .split(',')
-      .map((origin) => origin.trim()),
+    origin: allowedOrigins,
     credentials: true,
   });
 
