@@ -133,10 +133,18 @@ export class SeederService {
 
   private async seedContent() {
     await this.insertMissing('pages', SEED_PAGES, 'slug');
-    if ((await countOf(this.db.from('faqs').select('id', { count: 'exact', head: true }))) === 0) {
-      unwrap(await this.db.from('faqs').insert(SEED_FAQS));
+
+    // FAQs have no unique column, so insert the ones whose question is not present yet.
+    const existingQuestions = new Set(
+      (unwrap(await this.db.from('faqs').select('question')) || []).map((f: any) => f.question),
+    );
+    const missingFaqs = SEED_FAQS.filter((faq) => !existingQuestions.has(faq.question));
+    if (missingFaqs.length) {
+      unwrap(await this.db.from('faqs').insert(missingFaqs));
     }
-    this.logger.log(`✅ Content pages (${SEED_PAGES.length}) and FAQs ensured.`);
+    this.logger.log(
+      `✅ Content pages (${SEED_PAGES.length}) ensured; FAQs ensured (${missingFaqs.length} new).`,
+    );
   }
 
   private async seedAdmin() {
