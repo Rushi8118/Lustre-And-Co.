@@ -261,6 +261,22 @@ export function StoreProvider({ children }) {
     [completeSignIn, showToast]
   );
 
+  /** Completes a Google sign-in: the API redirect hands us a token, we load the profile. */
+  const signInWithToken = useCallback(
+    async (token) => {
+      try {
+        localStorage.setItem(TOKEN_KEY, token);
+      } catch {
+        // ignore
+      }
+      const { data } = await api.get("/auth/me");
+      await completeSignIn({ token, user: data.user });
+      showToast(`Welcome, ${data.user.name.split(" ")[0]}.`, "success");
+      return data.user;
+    },
+    [completeSignIn, showToast]
+  );
+
   const logout = useCallback(() => {
     clearSession();
     showToast("You have been signed out.");
@@ -569,6 +585,7 @@ export function StoreProvider({ children }) {
       removePromoCode,
       login,
       register,
+      signInWithToken,
       logout,
       updateUser,
       placeOrder,
@@ -602,6 +619,7 @@ export function StoreProvider({ children }) {
       removePromoCode,
       login,
       register,
+      signInWithToken,
       logout,
       updateUser,
       placeOrder,

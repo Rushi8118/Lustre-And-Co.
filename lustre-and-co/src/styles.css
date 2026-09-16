@@ -11893,4 +11893,152 @@ a.button,
   }
 }
 
-
+
+/* ---------------------------------------------------------------------------
+   Auth pages fit the viewport: the sign-in and sign-up screens never scroll the
+   page itself. Only the form column scrolls, and only when it has to.
+   --------------------------------------------------------------------------- */
+
+.auth-page {
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.auth-layout {
+  height: 100%;
+  min-height: 0;
+  align-items: stretch;
+}
+
+.auth-brand-panel {
+  min-height: 0;
+  height: 100%;
+  justify-content: space-between;
+  padding-top: clamp(24px, 4vh, 48px);
+  padding-bottom: clamp(24px, 4vh, 48px);
+  overflow: hidden;
+}
+
+.auth-form-panel {
+  min-height: 0;
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-top: clamp(18px, 3vh, 44px);
+  padding-bottom: clamp(18px, 3vh, 44px);
+}
+
+/* Tighten the vertical rhythm so the longer sign-up form still fits. */
+.auth-form-content {
+  margin-top: clamp(14px, 3vh, 40px);
+  margin-bottom: clamp(14px, 2vh, 32px);
+}
+
+.auth-form-heading {
+  margin-bottom: clamp(12px, 2vh, 24px);
+}
+
+.auth-form-heading h2 {
+  font-size: clamp(26px, 3.4vh, 42px);
+  line-height: 1.12;
+}
+
+.auth-modern-form {
+  gap: clamp(9px, 1.5vh, 16px);
+}
+
+.auth-field > span {
+  margin-bottom: 4px;
+}
+
+.auth-divider {
+  margin: clamp(6px, 1.2vh, 14px) 0;
+}
+
+.auth-bottom-note {
+  margin-top: clamp(8px, 1.5vh, 18px);
+}
+
+@media (max-width: 760px) {
+  .auth-layout {
+    display: block;
+  }
+
+  .auth-form-panel {
+    min-height: 0;
+    height: 100%;
+  }
+
+  .auth-form-content {
+    width: min(100%, 520px);
+    margin: clamp(12px, 3vh, 40px) auto clamp(12px, 2vh, 30px);
+  }
+}
+
+/* Short windows (or a browser zoomed in): shrink the decorative parts first. */
+@media (max-height: 760px) {
+  .auth-visual-scene,
+  .auth-brand-footer {
+    display: none;
+  }
+
+  .auth-brand-copy h1 {
+    font-size: clamp(30px, 5vh, 44px);
+  }
+}
+
+/* The "signing you in" screen after the Google redirect. */
+.auth-page-simple {
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.auth-callback-card {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: min(100%, 420px);
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 40px 32px;
+  border: 1px solid var(--auth-line, rgba(34, 34, 34, 0.13));
+  border-radius: 18px;
+  background: rgba(255, 253, 248, 0.9);
+  text-align: center;
+}
+
+.auth-callback-card h2 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.auth-callback-card p {
+  margin: 0;
+  color: var(--auth-muted, #777169);
+  font-size: 14px;
+}
+
+.auth-callback-spinner {
+  width: 30px;
+  height: 30px;
+  border: 2px solid rgba(214, 181, 109, 0.3);
+  border-top-color: var(--auth-gold, #d6b56d);
+  border-radius: 50%;
+  animation: auth-callback-spin 0.9s linear infinite;
+}
+
+@keyframes auth-callback-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-callback-spinner {
+    animation-duration: 3s;
+  }
+}

@@ -719,6 +719,827 @@ export const products = [
       "Smooth rounded inner rim",
       "Traditional North Indian bridal styling"
     ]
+  },
+  {
+      "id": "p19",
+      "slug": "lyra-layered-coin-necklace",
+      "name": "Lyra Layered Coin Necklace",
+      "category": "necklaces",
+      "collection": "everyday",
+      "occasion": "everyday",
+      "price": 1699,
+      "finish": "18K Gold Plated",
+      "material": "Gold-plated brass",
+      "color": "Gold",
+      "availableColors": [
+          "Gold",
+          "Rose gold",
+          "Silver"
+      ],
+      "availableSizes": [
+          "Standard (16\" + 18\")"
+      ],
+      "availability": "in-stock",
+      "stockQuantity": 55,
+      "popularity": 84,
+      "dateAdded": "2026-09-01",
+      "tags": [
+          "new",
+          "everyday"
+      ],
+      "image": "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=1200&q=85",
+      "gallery": [
+          "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=1200&q=85",
+          "https://images.unsplash.com/photo-1599643477877-530eb83abc8e?auto=format&fit=crop&w=1200&q=85",
+          "https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "description": "Two delicate chains layered as one, finished with a hammered coin pendant that catches the light with every movement.",
+      "details": [
+          "Double-layer chain: 16 inch and 18 inch",
+          "Hammered 12mm coin pendant",
+          "18K micro-gold plating",
+          "Lobster clasp with brand charm"
+      ],
+      "care": [
+          "Avoid contact with perfume, lotion, and household chemicals.",
+          "Remove before swimming, bathing, or sleeping.",
+          "Wipe with the enclosed polishing cloth after wear.",
+          "Store in the velvet pouch to prevent scratches."
+      ],
+      "shipping": [
+          "Dispatched within 1-2 business days.",
+          "Complimentary standard shipping on orders over Rs. 1,999.",
+          "Standard delivery: 3-5 business days with tracking.",
+          "Arrives in a signature gift box."
+      ],
+      "returns": [
+          "Easy returns within 7 days of delivery.",
+          "Item must be unworn and in original packaging.",
+          "Refunds are issued to the original payment method."
+      ],
+      "oldPrice": 2399,
+      "badge": "New",
+      "customerReviews": [
+          {
+              "author": "Ishita R.",
+              "rating": 5,
+              "title": "Everyday favourite",
+              "comment": "The layering looks expensive and it has not tarnished at all."
+          },
+          {
+              "author": "Neha P.",
+              "rating": 4,
+              "title": "Pretty and light",
+              "comment": "Very light on the neck. The clasp is a little small but manageable."
+          }
+      ]
+  },
+  {
+      "id": "p20",
+      "slug": "orla-pearl-strand-necklace",
+      "name": "Orla Pearl Strand Necklace",
+      "category": "necklaces",
+      "collection": "bridal",
+      "occasion": "bridal",
+      "price": 2199,
+      "finish": "18K Gold Plated",
+      "material": "Imitation pearl & alloy",
+      "color": "Gold",
+      "availableColors": [
+          "Gold",
+          "Rose gold",
+          "Silver"
+      ],
+      "availableSizes": [
+          "Standard"
+      ],
+      "availability": "in-stock",
+      "stockQuantity": 30,
+      "popularity": 76,
+      "dateAdded": "2026-09-01",
+      "tags": [
+          "bridal",
+          "new"
+      ],
+      "image": "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1200&q=85",
+      "gallery": [
+          "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1200&q=85",
+          "https://images.unsplash.com/photo-1599643477877-530eb83abc8e?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "description": "A single strand of hand-knotted imitation pearls with a softly luminous finish, made for occasions that call for quiet polish.",
+      "details": [
+          "Hand-knotted 7mm imitation pearls",
+          "18-inch strand with 2-inch extender",
+          "Champagne-gold toned clasp"
+      ],
+      "care": [
+          "Avoid contact with perfume, lotion, and household chemicals.",
+          "Remove before swimming, bathing, or sleeping.",
+          "Wipe with the enclosed polishing cloth after wear.",
+          "Store in the velvet pouch to prevent scratches."
+      ],
+      "shipping": [
+          "Dispatched within 1-2 business days.",
+          "Complimentary standard shipping on orders over Rs. 1,999.",
+          "Standard delivery: 3-5 business days with tracking.",
+          "Arrives in a signature gift box."
+      ],
+      "returns": [
+          "Easy returns within 7 days of delivery.",
+          "Item must be unworn and in original packaging.",
+          "Refunds are issued to the original payment method."
+      ]
+  },
+  {
+      "id": "p21",
+      "slug": "nova-starlight-pendant",
+      "name": "Nova Starlight Pendant",
+      "category": "necklaces",
+      "collection": "everyday",
+      "occasion": "everyday",
+      "price": 1299,
+      "finish": "18K Gold Plated",
+      "material": "Gold-plated brass",
+      "color": "Gold",
+      "availableColors": [
+          "Gold",
+          "Rose gold",
+          "Silver"
+      ],
+      "availableSizes": [
+          "Standard"
+      ],
+      "availability": "in-stock",
+      "stockQuantity": 65,
+      "popularity": 90,
+      "dateAdded": "2026-09-01",
+      "tags": [
+          "new",
+          "bestseller"
+      ],
+      "image": "https://images.unsplash.com/photo-1599643477877-530eb83abc8e?auto=format&fit=crop&w=1200&q=85",
+      "gallery": [
+          "https://images.unsplash.com/photo-1599643477877-530eb83abc8e?auto=format&fit=crop&w=1200&q=85",
+          "https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "description": "A faceted solitaire drop on a whisper-fine chain - the piece to reach for when you want one point of sparkle.",
+      "details": [
+          "6mm faceted crystal solitaire",
+          "Fine cable chain, 16 inch + 2 inch",
+          "Hypoallergenic, nickel-free"
+      ],
+      "care": [
+          "Avoid contact with perfume, lotion, and household chemicals.",
+          "Remove before swimming, bathing, or sleeping.",
+          "Wipe with the enclosed polishing cloth after wear.",
+          "Store in the velvet pouch to prevent scratches."
+      ],
+      "shipping": [
+          "Dispatched within 1-2 business days.",
+          "Complimentary standard shipping on orders over Rs. 1,999.",
+          "Standard delivery: 3-5 business days with tracking.",
+          "Arrives in a signature gift box."
+      ],
+      "returns": [
+          "Easy returns within 7 days of delivery.",
+          "Item must be unworn and in original packaging.",
+          "Refunds are issued to the original payment method."
+      ],
+      "oldPrice": 1799,
+      "badge": "Bestseller"
+  },
+  {
+      "id": "p22",
+      "slug": "isla-pearl-huggie-earrings",
+      "name": "Isla Pearl Huggie Earrings",
+      "category": "earrings",
+      "collection": "everyday",
+      "occasion": "everyday",
+      "price": 899,
+      "finish": "18K Gold Plated",
+      "material": "Gold-plated brass",
+      "color": "Gold",
+      "availableColors": [
+          "Gold",
+          "Rose gold",
+          "Silver"
+      ],
+      "availableSizes": [
+          "One size"
+      ],
+      "availability": "in-stock",
+      "stockQuantity": 80,
+      "popularity": 88,
+      "dateAdded": "2026-09-01",
+      "tags": [
+          "new",
+          "everyday"
+      ],
+      "image": "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=1200&q=85",
+      "gallery": [
+          "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=1200&q=85",
+          "https://images.unsplash.com/photo-1596944924616-7b38e7cfac36?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "description": "Snug huggie hoops topped with a single pearl, light enough to forget you are wearing them.",
+      "details": [
+          "12mm huggie hoop",
+          "6mm imitation pearl",
+          "Secure snap closure",
+          "Weight: 2.1g per earring"
+      ],
+      "care": [
+          "Avoid contact with perfume, lotion, and household chemicals.",
+          "Remove before swimming, bathing, or sleeping.",
+          "Wipe with the enclosed polishing cloth after wear.",
+          "Store in the velvet pouch to prevent scratches."
+      ],
+      "shipping": [
+          "Dispatched within 1-2 business days.",
+          "Complimentary standard shipping on orders over Rs. 1,999.",
+          "Standard delivery: 3-5 business days with tracking.",
+          "Arrives in a signature gift box."
+      ],
+      "returns": [
+          "Easy returns within 7 days of delivery.",
+          "Item must be unworn and in original packaging.",
+          "Refunds are issued to the original payment method."
+      ],
+      "oldPrice": 1299,
+      "badge": "New"
+  },
+  {
+      "id": "p23",
+      "slug": "mira-chandelier-earrings",
+      "name": "Mira Chandelier Earrings",
+      "category": "earrings",
+      "collection": "bridal",
+      "occasion": "party",
+      "price": 2499,
+      "finish": "Champagne Gold",
+      "material": "Crystal & gold-tone alloy",
+      "color": "Gold",
+      "availableColors": [
+          "Gold",
+          "Rose gold",
+          "Silver"
+      ],
+      "availableSizes": [
+          "Standard"
+      ],
+      "availability": "in-stock",
+      "stockQuantity": 25,
+      "popularity": 72,
+      "dateAdded": "2026-09-01",
+      "tags": [
+          "bridal",
+          "party"
+      ],
+      "image": "https://images.unsplash.com/photo-1596944924616-7b38e7cfac36?auto=format&fit=crop&w=1200&q=85",
+      "gallery": [
+          "https://images.unsplash.com/photo-1596944924616-7b38e7cfac36?auto=format&fit=crop&w=1200&q=85",
+          "https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "description": "Tiered chandelier drops with cascading crystals, designed to move and shimmer under evening light.",
+      "details": [
+          "Length: 68mm",
+          "Three tiers of faceted crystals",
+          "Secure fish-hook fitting"
+      ],
+      "care": [
+          "Avoid contact with perfume, lotion, and household chemicals.",
+          "Remove before swimming, bathing, or sleeping.",
+          "Wipe with the enclosed polishing cloth after wear.",
+          "Store in the velvet pouch to prevent scratches."
+      ],
+      "shipping": [
+          "Dispatched within 1-2 business days.",
+          "Complimentary standard shipping on orders over Rs. 1,999.",
+          "Standard delivery: 3-5 business days with tracking.",
+          "Arrives in a signature gift box."
+      ],
+      "returns": [
+          "Easy returns within 7 days of delivery.",
+          "Item must be unworn and in original packaging.",
+          "Refunds are issued to the original payment method."
+      ],
+      "oldPrice": 3299
+  },
+  {
+      "id": "p24",
+      "slug": "freya-threader-drops",
+      "name": "Freya Threader Drops",
+      "category": "earrings",
+      "collection": "everyday",
+      "occasion": "everyday",
+      "price": 749,
+      "finish": "18K Gold Plated",
+      "material": "Gold-plated brass",
+      "color": "Gold",
+      "availableColors": [
+          "Gold",
+          "Rose gold",
+          "Silver"
+      ],
+      "availableSizes": [
+          "One size"
+      ],
+      "availability": "in-stock",
+      "stockQuantity": 70,
+      "popularity": 64,
+      "dateAdded": "2026-09-01",
+      "tags": [
+          "new"
+      ],
+      "image": "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=1200&q=85",
+      "gallery": [
+          "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=1200&q=85",
+          "https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "description": "Minimal threader earrings that slip through the lobe and fall into a fine line of gold.",
+      "details": [
+          "Threader length: 60mm",
+          "Fine snake chain",
+          "Sold as a pair"
+      ],
+      "care": [
+          "Avoid contact with perfume, lotion, and household chemicals.",
+          "Remove before swimming, bathing, or sleeping.",
+          "Wipe with the enclosed polishing cloth after wear.",
+          "Store in the velvet pouch to prevent scratches."
+      ],
+      "shipping": [
+          "Dispatched within 1-2 business days.",
+          "Complimentary standard shipping on orders over Rs. 1,999.",
+          "Standard delivery: 3-5 business days with tracking.",
+          "Arrives in a signature gift box."
+      ],
+      "returns": [
+          "Easy returns within 7 days of delivery.",
+          "Item must be unworn and in original packaging.",
+          "Refunds are issued to the original payment method."
+      ]
+  },
+  {
+      "id": "p25",
+      "slug": "cleo-signet-ring",
+      "name": "Cleo Signet Ring",
+      "category": "rings",
+      "collection": "everyday",
+      "occasion": "everyday",
+      "price": 1099,
+      "finish": "18K Gold Plated",
+      "material": "Gold-plated brass",
+      "color": "Gold",
+      "availableColors": [
+          "Gold",
+          "Rose gold",
+          "Silver"
+      ],
+      "availableSizes": [
+          "6",
+          "7",
+          "8",
+          "9"
+      ],
+      "availability": "in-stock",
+      "stockQuantity": 45,
+      "popularity": 86,
+      "dateAdded": "2026-09-01",
+      "tags": [
+          "new",
+          "bestseller"
+      ],
+      "image": "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=1200&q=85",
+      "gallery": [
+          "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=1200&q=85",
+          "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "description": "A smooth, sculpted signet with a softly domed face - the quiet statement piece of the collection.",
+      "details": [
+          "12mm oval signet face",
+          "Comfort-fit band",
+          "Tarnish-resistant lacquer"
+      ],
+      "care": [
+          "Avoid contact with perfume, lotion, and household chemicals.",
+          "Remove before swimming, bathing, or sleeping.",
+          "Wipe with the enclosed polishing cloth after wear.",
+          "Store in the velvet pouch to prevent scratches."
+      ],
+      "shipping": [
+          "Dispatched within 1-2 business days.",
+          "Complimentary standard shipping on orders over Rs. 1,999.",
+          "Standard delivery: 3-5 business days with tracking.",
+          "Arrives in a signature gift box."
+      ],
+      "returns": [
+          "Easy returns within 7 days of delivery.",
+          "Item must be unworn and in original packaging.",
+          "Refunds are issued to the original payment method."
+      ]
+  },
+  {
+      "id": "p26",
+      "slug": "elsa-stacking-ring-set",
+      "name": "Elsa Stacking Ring Set",
+      "category": "rings",
+      "collection": "everyday",
+      "occasion": "everyday",
+      "price": 1349,
+      "finish": "18K Gold Plated",
+      "material": "Gold-plated brass",
+      "color": "Gold",
+      "availableColors": [
+          "Gold",
+          "Rose gold",
+          "Silver"
+      ],
+      "availableSizes": [
+          "6",
+          "7",
+          "8"
+      ],
+      "availability": "in-stock",
+      "stockQuantity": 50,
+      "popularity": 79,
+      "dateAdded": "2026-09-01",
+      "tags": [
+          "new",
+          "everyday"
+      ],
+      "image": "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?auto=format&fit=crop&w=1200&q=85",
+      "gallery": [
+          "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?auto=format&fit=crop&w=1200&q=85",
+          "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "description": "Three slim bands - plain, twisted, and pave - made to be worn together or spread across fingers.",
+      "details": [
+          "Set of 3 stackable bands",
+          "1.5mm band width",
+          "Mixed plain, rope, and pave textures"
+      ],
+      "care": [
+          "Avoid contact with perfume, lotion, and household chemicals.",
+          "Remove before swimming, bathing, or sleeping.",
+          "Wipe with the enclosed polishing cloth after wear.",
+          "Store in the velvet pouch to prevent scratches."
+      ],
+      "shipping": [
+          "Dispatched within 1-2 business days.",
+          "Complimentary standard shipping on orders over Rs. 1,999.",
+          "Standard delivery: 3-5 business days with tracking.",
+          "Arrives in a signature gift box."
+      ],
+      "returns": [
+          "Easy returns within 7 days of delivery.",
+          "Item must be unworn and in original packaging.",
+          "Refunds are issued to the original payment method."
+      ],
+      "oldPrice": 1899,
+      "badge": "Set of 3"
+  },
+  {
+      "id": "p27",
+      "slug": "juno-cocktail-ring",
+      "name": "Juno Cocktail Ring",
+      "category": "rings",
+      "collection": "everyday",
+      "occasion": "party",
+      "price": 1599,
+      "finish": "18K Gold Plated",
+      "material": "Crystal & gold-tone alloy",
+      "color": "Gold",
+      "availableColors": [
+          "Gold",
+          "Rose gold",
+          "Silver"
+      ],
+      "availableSizes": [
+          "Adjustable"
+      ],
+      "availability": "in-stock",
+      "stockQuantity": 28,
+      "popularity": 68,
+      "dateAdded": "2026-09-01",
+      "tags": [
+          "party",
+          "festive"
+      ],
+      "image": "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=1200&q=85",
+      "gallery": [
+          "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=1200&q=85",
+          "https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "description": "An oversized emerald-cut stone in a halo setting, built for evenings that deserve a little drama.",
+      "details": [
+          "14mm emerald-cut centre stone",
+          "Pave halo surround",
+          "Adjustable band"
+      ],
+      "care": [
+          "Avoid contact with perfume, lotion, and household chemicals.",
+          "Remove before swimming, bathing, or sleeping.",
+          "Wipe with the enclosed polishing cloth after wear.",
+          "Store in the velvet pouch to prevent scratches."
+      ],
+      "shipping": [
+          "Dispatched within 1-2 business days.",
+          "Complimentary standard shipping on orders over Rs. 1,999.",
+          "Standard delivery: 3-5 business days with tracking.",
+          "Arrives in a signature gift box."
+      ],
+      "returns": [
+          "Easy returns within 7 days of delivery.",
+          "Item must be unworn and in original packaging.",
+          "Refunds are issued to the original payment method."
+      ],
+      "oldPrice": 2199
+  },
+  {
+      "id": "p28",
+      "slug": "sera-tennis-bracelet",
+      "name": "Sera Tennis Bracelet",
+      "category": "bracelets",
+      "collection": "everyday",
+      "occasion": "everyday",
+      "price": 1899,
+      "finish": "18K Gold Plated",
+      "material": "Gold-plated brass",
+      "color": "Gold",
+      "availableColors": [
+          "Gold",
+          "Rose gold",
+          "Silver"
+      ],
+      "availableSizes": [
+          "7 inches"
+      ],
+      "availability": "in-stock",
+      "stockQuantity": 40,
+      "popularity": 91,
+      "dateAdded": "2026-09-01",
+      "tags": [
+          "bestseller",
+          "party"
+      ],
+      "image": "https://images.unsplash.com/photo-1611591475152-4783113828af?auto=format&fit=crop&w=1200&q=85",
+      "gallery": [
+          "https://images.unsplash.com/photo-1611591475152-4783113828af?auto=format&fit=crop&w=1200&q=85",
+          "https://images.unsplash.com/photo-1630019852942-f89202989a59?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "description": "A classic line of graduated crystals in a slim setting, with a fold-over clasp that sits flat on the wrist.",
+      "details": [
+          "Length: 7 inches",
+          "3mm graduated crystals",
+          "Fold-over safety clasp"
+      ],
+      "care": [
+          "Avoid contact with perfume, lotion, and household chemicals.",
+          "Remove before swimming, bathing, or sleeping.",
+          "Wipe with the enclosed polishing cloth after wear.",
+          "Store in the velvet pouch to prevent scratches."
+      ],
+      "shipping": [
+          "Dispatched within 1-2 business days.",
+          "Complimentary standard shipping on orders over Rs. 1,999.",
+          "Standard delivery: 3-5 business days with tracking.",
+          "Arrives in a signature gift box."
+      ],
+      "returns": [
+          "Easy returns within 7 days of delivery.",
+          "Item must be unworn and in original packaging.",
+          "Refunds are issued to the original payment method."
+      ],
+      "oldPrice": 2599,
+      "badge": "Bestseller"
+  },
+  {
+      "id": "p29",
+      "slug": "noor-charm-bracelet",
+      "name": "Noor Charm Bracelet",
+      "category": "bracelets",
+      "collection": "everyday",
+      "occasion": "everyday",
+      "price": 1249,
+      "finish": "18K Gold Plated",
+      "material": "Gold-plated brass",
+      "color": "Gold",
+      "availableColors": [
+          "Gold",
+          "Rose gold",
+          "Silver"
+      ],
+      "availableSizes": [
+          "Adjustable"
+      ],
+      "availability": "in-stock",
+      "stockQuantity": 55,
+      "popularity": 70,
+      "dateAdded": "2026-09-01",
+      "tags": [
+          "new",
+          "everyday"
+      ],
+      "image": "https://images.unsplash.com/photo-1630019852942-f89202989a59?auto=format&fit=crop&w=1200&q=85",
+      "gallery": [
+          "https://images.unsplash.com/photo-1630019852942-f89202989a59?auto=format&fit=crop&w=1200&q=85",
+          "https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "description": "A fine curb chain hung with a trio of charms - a pearl, a coin, and a tiny star.",
+      "details": [
+          "Adjustable 6.5 inch - 8 inch chain",
+          "Three removable charms",
+          "Lobster clasp"
+      ],
+      "care": [
+          "Avoid contact with perfume, lotion, and household chemicals.",
+          "Remove before swimming, bathing, or sleeping.",
+          "Wipe with the enclosed polishing cloth after wear.",
+          "Store in the velvet pouch to prevent scratches."
+      ],
+      "shipping": [
+          "Dispatched within 1-2 business days.",
+          "Complimentary standard shipping on orders over Rs. 1,999.",
+          "Standard delivery: 3-5 business days with tracking.",
+          "Arrives in a signature gift box."
+      ],
+      "returns": [
+          "Easy returns within 7 days of delivery.",
+          "Item must be unworn and in original packaging.",
+          "Refunds are issued to the original payment method."
+      ]
+  },
+  {
+      "id": "p30",
+      "slug": "amara-temple-bangle-set",
+      "name": "Amara Temple Bangle Set",
+      "category": "bangles",
+      "collection": "bridal",
+      "occasion": "festive",
+      "price": 2899,
+      "finish": "Antique Gold",
+      "material": "Gold-tone alloy & stones",
+      "color": "Gold",
+      "availableColors": [
+          "Gold",
+          "Rose gold",
+          "Silver"
+      ],
+      "availableSizes": [
+          "2.4",
+          "2.6",
+          "2.8"
+      ],
+      "availability": "in-stock",
+      "stockQuantity": 20,
+      "popularity": 74,
+      "dateAdded": "2026-09-01",
+      "tags": [
+          "bridal",
+          "festive"
+      ],
+      "image": "https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=1200&q=85",
+      "gallery": [
+          "https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=1200&q=85",
+          "https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "description": "Antique-finish bangles with temple motifs and ruby-toned stones, made for festive and bridal wear.",
+      "details": [
+          "Set of 4 bangles",
+          "Traditional temple motif",
+          "Ruby-toned stone detailing"
+      ],
+      "care": [
+          "Avoid contact with perfume, lotion, and household chemicals.",
+          "Remove before swimming, bathing, or sleeping.",
+          "Wipe with the enclosed polishing cloth after wear.",
+          "Store in the velvet pouch to prevent scratches."
+      ],
+      "shipping": [
+          "Dispatched within 1-2 business days.",
+          "Complimentary standard shipping on orders over Rs. 1,999.",
+          "Standard delivery: 3-5 business days with tracking.",
+          "Arrives in a signature gift box."
+      ],
+      "returns": [
+          "Easy returns within 7 days of delivery.",
+          "Item must be unworn and in original packaging.",
+          "Refunds are issued to the original payment method."
+      ],
+      "oldPrice": 3999,
+      "badge": "Set of 4"
+  },
+  {
+      "id": "p31",
+      "slug": "kiara-pearl-anklet",
+      "name": "Kiara Pearl Anklet",
+      "category": "anklets",
+      "collection": "everyday",
+      "occasion": "everyday",
+      "price": 699,
+      "finish": "18K Gold Plated",
+      "material": "Gold-plated brass",
+      "color": "Gold",
+      "availableColors": [
+          "Gold",
+          "Rose gold",
+          "Silver"
+      ],
+      "availableSizes": [
+          "Adjustable"
+      ],
+      "availability": "in-stock",
+      "stockQuantity": 60,
+      "popularity": 66,
+      "dateAdded": "2026-09-01",
+      "tags": [
+          "new",
+          "everyday"
+      ],
+      "image": "https://images.unsplash.com/photo-1611591475152-4783113828af?auto=format&fit=crop&w=1200&q=85",
+      "gallery": [
+          "https://images.unsplash.com/photo-1611591475152-4783113828af?auto=format&fit=crop&w=1200&q=85",
+          "https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "description": "A fine chain anklet dotted with tiny pearls, finished with an adjustable extender.",
+      "details": [
+          "Adjustable 9 inch - 10.5 inch",
+          "3mm imitation pearls",
+          "Water-resistant lacquer finish"
+      ],
+      "care": [
+          "Avoid contact with perfume, lotion, and household chemicals.",
+          "Remove before swimming, bathing, or sleeping.",
+          "Wipe with the enclosed polishing cloth after wear.",
+          "Store in the velvet pouch to prevent scratches."
+      ],
+      "shipping": [
+          "Dispatched within 1-2 business days.",
+          "Complimentary standard shipping on orders over Rs. 1,999.",
+          "Standard delivery: 3-5 business days with tracking.",
+          "Arrives in a signature gift box."
+      ],
+      "returns": [
+          "Easy returns within 7 days of delivery.",
+          "Item must be unworn and in original packaging.",
+          "Refunds are issued to the original payment method."
+      ],
+      "oldPrice": 999,
+      "badge": "New"
+  },
+  {
+      "id": "p32",
+      "slug": "tara-ghungroo-anklet-pair",
+      "name": "Tara Ghungroo Anklet Pair",
+      "category": "anklets",
+      "collection": "everyday",
+      "occasion": "festive",
+      "price": 949,
+      "finish": "Silver Tone",
+      "material": "Silver-tone alloy",
+      "color": "Silver",
+      "availableColors": [
+          "Silver",
+          "Oxidised silver"
+      ],
+      "availableSizes": [
+          "Adjustable"
+      ],
+      "availability": "in-stock",
+      "stockQuantity": 35,
+      "popularity": 61,
+      "dateAdded": "2026-09-01",
+      "tags": [
+          "festive"
+      ],
+      "image": "https://images.unsplash.com/photo-1630019852942-f89202989a59?auto=format&fit=crop&w=1200&q=85",
+      "gallery": [
+          "https://images.unsplash.com/photo-1630019852942-f89202989a59?auto=format&fit=crop&w=1200&q=85",
+          "https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "description": "A traditional pair of anklets strung with fine ghungroo bells that chime softly as you move.",
+      "details": [
+          "Sold as a pair",
+          "Hand-strung ghungroo bells",
+          "Adjustable hook closure"
+      ],
+      "care": [
+          "Avoid contact with perfume, lotion, and household chemicals.",
+          "Remove before swimming, bathing, or sleeping.",
+          "Wipe with the enclosed polishing cloth after wear.",
+          "Store in the velvet pouch to prevent scratches."
+      ],
+      "shipping": [
+          "Dispatched within 1-2 business days.",
+          "Complimentary standard shipping on orders over Rs. 1,999.",
+          "Standard delivery: 3-5 business days with tracking.",
+          "Arrives in a signature gift box."
+      ],
+      "returns": [
+          "Easy returns within 7 days of delivery.",
+          "Item must be unworn and in original packaging.",
+          "Refunds are issued to the original payment method."
+      ]
   }
 ];
 

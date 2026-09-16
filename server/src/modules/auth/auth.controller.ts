@@ -1,4 +1,6 @@
-import { Controller, Post, Get, Body, UseGuards, Inject, HttpCode, Req } from '@nestjs/common';
+import { Controller, Post, Get, Body, UseGuards, Inject, HttpCode, Req, Res } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import type { Response } from 'express';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthService } from './auth.service.js';
 import { RegisterDto } from './dto/register.dto.js';
@@ -9,11 +11,15 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
 import { GoogleAuthGuard } from './guards/google-auth.guard.js';
 import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
 import type { UserDocument } from '../users/schemas/user.schema.js';
+import { getFrontendUrl } from '../../common/utils/google.js';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(@Inject(AuthService) private readonly authService: AuthService) {}
+  constructor(
+    @Inject(AuthService) private readonly authService: AuthService,
+    @Inject(ConfigService) private readonly configService: ConfigService,
+  ) {}
 
   @Post('register')
   @ApiOperation({ summary: 'Create a new customer account' })
@@ -42,10 +48,17 @@ export class AuthController {
 
   @Get('google/callback')
   @UseGuards(GoogleAuthGuard)
-  @ApiOperation({ summary: 'Google OAuth callback' })
-  async googleCallback(@Req() req: any) {
-    const user = await this.authService.googleLogin(req.user);
-    return { user, token: user.token };
+  @ApiOperation({ summary: 'Google OAuth callback; redirects back to the storefront with a token' })
+  async googleCallback(@Req() req: any, @Res() res: Response) {
+    const frontendUrl = getFrontendUrl(this.configService);
+    try {
+      const { token } = await this.authService.googleLogin(req.user);
+      res.redirect(`${frontendUrl}/account/oauth?token=${encodeURIComponent(token)}`);
+    } catch {
+      res.redirect(
+        `${frontendUrl}/account/login?error=${encodeURIComponent('Google sign-in failed. Please try again.')}`,
+      );
+    }
   }
 
   @Get('me')

@@ -61,12 +61,26 @@ export const SEED_CATEGORIES = [
     showInMenu: true,
     showOnHome: false,
   },
+  {
+    name: 'Anklets',
+    slug: 'anklets',
+    eyebrow: 'Anklet Collection',
+    title: 'Anklets & Payals',
+    description: 'Fine chains, pearl accents, and traditional ghungroo payals for everyday and festive wear.',
+    image: 'https://images.unsplash.com/photo-1611591475152-4783113828af?auto=format&fit=crop&w=900&q=85',
+    sortOrder: 6,
+    isActive: true,
+    showInMenu: true,
+    showOnHome: true,
+  },
 ];
 
 export const SEED_COUPONS = [
   { code: 'SHINE10', type: 'percentage', value: 0.1, minOrderAmount: 0, usageLimit: 0, usedCount: 0, isActive: true, description: 'Newsletter welcome offer' },
   { code: 'LUSTRE20', type: 'percentage', value: 0.2, minOrderAmount: 1999, usageLimit: 0, usedCount: 0, isActive: true, description: '20% off orders above ₹1,999' },
   { code: 'FREESHIP', type: 'free_shipping', value: 0, minOrderAmount: 0, usageLimit: 0, usedCount: 0, isActive: true, description: 'Free standard delivery' },
+  { code: 'WELCOME5', type: 'fixed', value: 250, minOrderAmount: 999, usageLimit: 0, usedCount: 0, isActive: true, description: 'Rs. 250 off your first order' },
+  { code: 'FESTIVE15', type: 'percentage', value: 0.15, minOrderAmount: 2499, usageLimit: 500, usedCount: 0, isActive: true, description: 'Festive season offer' },
   { code: 'BRIDAL25', type: 'percentage', value: 0.25, minOrderAmount: 4999, usageLimit: 0, usedCount: 0, isActive: true, description: 'Bridal edit offer' },
 ];
 
@@ -250,5 +264,9 @@ export const SEED_FAQS = [
   faq('Shipping and returns', 2, 'What is the return period?', 'Eligible items may be returned within 7 days of delivery in their original condition.'),
   faq('Shipping and returns', 3, 'How can I track my order?', 'Use the Track My Order page with your order number and email address.'),
   faq('Payments', 1, 'Which payment methods are available?', 'Cash on delivery is available for eligible orders, and online payment is offered at checkout when enabled.'),
+  faq('Orders', 4, 'Do you offer gift wrapping?', 'Every order arrives in a signature gift box with a velvet pouch, at no extra cost. Add a gift note at checkout.'),
+  faq('Products', 4, 'How do I choose my ring size?', 'Measure the inner diameter of a ring you already wear and compare it with the size guide on each ring product page. Adjustable styles are marked on the listing.'),
+  faq('Products', 5, 'Will the plating fade?', 'Our 18K micro-gold plating is finished with a protective lacquer. With the care steps on each product page, it keeps its shine for a year or more of regular wear.'),
+  faq('Shipping and returns', 4, 'Do you ship across India?', 'Yes. We deliver to all serviceable PIN codes across India, with express delivery available at checkout in major cities.'),
   faq('Payments', 2, 'Are online payments secure?', 'Online payments are processed by our payment gateway. We never see or store your complete card details.'),
 ];

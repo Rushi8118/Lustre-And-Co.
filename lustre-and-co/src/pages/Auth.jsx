@@ -1,10 +1,13 @@
 import { useMemo, useState } from "react";
 import { ArrowRight, Check, Eye, EyeOff, Heart, LockKeyhole, Mail, Sparkles, UserRound, Github } from "lucide-react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useStore } from "../context/StoreContext";
 import { useSettings } from "../context/SettingsContext";
 import { getErrorMessage } from "../services/api";
+
+/** The API lives on its own origin, so Google sign-in is a full page navigation to it. */
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
 
 const benefits = ["Save your favorite pieces", "Track orders effortlessly", "Enjoy a faster checkout"];
 
@@ -88,6 +91,7 @@ export default function Auth({ mode = "login" }) {
   const isLogin = mode === "login";
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const { login, register } = useStore();
   const { settings } = useSettings();
   const storeName = settings.store.name;
@@ -95,9 +99,10 @@ export default function Auth({ mode = "login" }) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formError, setFormError] = useState("");
+  const [formError, setFormError] = useState(() => searchParams.get("error") || "");
   const [agreed, setAgreed] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "" });
+  const googleEnabled = settings.auth?.googleEnabled;
   const [touched, setTouched] = useState({});
 
   const strength = useMemo(() => getPasswordStrength(form.password), [form.password]);
@@ -344,20 +349,24 @@ export default function Auth({ mode = "login" }) {
                 {!isSubmitting && <ArrowRight size={17} />}
               </button>
 
-              <div className="auth-divider">
-                <span>or continue with</span>
-              </div>
+              {googleEnabled && (
+                <>
+                  <div className="auth-divider">
+                    <span>or continue with</span>
+                  </div>
 
-              <button
-                type="button"
-                className="social-login-button"
-                onClick={() => {
-                  window.location.href = '/api/auth/google';
-                }}
-              >
-                <GoogleIcon />
-                <span>Continue with Google</span>
-              </button>
+                  <button
+                    type="button"
+                    className="social-login-button"
+                    onClick={() => {
+                      window.location.href = `${API_BASE_URL}/auth/google`;
+                    }}
+                  >
+                    <GoogleIcon />
+                    <span>Continue with Google</span>
+                  </button>
+                </>
+              )}
             </form>
 
             <p className="auth-bottom-note">

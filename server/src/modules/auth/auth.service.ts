@@ -19,7 +19,7 @@ import { ResetPasswordDto } from './dto/reset-password.dto.js';
 import type { UserDocument } from '../users/schemas/user.schema.js';
 import { SmtpService } from './smtp/smtp.service.js';
 import { SupabaseService } from '../../database/supabase.service.js';
-import { toDoc, unwrap } from '../../common/utils/db.js';
+import { unwrap } from '../../common/utils/db.js';
 
 const RESET_TOKEN_TTL_MS = 60 * 60 * 1000;
 
@@ -88,13 +88,8 @@ export class AuthService {
     };
   }
 
-  async googleLogin(profile: any): Promise<{ user: any; token: string }> {
-    const googleId = profile?.googleId || profile?.id;
-    const row = googleId
-      ? unwrap(await this.db.from('users').select('*').eq('googleId', googleId).maybeSingle())
-      : null;
-    const user = toDoc<any>(row) as UserDocument | null;
-
+  /** Takes the user resolved by GoogleStrategy.validate and issues a session token. */
+  async googleLogin(user: UserDocument): Promise<{ user: any; token: string }> {
     if (!user || user.isActive === false) {
       throw new UnauthorizedException('Google account not found or deactivated.');
     }
