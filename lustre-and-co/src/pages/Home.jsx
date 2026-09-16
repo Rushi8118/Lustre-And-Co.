@@ -1,13 +1,16 @@
+import { lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import { ArrowUpRight, Star } from "lucide-react";
 import { motion } from "framer-motion";
-import ThreeHero from "../components/ThreeHero";
 import SectionHeading from "../components/SectionHeading";
 import ProductGrid from "../components/ProductGrid";
 import PromotionalBanner from "../components/PromotionalBanner";
 import WhyShopWithUs from "../components/WhyShopWithUs";
 import { useSettings } from "../context/SettingsContext";
 import { useStore } from "../context/StoreContext";
+
+// three.js is ~600 KB; fetch it after the page shell renders instead of blocking first paint.
+const ThreeHero = lazy(() => import("../components/ThreeHero"));
 
 function ProductSection({ status, products, emptyText }) {
   if (status === "loading") return <p className="catalog-loading">Loading pieces…</p>;
@@ -91,7 +94,9 @@ export default function Home() {
                 <small>{hero.cardText}</small>
               </div>
             )}
-            <ThreeHero />
+            <Suspense fallback={null}>
+              <ThreeHero />
+            </Suspense>
           </motion.div>
         </div>
       </section>

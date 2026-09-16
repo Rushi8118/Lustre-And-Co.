@@ -25,8 +25,16 @@ function deepMerge<T>(base: T, override: unknown): T {
   return result as T;
 }
 
+/** Settings change rarely but are read on nearly every request (cart, checkout, reviews, dashboard). */
+const SETTINGS_TTL_MS = 60 * 1000;
+/** Storefront stats (customer count, rating) can lag slightly behind. */
+const PUBLIC_STATS_TTL_MS = 5 * 60 * 1000;
+
 @Injectable()
 export class SettingsService implements OnModuleInit {
+  private settingsCache: { value: StoreSettings; expiresAt: number } | null = null;
+  private statsCache: { value: Record<string, any>; expiresAt: number } | null = null;
+
   constructor(
     @Inject(SupabaseService) private readonly db: SupabaseService,
     @Inject(ConfigService) private readonly configService: ConfigService,
@@ -52,6 +60,15 @@ export class SettingsService implements OnModuleInit {
 
   /** Full settings with defaults filled in for any section or field not yet saved. */
   async get(): Promise<StoreSettings> {
+    if (this.settingsCache && this.settingsCache.expiresAt > Date.now()) {
+      return this.settingsCache.value;
+    }
+    const value = await this.load();
+    this.settingsCache = { value, expiresAt: Date.now() + SETTINGS_TTL_MS };
+    return value;
+  }
+
+  private async load(): Promise<StoreSettings> {
     const row: Record<string, any> | null = unwrap(
       await this.db.from('settings').select('*').eq('key', 'store').maybeSingle(),
     );
@@ -67,14 +84,8 @@ export class SettingsService implements OnModuleInit {
   }
 
   async getPublic() {
-    const [settings, customerCount, ratingStats] = await Promise.all([
-      this.get(),
-      countOf(this.db.from('users').select('id', { count: 'exact', head: true }).eq('role', 'customer')),
-      this.db.rpc<any[]>('review_stats'),
-    ]);
-
+    const [settings, stats] = await Promise.all([this.get(), this.getPublicStats()]);
     const { configured, keyId } = getRazorpayCredentials(this.configService);
-    const stats = ratingStats?.[0];
 
     return {
       ...settings,
@@ -86,18 +97,34 @@ export class SettingsService implements OnModuleInit {
         razorpayKeyId: configured ? keyId : null,
         codEnabled: settings.commerce.codEnabled,
       },
-      stats: {
-        customerCount,
-        reviewCount: Number(stats?.count || 0),
-        averageRating: stats?.average ? Number(Number(stats.average).toFixed(1)) : null,
-      },
+      stats,
     };
+  }
+
+  private async getPublicStats() {
+    if (this.statsCache && this.statsCache.expiresAt > Date.now()) {
+      return this.statsCache.value;
+    }
+    const [customerCount, ratingStats] = await Promise.all([
+      countOf(this.db.from('users').select('id', { count: 'exact', head: true }).eq('role', 'customer')),
+      this.db.rpc<any[]>('review_stats'),
+    ]);
+    const stats = ratingStats?.[0];
+    const value = {
+      customerCount,
+      reviewCount: Number(stats?.count || 0),
+      averageRating: stats?.average ? Number(Number(stats.average).toFixed(1)) : null,
+    };
+    this.statsCache = { value, expiresAt: Date.now() + PUBLIC_STATS_TTL_MS };
+    return value;
   }
 
   async update(dto: UpdateSettingsDto): Promise<StoreSettings> {
     const current = await this.get();
     const next = deepMerge(current, dto);
     unwrap(await this.db.from('settings').upsert({ key: 'store', ...next }, { onConflict: 'key' }));
+    // Admin edits must show up immediately, not after the cache expires.
+    this.settingsCache = { value: next, expiresAt: Date.now() + SETTINGS_TTL_MS };
     return next;
   }
 }
