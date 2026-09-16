@@ -11,6 +11,7 @@ import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import OrderConfirmation from "./pages/OrderConfirmation";
 import Auth from "./pages/Auth";
+import OAuthCallback from "./pages/OAuthCallback";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Account from "./pages/Account";
@@ -47,6 +48,7 @@ export default function App() {
 
         <Route path="/account/login" element={<Auth mode="login" />} />
         <Route path="/account/signup" element={<Auth mode="signup" />} />
+        <Route path="/account/oauth" element={<OAuthCallback />} />
         <Route path="/account/forgot-password" element={<ForgotPassword />} />
         <Route path="/account/reset-password" element={<ResetPassword />} />
         <Route

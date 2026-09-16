@@ -10,6 +10,20 @@ import { GoogleStrategy } from './strategies/google.strategy.js';
 import { GoogleAuthGuard } from './guards/google-auth.guard.js';
 import { SmtpModule } from './smtp/smtp.module.js';
 import { UsersModule } from '../users/users.module.js';
+import { UsersService } from '../users/users.service.js';
+import { SupabaseService } from '../../database/supabase.service.js';
+import { getGoogleCredentials } from '../../common/utils/google.js';
+
+/**
+ * The Google strategy is only registered when real OAuth credentials are set;
+ * passport-google-oauth20 throws at startup when the client id is empty.
+ */
+const googleStrategyProvider = {
+  provide: GoogleStrategy,
+  inject: [ConfigService, SupabaseService, UsersService],
+  useFactory: (config: ConfigService, db: SupabaseService, users: UsersService) =>
+    getGoogleCredentials(config).configured ? new GoogleStrategy(config, db, users) : null,
+};
 
 @Module({
   imports: [
@@ -30,7 +44,7 @@ import { UsersModule } from '../users/users.module.js';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, GoogleStrategy, JwtAuthGuard, GoogleAuthGuard],
-  exports: [AuthService, JwtAuthGuard, GoogleAuthGuard, JwtStrategy, GoogleStrategy, PassportModule, JwtModule],
+  providers: [AuthService, JwtStrategy, googleStrategyProvider, JwtAuthGuard, GoogleAuthGuard],
+  exports: [AuthService, JwtAuthGuard, GoogleAuthGuard, JwtStrategy, PassportModule, JwtModule],
 })
 export class AuthModule {}

@@ -1,8 +1,9 @@
-import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DEFAULT_SETTINGS, SETTINGS_SECTIONS, StoreSettings } from './settings.defaults.js';
 import { UpdateSettingsDto } from './dto/update-settings.dto.js';
 import { getRazorpayCredentials } from '../../common/utils/payments.js';
+import { getGoogleCredentials } from '../../common/utils/google.js';
 import { SupabaseService } from '../../database/supabase.service.js';
 import { countOf, unwrap } from '../../common/utils/db.js';
 
@@ -31,12 +32,22 @@ export class SettingsService implements OnModuleInit {
     @Inject(ConfigService) private readonly configService: ConfigService,
   ) {}
 
+  private readonly logger = new Logger(SettingsService.name);
+
   async onModuleInit() {
-    unwrap(
-      await this.db
-        .from('settings')
-        .upsert({ key: 'store', ...DEFAULT_SETTINGS }, { onConflict: 'key', ignoreDuplicates: true }),
-    );
+    try {
+      unwrap(
+        await this.db
+          .from('settings')
+          .upsert({ key: 'store', ...DEFAULT_SETTINGS }, { onConflict: 'key', ignoreDuplicates: true }),
+      );
+    } catch (err) {
+      this.logger.error(
+        'Could not reach the database. Check SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in server/.env, ' +
+          'and make sure supabase/schema.sql has been run in your Supabase project.',
+      );
+      throw err;
+    }
   }
 
   /** Full settings with defaults filled in for any section or field not yet saved. */
@@ -67,6 +78,9 @@ export class SettingsService implements OnModuleInit {
 
     return {
       ...settings,
+      auth: {
+        googleEnabled: getGoogleCredentials(this.configService).configured,
+      },
       payments: {
         onlineEnabled: configured,
         razorpayKeyId: configured ? keyId : null,
