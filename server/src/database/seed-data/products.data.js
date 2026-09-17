@@ -536,9 +536,9 @@ export const products = [
     dateAdded: "2026-09-10",
     tags: ["new", "party"],
     image:
-      "https://images.unsplash.com/photo-1611591475152-4783113828af?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1602173574767-37ac01994b2a?auto=format&fit=crop&w=1200&q=85",
     gallery: [
-      "https://images.unsplash.com/photo-1611591475152-4783113828af?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1602173574767-37ac01994b2a?auto=format&fit=crop&w=1200&q=85",
       "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1200&q=85"
     ],
     description:
@@ -1282,9 +1282,9 @@ export const products = [
           "bestseller",
           "party"
       ],
-      "image": "https://images.unsplash.com/photo-1611591475152-4783113828af?auto=format&fit=crop&w=1200&q=85",
+      "image": "https://images.unsplash.com/photo-1573408301185-9146fe634ad0?auto=format&fit=crop&w=1200&q=85",
       "gallery": [
-          "https://images.unsplash.com/photo-1611591475152-4783113828af?auto=format&fit=crop&w=1200&q=85",
+          "https://images.unsplash.com/photo-1573408301185-9146fe634ad0?auto=format&fit=crop&w=1200&q=85",
           "https://images.unsplash.com/photo-1630019852942-f89202989a59?auto=format&fit=crop&w=1200&q=85"
       ],
       "description": "A classic line of graduated crystals in a slim setting, with a fold-over clasp that sits flat on the wrist.",
@@ -1456,9 +1456,9 @@ export const products = [
           "new",
           "everyday"
       ],
-      "image": "https://images.unsplash.com/photo-1611591475152-4783113828af?auto=format&fit=crop&w=1200&q=85",
+      "image": "https://images.unsplash.com/photo-1602173574767-37ac01994b2a?auto=format&fit=crop&w=1200&q=85",
       "gallery": [
-          "https://images.unsplash.com/photo-1611591475152-4783113828af?auto=format&fit=crop&w=1200&q=85",
+          "https://images.unsplash.com/photo-1602173574767-37ac01994b2a?auto=format&fit=crop&w=1200&q=85",
           "https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=1200&q=85"
       ],
       "description": "A fine chain anklet dotted with tiny pearls, finished with an adjustable extender.",
@@ -1540,6 +1540,1178 @@ export const products = [
           "Item must be unworn and in original packaging.",
           "Refunds are issued to the original payment method."
       ]
+  },
+  {
+      "id": "p33",
+      "slug": "amour-heart-pave-pendant",
+      "name": "Amour Heart Pave Pendant",
+      "category": "necklaces",
+      "collection": "everyday",
+      "occasion": "everyday",
+      "price": 1499,
+      "finish": "Rhodium Finish",
+      "material": "Silver-tone brass & crystals",
+      "color": "Silver",
+      "availableColors": [
+          "Silver",
+          "Rose gold"
+      ],
+      "availableSizes": [
+          "Standard"
+      ],
+      "availability": "in-stock",
+      "stockQuantity": 60,
+      "popularity": 89,
+      "dateAdded": "2026-09-16",
+      "tags": [
+          "new",
+          "bestseller"
+      ],
+      "image": "https://images.unsplash.com/photo-1588444837495-c6cfeb53f32d?auto=format&fit=crop&w=1200&q=85",
+      "gallery": [
+          "https://images.unsplash.com/photo-1588444837495-c6cfeb53f32d?auto=format&fit=crop&w=1200&q=85",
+          "https://images.unsplash.com/photo-1589128777073-263566ae5e4d?auto=format&fit=crop&w=1200&q=85",
+          "https://images.unsplash.com/photo-1506630448388-4e683c67ddb0?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "description": "An open heart outlined in pave crystals on a fine silver-tone chain - a gift that says it without words.",
+      "details": [
+          "Heart pendant: 18mm, pave-set crystals",
+          "Rhodium-finish chain, 16 inch + 2 inch",
+          "Spring-ring clasp",
+          "Hypoallergenic, nickel-free"
+      ],
+      "care": [
+          "Avoid contact with perfume, lotion, and household chemicals.",
+          "Remove before swimming, bathing, or sleeping.",
+          "Wipe with the enclosed polishing cloth after wear.",
+          "Store in the velvet pouch to prevent scratches."
+      ],
+      "shipping": [
+          "Dispatched within 1-2 business days.",
+          "Complimentary standard shipping on orders over Rs. 1,999.",
+          "Standard delivery: 3-5 business days with tracking.",
+          "Arrives in a signature gift box."
+      ],
+      "returns": [
+          "Easy returns within 7 days of delivery.",
+          "Item must be unworn and in original packaging.",
+          "Refunds are issued to the original payment method."
+      ],
+      "oldPrice": 1999,
+      "badge": "Gift pick",
+      "customerReviews": [
+          {
+              "author": "Kavya M.",
+              "rating": 5,
+              "title": "Perfect anniversary gift",
+              "comment": "Sparkles beautifully and the chain feels sturdy."
+          }
+      ]
+  },
+  {
+      "id": "p34",
+      "slug": "regal-cushion-halo-pendant",
+      "name": "Regal Cushion Halo Pendant",
+      "category": "necklaces",
+      "collection": "everyday",
+      "occasion": "party",
+      "price": 1899,
+      "finish": "Rhodium Finish",
+      "material": "Silver-tone brass & crystals",
+      "color": "Silver",
+      "availableColors": [
+          "Silver"
+      ],
+      "availableSizes": [
+          "Standard"
+      ],
+      "availability": "in-stock",
+      "stockQuantity": 35,
+      "popularity": 75,
+      "dateAdded": "2026-09-16",
+      "tags": [
+          "party",
+          "new"
+      ],
+      "image": "https://images.unsplash.com/photo-1589128777073-263566ae5e4d?auto=format&fit=crop&w=1200&q=85",
+      "gallery": [
+          "https://images.unsplash.com/photo-1589128777073-263566ae5e4d?auto=format&fit=crop&w=1200&q=85",
+          "https://images.unsplash.com/photo-1588444837495-c6cfeb53f32d?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "description": "A cushion-cut centre stone framed by a double halo, suspended from a sleek box chain.",
+      "details": [
+          "12mm cushion-cut centre stone",
+          "Double pave halo",
+          "Box chain, 18 inch",
+          "Lobster clasp"
+      ],
+      "care": [
+          "Avoid contact with perfume, lotion, and household chemicals.",
+          "Remove before swimming, bathing, or sleeping.",
+          "Wipe with the enclosed polishing cloth after wear.",
+          "Store in the velvet pouch to prevent scratches."
+      ],
+      "shipping": [
+          "Dispatched within 1-2 business days.",
+          "Complimentary standard shipping on orders over Rs. 1,999.",
+          "Standard delivery: 3-5 business days with tracking.",
+          "Arrives in a signature gift box."
+      ],
+      "returns": [
+          "Easy returns within 7 days of delivery.",
+          "Item must be unworn and in original packaging.",
+          "Refunds are issued to the original payment method."
+      ],
+      "oldPrice": 2499
+  },
+  {
+      "id": "p35",
+      "slug": "devika-temple-necklace-set",
+      "name": "Devika Temple Necklace Set",
+      "category": "necklaces",
+      "collection": "bridal",
+      "occasion": "bridal",
+      "price": 3999,
+      "finish": "Antique Gold",
+      "material": "Gold-tone alloy & stones",
+      "color": "Gold",
+      "availableColors": [
+          "Gold",
+          "Rose gold",
+          "Silver"
+      ],
+      "availableSizes": [
+          "Adjustable"
+      ],
+      "availability": "in-stock",
+      "stockQuantity": 18,
+      "popularity": 82,
+      "dateAdded": "2026-09-16",
+      "tags": [
+          "bridal",
+          "festive"
+      ],
+      "image": "https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?auto=format&fit=crop&w=1200&q=85",
+      "gallery": [
+          "https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?auto=format&fit=crop&w=1200&q=85",
+          "https://images.unsplash.com/photo-1611107683227-e9060eccd846?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "description": "A traditional temple collar with ruby-toned stones and matching drops, made for weddings and festivals.",
+      "details": [
+          "Necklace with matching earrings",
+          "Antique temple-coin detailing",
+          "Ruby-toned stone accents",
+          "Adjustable dori tie closure"
+      ],
+      "care": [
+          "Avoid contact with perfume, lotion, and household chemicals.",
+          "Remove before swimming, bathing, or sleeping.",
+          "Wipe with the enclosed polishing cloth after wear.",
+          "Store in the velvet pouch to prevent scratches."
+      ],
+      "shipping": [
+          "Dispatched within 1-2 business days.",
+          "Complimentary standard shipping on orders over Rs. 1,999.",
+          "Standard delivery: 3-5 business days with tracking.",
+          "Arrives in a signature gift box."
+      ],
+      "returns": [
+          "Easy returns within 7 days of delivery.",
+          "Item must be unworn and in original packaging.",
+          "Refunds are issued to the original payment method."
+      ],
+      "oldPrice": 5499,
+      "badge": "Bridal",
+      "customerReviews": [
+          {
+              "author": "Priya S.",
+              "rating": 5,
+              "title": "Looked stunning at my sister's wedding",
+              "comment": "Heavy on detail but light to wear all evening."
+          },
+          {
+              "author": "Anjali K.",
+              "rating": 4,
+              "title": "Beautiful set",
+              "comment": "Colour is richer in person. The dori could be longer."
+          }
+      ]
+  },
+  {
+      "id": "p36",
+      "slug": "leela-leaf-pendant",
+      "name": "Leela Leaf Pendant",
+      "category": "necklaces",
+      "collection": "everyday",
+      "occasion": "everyday",
+      "price": 999,
+      "finish": "18K Gold Plated",
+      "material": "Gold-plated brass",
+      "color": "Gold",
+      "availableColors": [
+          "Gold",
+          "Rose gold",
+          "Silver"
+      ],
+      "availableSizes": [
+          "Standard"
+      ],
+      "availability": "in-stock",
+      "stockQuantity": 70,
+      "popularity": 71,
+      "dateAdded": "2026-09-16",
+      "tags": [
+          "new",
+          "everyday"
+      ],
+      "image": "https://images.unsplash.com/photo-1620656798579-1984d9e87df7?auto=format&fit=crop&w=1200&q=85",
+      "gallery": [
+          "https://images.unsplash.com/photo-1620656798579-1984d9e87df7?auto=format&fit=crop&w=1200&q=85",
+          "https://images.unsplash.com/photo-1633934542430-0905ccb5f050?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "description": "A single sculpted leaf on a delicate chain - understated enough for every day.",
+      "details": [
+          "Leaf pendant: 15mm",
+          "Fine cable chain, 16 inch + 2 inch",
+          "18K micro-gold plating"
+      ],
+      "care": [
+          "Avoid contact with perfume, lotion, and household chemicals.",
+          "Remove before swimming, bathing, or sleeping.",
+          "Wipe with the enclosed polishing cloth after wear.",
+          "Store in the velvet pouch to prevent scratches."
+      ],
+      "shipping": [
+          "Dispatched within 1-2 business days.",
+          "Complimentary standard shipping on orders over Rs. 1,999.",
+          "Standard delivery: 3-5 business days with tracking.",
+          "Arrives in a signature gift box."
+      ],
+      "returns": [
+          "Easy returns within 7 days of delivery.",
+          "Item must be unworn and in original packaging.",
+          "Refunds are issued to the original payment method."
+      ]
+  },
+  {
+      "id": "p37",
+      "slug": "moti-pearl-drop-necklace",
+      "name": "Moti Pearl Drop Necklace",
+      "category": "necklaces",
+      "collection": "everyday",
+      "occasion": "everyday",
+      "price": 1199,
+      "finish": "18K Gold Plated",
+      "material": "Imitation pearl & gold-plated brass",
+      "color": "Gold",
+      "availableColors": [
+          "Gold",
+          "Rose gold",
+          "Silver"
+      ],
+      "availableSizes": [
+          "Standard"
+      ],
+      "availability": "in-stock",
+      "stockQuantity": 65,
+      "popularity": 78,
+      "dateAdded": "2026-09-16",
+      "tags": [
+          "new",
+          "everyday"
+      ],
+      "image": "https://images.unsplash.com/photo-1611085583191-a3b181a88401?auto=format&fit=crop&w=1200&q=85",
+      "gallery": [
+          "https://images.unsplash.com/photo-1611085583191-a3b181a88401?auto=format&fit=crop&w=1200&q=85",
+          "https://images.unsplash.com/photo-1610694955371-d4a3e0ce4b52?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "description": "One luminous pearl on a whisper-fine chain, the easiest way to finish a crisp white shirt.",
+      "details": [
+          "8mm imitation pearl drop",
+          "Fine chain, 17 inch + 2 inch",
+          "Lobster clasp"
+      ],
+      "care": [
+          "Avoid contact with perfume, lotion, and household chemicals.",
+          "Remove before swimming, bathing, or sleeping.",
+          "Wipe with the enclosed polishing cloth after wear.",
+          "Store in the velvet pouch to prevent scratches."
+      ],
+      "shipping": [
+          "Dispatched within 1-2 business days.",
+          "Complimentary standard shipping on orders over Rs. 1,999.",
+          "Standard delivery: 3-5 business days with tracking.",
+          "Arrives in a signature gift box."
+      ],
+      "returns": [
+          "Easy returns within 7 days of delivery.",
+          "Item must be unworn and in original packaging.",
+          "Refunds are issued to the original payment method."
+      ],
+      "oldPrice": 1599
+  },
+  {
+      "id": "p38",
+      "slug": "willow-layered-leaf-necklace",
+      "name": "Willow Layered Leaf Necklace",
+      "category": "necklaces",
+      "collection": "everyday",
+      "occasion": "everyday",
+      "price": 1799,
+      "finish": "Rose Gold Plated",
+      "material": "Gold-plated brass",
+      "color": "Rose gold",
+      "availableColors": [
+          "Rose gold",
+          "Gold"
+      ],
+      "availableSizes": [
+          "Standard (16\" + 18\")"
+      ],
+      "availability": "in-stock",
+      "stockQuantity": 40,
+      "popularity": 69,
+      "dateAdded": "2026-09-16",
+      "tags": [
+          "new"
+      ],
+      "image": "https://images.unsplash.com/photo-1590548784585-643d2b9f2925?auto=format&fit=crop&w=1200&q=85",
+      "gallery": [
+          "https://images.unsplash.com/photo-1590548784585-643d2b9f2925?auto=format&fit=crop&w=1200&q=85",
+          "https://images.unsplash.com/photo-1599459183200-59c7687a0275?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "description": "Two chains worn as one: a trailing leaf motif above a fine chain with a single pearl drop.",
+      "details": [
+          "Pre-layered: 16 inch and 18 inch",
+          "Leaf-link upper strand",
+          "Pearl drop lower strand"
+      ],
+      "care": [
+          "Avoid contact with perfume, lotion, and household chemicals.",
+          "Remove before swimming, bathing, or sleeping.",
+          "Wipe with the enclosed polishing cloth after wear.",
+          "Store in the velvet pouch to prevent scratches."
+      ],
+      "shipping": [
+          "Dispatched within 1-2 business days.",
+          "Complimentary standard shipping on orders over Rs. 1,999.",
+          "Standard delivery: 3-5 business days with tracking.",
+          "Arrives in a signature gift box."
+      ],
+      "returns": [
+          "Easy returns within 7 days of delivery.",
+          "Item must be unworn and in original packaging.",
+          "Refunds are issued to the original payment method."
+      ]
+  },
+  {
+      "id": "p39",
+      "slug": "rani-gemstone-chandelier-earrings",
+      "name": "Rani Gemstone Chandelier Earrings",
+      "category": "earrings",
+      "collection": "everyday",
+      "occasion": "party",
+      "price": 2299,
+      "finish": "Silver Tone",
+      "material": "Alloy, glass stones & crystals",
+      "color": "Multicolour",
+      "availableColors": [
+          "Emerald",
+          "Ruby",
+          "Sapphire"
+      ],
+      "availableSizes": [
+          "One size"
+      ],
+      "availability": "in-stock",
+      "stockQuantity": 30,
+      "popularity": 80,
+      "dateAdded": "2026-09-16",
+      "tags": [
+          "party",
+          "festive"
+      ],
+      "image": "https://images.unsplash.com/photo-1535632787350-4e68ef0ac584?auto=format&fit=crop&w=1200&q=85",
+      "gallery": [
+          "https://images.unsplash.com/photo-1535632787350-4e68ef0ac584?auto=format&fit=crop&w=1200&q=85",
+          "https://images.unsplash.com/photo-1629224316810-9d8805b95e76?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "description": "Marquise-shaped drops set with jewel-toned stones and a crystal border, made to catch the light.",
+      "details": [
+          "Length: 72mm",
+          "Marquise-cut coloured stones",
+          "Crystal pave border",
+          "Push-back fitting"
+      ],
+      "care": [
+          "Avoid contact with perfume, lotion, and household chemicals.",
+          "Remove before swimming, bathing, or sleeping.",
+          "Wipe with the enclosed polishing cloth after wear.",
+          "Store in the velvet pouch to prevent scratches."
+      ],
+      "shipping": [
+          "Dispatched within 1-2 business days.",
+          "Complimentary standard shipping on orders over Rs. 1,999.",
+          "Standard delivery: 3-5 business days with tracking.",
+          "Arrives in a signature gift box."
+      ],
+      "returns": [
+          "Easy returns within 7 days of delivery.",
+          "Item must be unworn and in original packaging.",
+          "Refunds are issued to the original payment method."
+      ],
+      "oldPrice": 2999,
+      "badge": "Statement"
+  },
+  {
+      "id": "p40",
+      "slug": "kamal-flower-stud-earrings",
+      "name": "Kamal Flower Stud Earrings",
+      "category": "earrings",
+      "collection": "everyday",
+      "occasion": "festive",
+      "price": 1099,
+      "finish": "Antique Gold",
+      "material": "Gold-plated brass",
+      "color": "Gold",
+      "availableColors": [
+          "Gold",
+          "Rose gold",
+          "Silver"
+      ],
+      "availableSizes": [
+          "One size"
+      ],
+      "availability": "in-stock",
+      "stockQuantity": 55,
+      "popularity": 87,
+      "dateAdded": "2026-09-16",
+      "tags": [
+          "festive",
+          "bestseller"
+      ],
+      "image": "https://images.unsplash.com/photo-1626784215021-2e39ccf971cd?auto=format&fit=crop&w=1200&q=85",
+      "gallery": [
+          "https://images.unsplash.com/photo-1626784215021-2e39ccf971cd?auto=format&fit=crop&w=1200&q=85",
+          "https://images.unsplash.com/photo-1603974372039-adc49044b6bd?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "description": "Lotus-inspired studs with a crystal centre and granulated gold petals.",
+      "details": [
+          "Diameter: 14mm",
+          "Crystal centre stone",
+          "Granulated petal detail",
+          "Secure screw back"
+      ],
+      "care": [
+          "Avoid contact with perfume, lotion, and household chemicals.",
+          "Remove before swimming, bathing, or sleeping.",
+          "Wipe with the enclosed polishing cloth after wear.",
+          "Store in the velvet pouch to prevent scratches."
+      ],
+      "shipping": [
+          "Dispatched within 1-2 business days.",
+          "Complimentary standard shipping on orders over Rs. 1,999.",
+          "Standard delivery: 3-5 business days with tracking.",
+          "Arrives in a signature gift box."
+      ],
+      "returns": [
+          "Easy returns within 7 days of delivery.",
+          "Item must be unworn and in original packaging.",
+          "Refunds are issued to the original payment method."
+      ],
+      "oldPrice": 1499,
+      "customerReviews": [
+          {
+              "author": "Sneha D.",
+              "rating": 5,
+              "title": "Everyday festive",
+              "comment": "Go with both sarees and western wear."
+          }
+      ]
+  },
+  {
+      "id": "p41",
+      "slug": "blush-teardrop-earrings",
+      "name": "Blush Teardrop Earrings",
+      "category": "earrings",
+      "collection": "everyday",
+      "occasion": "party",
+      "price": 1399,
+      "finish": "Rose Gold Plated",
+      "material": "Gold-plated brass",
+      "color": "Rose gold",
+      "availableColors": [
+          "Rose gold"
+      ],
+      "availableSizes": [
+          "One size"
+      ],
+      "availability": "in-stock",
+      "stockQuantity": 45,
+      "popularity": 73,
+      "dateAdded": "2026-09-16",
+      "tags": [
+          "party",
+          "new"
+      ],
+      "image": "https://images.unsplash.com/photo-1629224316810-9d8805b95e76?auto=format&fit=crop&w=1200&q=85",
+      "gallery": [
+          "https://images.unsplash.com/photo-1629224316810-9d8805b95e76?auto=format&fit=crop&w=1200&q=85",
+          "https://images.unsplash.com/photo-1535632787350-4e68ef0ac584?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "description": "Champagne-pink crystal teardrops that swing from a small pave link.",
+      "details": [
+          "Length: 45mm",
+          "Pear-cut blush crystals",
+          "Fish-hook fitting"
+      ],
+      "care": [
+          "Avoid contact with perfume, lotion, and household chemicals.",
+          "Remove before swimming, bathing, or sleeping.",
+          "Wipe with the enclosed polishing cloth after wear.",
+          "Store in the velvet pouch to prevent scratches."
+      ],
+      "shipping": [
+          "Dispatched within 1-2 business days.",
+          "Complimentary standard shipping on orders over Rs. 1,999.",
+          "Standard delivery: 3-5 business days with tracking.",
+          "Arrives in a signature gift box."
+      ],
+      "returns": [
+          "Easy returns within 7 days of delivery.",
+          "Item must be unworn and in original packaging.",
+          "Refunds are issued to the original payment method."
+      ]
+  },
+  {
+      "id": "p42",
+      "slug": "ivy-knot-earrings",
+      "name": "Ivy Knot Earrings",
+      "category": "earrings",
+      "collection": "everyday",
+      "occasion": "everyday",
+      "price": 899,
+      "finish": "18K Gold Plated",
+      "material": "Gold-plated brass",
+      "color": "Gold",
+      "availableColors": [
+          "Gold",
+          "Rose gold",
+          "Silver"
+      ],
+      "availableSizes": [
+          "One size"
+      ],
+      "availability": "in-stock",
+      "stockQuantity": 65,
+      "popularity": 76,
+      "dateAdded": "2026-09-16",
+      "tags": [
+          "new",
+          "everyday"
+      ],
+      "image": "https://images.unsplash.com/photo-1603974372039-adc49044b6bd?auto=format&fit=crop&w=1200&q=85",
+      "gallery": [
+          "https://images.unsplash.com/photo-1603974372039-adc49044b6bd?auto=format&fit=crop&w=1200&q=85",
+          "https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "description": "A soft gold knot that sits close to the lobe, polished to a warm high shine.",
+      "details": [
+          "Diameter: 16mm",
+          "Hollow-form, featherlight",
+          "Butterfly backs"
+      ],
+      "care": [
+          "Avoid contact with perfume, lotion, and household chemicals.",
+          "Remove before swimming, bathing, or sleeping.",
+          "Wipe with the enclosed polishing cloth after wear.",
+          "Store in the velvet pouch to prevent scratches."
+      ],
+      "shipping": [
+          "Dispatched within 1-2 business days.",
+          "Complimentary standard shipping on orders over Rs. 1,999.",
+          "Standard delivery: 3-5 business days with tracking.",
+          "Arrives in a signature gift box."
+      ],
+      "returns": [
+          "Easy returns within 7 days of delivery.",
+          "Item must be unworn and in original packaging.",
+          "Refunds are issued to the original payment method."
+      ],
+      "oldPrice": 1199
+  },
+  {
+      "id": "p43",
+      "slug": "cascade-loop-earrings",
+      "name": "Cascade Loop Earrings",
+      "category": "earrings",
+      "collection": "everyday",
+      "occasion": "everyday",
+      "price": 799,
+      "finish": "18K Gold Plated",
+      "material": "Gold-plated brass",
+      "color": "Gold",
+      "availableColors": [
+          "Gold",
+          "Rose gold",
+          "Silver"
+      ],
+      "availableSizes": [
+          "One size"
+      ],
+      "availability": "in-stock",
+      "stockQuantity": 60,
+      "popularity": 64,
+      "dateAdded": "2026-09-16",
+      "tags": [
+          "new"
+      ],
+      "image": "https://images.unsplash.com/photo-1535556116002-6281ff3e9f36?auto=format&fit=crop&w=1200&q=85",
+      "gallery": [
+          "https://images.unsplash.com/photo-1535556116002-6281ff3e9f36?auto=format&fit=crop&w=1200&q=85",
+          "https://images.unsplash.com/photo-1600721391776-b5cd0e0048f9?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "description": "Three open loops linked in a gentle cascade - minimal, modern, and easy to wear.",
+      "details": [
+          "Length: 38mm",
+          "Three linked open loops",
+          "Fish-hook fitting"
+      ],
+      "care": [
+          "Avoid contact with perfume, lotion, and household chemicals.",
+          "Remove before swimming, bathing, or sleeping.",
+          "Wipe with the enclosed polishing cloth after wear.",
+          "Store in the velvet pouch to prevent scratches."
+      ],
+      "shipping": [
+          "Dispatched within 1-2 business days.",
+          "Complimentary standard shipping on orders over Rs. 1,999.",
+          "Standard delivery: 3-5 business days with tracking.",
+          "Arrives in a signature gift box."
+      ],
+      "returns": [
+          "Easy returns within 7 days of delivery.",
+          "Item must be unworn and in original packaging.",
+          "Refunds are issued to the original payment method."
+      ]
+  },
+  {
+      "id": "p44",
+      "slug": "nadia-twisted-hoops",
+      "name": "Nadia Twisted Hoops",
+      "category": "earrings",
+      "collection": "everyday",
+      "occasion": "everyday",
+      "price": 1149,
+      "finish": "18K Gold Plated",
+      "material": "Gold-plated brass",
+      "color": "Gold",
+      "availableColors": [
+          "Gold",
+          "Rose gold",
+          "Silver"
+      ],
+      "availableSizes": [
+          "One size"
+      ],
+      "availability": "in-stock",
+      "stockQuantity": 50,
+      "popularity": 85,
+      "dateAdded": "2026-09-16",
+      "tags": [
+          "new",
+          "bestseller"
+      ],
+      "image": "https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?auto=format&fit=crop&w=1200&q=85",
+      "gallery": [
+          "https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?auto=format&fit=crop&w=1200&q=85",
+          "https://images.unsplash.com/photo-1600721391776-b5cd0e0048f9?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "description": "Chunky rope-twist hoops with a satin-polished finish that reads as solid gold.",
+      "details": [
+          "Diameter: 22mm",
+          "Rope-twist texture",
+          "Hinged click closure"
+      ],
+      "care": [
+          "Avoid contact with perfume, lotion, and household chemicals.",
+          "Remove before swimming, bathing, or sleeping.",
+          "Wipe with the enclosed polishing cloth after wear.",
+          "Store in the velvet pouch to prevent scratches."
+      ],
+      "shipping": [
+          "Dispatched within 1-2 business days.",
+          "Complimentary standard shipping on orders over Rs. 1,999.",
+          "Standard delivery: 3-5 business days with tracking.",
+          "Arrives in a signature gift box."
+      ],
+      "returns": [
+          "Easy returns within 7 days of delivery.",
+          "Item must be unworn and in original packaging.",
+          "Refunds are issued to the original payment method."
+      ]
+  },
+  {
+      "id": "p45",
+      "slug": "aurora-bloom-solitaire-ring",
+      "name": "Aurora Bloom Solitaire Ring",
+      "category": "rings",
+      "collection": "bridal",
+      "occasion": "bridal",
+      "price": 1699,
+      "finish": "Rhodium Finish",
+      "material": "Silver-tone brass & crystals",
+      "color": "Silver",
+      "availableColors": [
+          "Silver"
+      ],
+      "availableSizes": [
+          "6",
+          "7",
+          "8",
+          "9"
+      ],
+      "availability": "in-stock",
+      "stockQuantity": 30,
+      "popularity": 81,
+      "dateAdded": "2026-09-16",
+      "tags": [
+          "bridal",
+          "new"
+      ],
+      "image": "https://images.unsplash.com/photo-1591209627710-d2427565a41f?auto=format&fit=crop&w=1200&q=85",
+      "gallery": [
+          "https://images.unsplash.com/photo-1591209627710-d2427565a41f?auto=format&fit=crop&w=1200&q=85",
+          "https://images.unsplash.com/photo-1627293509201-cd0c780043e6?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "description": "A round solitaire in a petal-shaped halo, with pave shoulders that add sparkle from every angle.",
+      "details": [
+          "8mm round centre stone",
+          "Floral pave halo",
+          "Pave shoulders"
+      ],
+      "care": [
+          "Avoid contact with perfume, lotion, and household chemicals.",
+          "Remove before swimming, bathing, or sleeping.",
+          "Wipe with the enclosed polishing cloth after wear.",
+          "Store in the velvet pouch to prevent scratches."
+      ],
+      "shipping": [
+          "Dispatched within 1-2 business days.",
+          "Complimentary standard shipping on orders over Rs. 1,999.",
+          "Standard delivery: 3-5 business days with tracking.",
+          "Arrives in a signature gift box."
+      ],
+      "returns": [
+          "Easy returns within 7 days of delivery.",
+          "Item must be unworn and in original packaging.",
+          "Refunds are issued to the original payment method."
+      ],
+      "oldPrice": 2299,
+      "badge": "Bridal"
+  },
+  {
+      "id": "p46",
+      "slug": "celeste-emerald-cut-ring",
+      "name": "Celeste Emerald-Cut Ring",
+      "category": "rings",
+      "collection": "everyday",
+      "occasion": "everyday",
+      "price": 1499,
+      "finish": "18K Gold Plated",
+      "material": "Gold-plated brass",
+      "color": "Gold",
+      "availableColors": [
+          "Gold",
+          "Rose gold",
+          "Silver"
+      ],
+      "availableSizes": [
+          "6",
+          "7",
+          "8"
+      ],
+      "availability": "in-stock",
+      "stockQuantity": 35,
+      "popularity": 72,
+      "dateAdded": "2026-09-16",
+      "tags": [
+          "new"
+      ],
+      "image": "https://images.unsplash.com/photo-1598560917807-1bae44bd2be8?auto=format&fit=crop&w=1200&q=85",
+      "gallery": [
+          "https://images.unsplash.com/photo-1598560917807-1bae44bd2be8?auto=format&fit=crop&w=1200&q=85",
+          "https://images.unsplash.com/photo-1543294001-f7cd5d7fb516?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "description": "An elongated emerald-cut crystal raised on a slim pave band.",
+      "details": [
+          "9x7mm emerald-cut stone",
+          "Four-claw setting",
+          "Pave half-eternity band"
+      ],
+      "care": [
+          "Avoid contact with perfume, lotion, and household chemicals.",
+          "Remove before swimming, bathing, or sleeping.",
+          "Wipe with the enclosed polishing cloth after wear.",
+          "Store in the velvet pouch to prevent scratches."
+      ],
+      "shipping": [
+          "Dispatched within 1-2 business days.",
+          "Complimentary standard shipping on orders over Rs. 1,999.",
+          "Standard delivery: 3-5 business days with tracking.",
+          "Arrives in a signature gift box."
+      ],
+      "returns": [
+          "Easy returns within 7 days of delivery.",
+          "Item must be unworn and in original packaging.",
+          "Refunds are issued to the original payment method."
+      ]
+  },
+  {
+      "id": "p47",
+      "slug": "champagne-cluster-ring",
+      "name": "Champagne Cluster Ring",
+      "category": "rings",
+      "collection": "everyday",
+      "occasion": "party",
+      "price": 1599,
+      "finish": "Champagne Gold",
+      "material": "Gold-plated brass",
+      "color": "Gold",
+      "availableColors": [
+          "Gold",
+          "Rose gold",
+          "Silver"
+      ],
+      "availableSizes": [
+          "Adjustable"
+      ],
+      "availability": "in-stock",
+      "stockQuantity": 25,
+      "popularity": 70,
+      "dateAdded": "2026-09-16",
+      "tags": [
+          "party",
+          "festive"
+      ],
+      "image": "https://images.unsplash.com/photo-1611955167811-4711904bb9f8?auto=format&fit=crop&w=1200&q=85",
+      "gallery": [
+          "https://images.unsplash.com/photo-1611955167811-4711904bb9f8?auto=format&fit=crop&w=1200&q=85",
+          "https://images.unsplash.com/photo-1617117811969-97f441511dee?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "description": "Pear and marquise champagne crystals gathered into a cocktail cluster.",
+      "details": [
+          "Cluster face: 20mm",
+          "Champagne-toned crystals",
+          "Open filigree gallery"
+      ],
+      "care": [
+          "Avoid contact with perfume, lotion, and household chemicals.",
+          "Remove before swimming, bathing, or sleeping.",
+          "Wipe with the enclosed polishing cloth after wear.",
+          "Store in the velvet pouch to prevent scratches."
+      ],
+      "shipping": [
+          "Dispatched within 1-2 business days.",
+          "Complimentary standard shipping on orders over Rs. 1,999.",
+          "Standard delivery: 3-5 business days with tracking.",
+          "Arrives in a signature gift box."
+      ],
+      "returns": [
+          "Easy returns within 7 days of delivery.",
+          "Item must be unworn and in original packaging.",
+          "Refunds are issued to the original payment method."
+      ],
+      "oldPrice": 1999
+  },
+  {
+      "id": "p48",
+      "slug": "heirloom-ruby-ring",
+      "name": "Heirloom Ruby Ring",
+      "category": "rings",
+      "collection": "everyday",
+      "occasion": "festive",
+      "price": 1299,
+      "finish": "Antique Gold",
+      "material": "Gold-tone alloy & glass stone",
+      "color": "Gold",
+      "availableColors": [
+          "Gold",
+          "Rose gold",
+          "Silver"
+      ],
+      "availableSizes": [
+          "6",
+          "7",
+          "8"
+      ],
+      "availability": "in-stock",
+      "stockQuantity": 30,
+      "popularity": 67,
+      "dateAdded": "2026-09-16",
+      "tags": [
+          "festive"
+      ],
+      "image": "https://images.unsplash.com/photo-1617117811969-97f441511dee?auto=format&fit=crop&w=1200&q=85",
+      "gallery": [
+          "https://images.unsplash.com/photo-1617117811969-97f441511dee?auto=format&fit=crop&w=1200&q=85",
+          "https://images.unsplash.com/photo-1611955167811-4711904bb9f8?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "description": "A deep ruby-toned oval in an ornate milgrain bezel, inspired by vintage family pieces.",
+      "details": [
+          "10x8mm oval ruby-toned stone",
+          "Milgrain bezel",
+          "Antique finish"
+      ],
+      "care": [
+          "Avoid contact with perfume, lotion, and household chemicals.",
+          "Remove before swimming, bathing, or sleeping.",
+          "Wipe with the enclosed polishing cloth after wear.",
+          "Store in the velvet pouch to prevent scratches."
+      ],
+      "shipping": [
+          "Dispatched within 1-2 business days.",
+          "Complimentary standard shipping on orders over Rs. 1,999.",
+          "Standard delivery: 3-5 business days with tracking.",
+          "Arrives in a signature gift box."
+      ],
+      "returns": [
+          "Easy returns within 7 days of delivery.",
+          "Item must be unworn and in original packaging.",
+          "Refunds are issued to the original payment method."
+      ]
+  },
+  {
+      "id": "p49",
+      "slug": "pastel-gemstone-ring-trio",
+      "name": "Pastel Gemstone Ring Trio",
+      "category": "rings",
+      "collection": "everyday",
+      "occasion": "everyday",
+      "price": 1799,
+      "finish": "18K Gold Plated",
+      "material": "Gold-plated brass",
+      "color": "Gold",
+      "availableColors": [
+          "Gold",
+          "Rose gold",
+          "Silver"
+      ],
+      "availableSizes": [
+          "6",
+          "7",
+          "8"
+      ],
+      "availability": "in-stock",
+      "stockQuantity": 40,
+      "popularity": 77,
+      "dateAdded": "2026-09-16",
+      "tags": [
+          "new",
+          "everyday"
+      ],
+      "image": "https://images.unsplash.com/photo-1608042314453-ae338d80c427?auto=format&fit=crop&w=1200&q=85",
+      "gallery": [
+          "https://images.unsplash.com/photo-1608042314453-ae338d80c427?auto=format&fit=crop&w=1200&q=85",
+          "https://images.unsplash.com/photo-1631982690223-8aa4be0a2497?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "description": "Three rings with coral, mint, and mirror-polished stones to wear together or apart.",
+      "details": [
+          "Set of 3 rings",
+          "Coral, mint, and polished-disc tops",
+          "Beaded and plain bands"
+      ],
+      "care": [
+          "Avoid contact with perfume, lotion, and household chemicals.",
+          "Remove before swimming, bathing, or sleeping.",
+          "Wipe with the enclosed polishing cloth after wear.",
+          "Store in the velvet pouch to prevent scratches."
+      ],
+      "shipping": [
+          "Dispatched within 1-2 business days.",
+          "Complimentary standard shipping on orders over Rs. 1,999.",
+          "Standard delivery: 3-5 business days with tracking.",
+          "Arrives in a signature gift box."
+      ],
+      "returns": [
+          "Easy returns within 7 days of delivery.",
+          "Item must be unworn and in original packaging.",
+          "Refunds are issued to the original payment method."
+      ],
+      "oldPrice": 2399,
+      "badge": "Set of 3"
+  },
+  {
+      "id": "p50",
+      "slug": "stella-crystal-link-bracelet",
+      "name": "Stella Crystal Link Bracelet",
+      "category": "bracelets",
+      "collection": "everyday",
+      "occasion": "party",
+      "price": 2199,
+      "finish": "Rhodium Finish",
+      "material": "Silver-tone brass & crystals",
+      "color": "Silver",
+      "availableColors": [
+          "Silver"
+      ],
+      "availableSizes": [
+          "7 inches"
+      ],
+      "availability": "in-stock",
+      "stockQuantity": 30,
+      "popularity": 88,
+      "dateAdded": "2026-09-16",
+      "tags": [
+          "party",
+          "bestseller"
+      ],
+      "image": "https://images.unsplash.com/photo-1573408301185-9146fe634ad0?auto=format&fit=crop&w=1200&q=85",
+      "gallery": [
+          "https://images.unsplash.com/photo-1573408301185-9146fe634ad0?auto=format&fit=crop&w=1200&q=85",
+          "https://images.unsplash.com/photo-1602173574767-37ac01994b2a?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "description": "Open oval links paved with crystals, joined by round solitaire stations.",
+      "details": [
+          "Length: 7 inches",
+          "Pave oval links",
+          "Box clasp with safety catch"
+      ],
+      "care": [
+          "Avoid contact with perfume, lotion, and household chemicals.",
+          "Remove before swimming, bathing, or sleeping.",
+          "Wipe with the enclosed polishing cloth after wear.",
+          "Store in the velvet pouch to prevent scratches."
+      ],
+      "shipping": [
+          "Dispatched within 1-2 business days.",
+          "Complimentary standard shipping on orders over Rs. 1,999.",
+          "Standard delivery: 3-5 business days with tracking.",
+          "Arrives in a signature gift box."
+      ],
+      "returns": [
+          "Easy returns within 7 days of delivery.",
+          "Item must be unworn and in original packaging.",
+          "Refunds are issued to the original payment method."
+      ],
+      "oldPrice": 2899,
+      "badge": "Bestseller"
+  },
+  {
+      "id": "p51",
+      "slug": "bold-curb-chain-bracelet",
+      "name": "Bold Curb Chain Bracelet",
+      "category": "bracelets",
+      "collection": "everyday",
+      "occasion": "everyday",
+      "price": 1399,
+      "finish": "18K Gold Plated",
+      "material": "Gold-plated brass",
+      "color": "Gold",
+      "availableColors": [
+          "Gold",
+          "Rose gold",
+          "Silver"
+      ],
+      "availableSizes": [
+          "7.5 inches"
+      ],
+      "availability": "in-stock",
+      "stockQuantity": 45,
+      "popularity": 74,
+      "dateAdded": "2026-09-16",
+      "tags": [
+          "new",
+          "everyday"
+      ],
+      "image": "https://images.unsplash.com/photo-1602173574767-37ac01994b2a?auto=format&fit=crop&w=1200&q=85",
+      "gallery": [
+          "https://images.unsplash.com/photo-1602173574767-37ac01994b2a?auto=format&fit=crop&w=1200&q=85",
+          "https://images.unsplash.com/photo-1633934542430-0905ccb5f050?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "description": "A chunky polished curb chain that holds its own or stacks with a watch.",
+      "details": [
+          "Length: 7.5 inches",
+          "9mm curb links",
+          "Toggle clasp"
+      ],
+      "care": [
+          "Avoid contact with perfume, lotion, and household chemicals.",
+          "Remove before swimming, bathing, or sleeping.",
+          "Wipe with the enclosed polishing cloth after wear.",
+          "Store in the velvet pouch to prevent scratches."
+      ],
+      "shipping": [
+          "Dispatched within 1-2 business days.",
+          "Complimentary standard shipping on orders over Rs. 1,999.",
+          "Standard delivery: 3-5 business days with tracking.",
+          "Arrives in a signature gift box."
+      ],
+      "returns": [
+          "Easy returns within 7 days of delivery.",
+          "Item must be unworn and in original packaging.",
+          "Refunds are issued to the original payment method."
+      ]
+  },
+  {
+      "id": "p52",
+      "slug": "swarna-filigree-bangle-set",
+      "name": "Swarna Filigree Bangle Set",
+      "category": "bangles",
+      "collection": "bridal",
+      "occasion": "festive",
+      "price": 2499,
+      "finish": "Antique Gold",
+      "material": "Gold-plated brass",
+      "color": "Gold",
+      "availableColors": [
+          "Gold",
+          "Rose gold",
+          "Silver"
+      ],
+      "availableSizes": [
+          "2.4",
+          "2.6",
+          "2.8"
+      ],
+      "availability": "in-stock",
+      "stockQuantity": 22,
+      "popularity": 79,
+      "dateAdded": "2026-09-16",
+      "tags": [
+          "bridal",
+          "festive"
+      ],
+      "image": "https://images.unsplash.com/photo-1611107683227-e9060eccd846?auto=format&fit=crop&w=1200&q=85",
+      "gallery": [
+          "https://images.unsplash.com/photo-1611107683227-e9060eccd846?auto=format&fit=crop&w=1200&q=85",
+          "https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "description": "Six slim bangles with hand-finished filigree and tiny floral accents, made for stacking.",
+      "details": [
+          "Set of 6 bangles",
+          "Filigree and floral detailing",
+          "Smooth inner rim"
+      ],
+      "care": [
+          "Avoid contact with perfume, lotion, and household chemicals.",
+          "Remove before swimming, bathing, or sleeping.",
+          "Wipe with the enclosed polishing cloth after wear.",
+          "Store in the velvet pouch to prevent scratches."
+      ],
+      "shipping": [
+          "Dispatched within 1-2 business days.",
+          "Complimentary standard shipping on orders over Rs. 1,999.",
+          "Standard delivery: 3-5 business days with tracking.",
+          "Arrives in a signature gift box."
+      ],
+      "returns": [
+          "Easy returns within 7 days of delivery.",
+          "Item must be unworn and in original packaging.",
+          "Refunds are issued to the original payment method."
+      ],
+      "oldPrice": 3299,
+      "badge": "Set of 6"
   }
 ];
 
