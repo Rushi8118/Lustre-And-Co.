@@ -67,7 +67,7 @@ export const SEED_CATEGORIES = [
     eyebrow: 'Anklet Collection',
     title: 'Anklets & Payals',
     description: 'Fine chains, pearl accents, and traditional ghungroo payals for everyday and festive wear.',
-    image: 'https://images.unsplash.com/photo-1611591475152-4783113828af?auto=format&fit=crop&w=900&q=85',
+    image: 'https://images.unsplash.com/photo-1602173574767-37ac01994b2a?auto=format&fit=crop&w=900&q=85',
     sortOrder: 6,
     isActive: true,
     showInMenu: true,
