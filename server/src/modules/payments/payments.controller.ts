@@ -3,8 +3,13 @@ import {
   Post,
   Get,
   Body,
+  Headers,
+  HttpCode,
   Inject,
+  Req,
+  type RawBodyRequest,
 } from '@nestjs/common';
+import type { Request } from 'express';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { PaymentsService } from './payments.service.js';
 import { CreatePaymentIntentDto } from './dto/create-intent.dto.js';
@@ -53,6 +58,21 @@ export class PaymentsController {
   @ApiResponse({ status: 404, description: 'Order not found.' })
   async verifyPayment(@Body() dto: VerifyPaymentDto) {
     return this.paymentsService.verifyPayment(dto);
+  }
+
+  @Post('webhook')
+  @HttpCode(200)
+  @ApiOperation({
+    summary:
+      'Razorpay webhook: marks an order paid even if the customer closed the browser',
+  })
+  @ApiResponse({ status: 200, description: 'Webhook received.' })
+  @ApiResponse({ status: 400, description: 'Missing or invalid webhook signature.' })
+  async handleWebhook(
+    @Req() request: RawBodyRequest<Request>,
+    @Headers('x-razorpay-signature') signature: string,
+  ) {
+    return this.paymentsService.handleWebhook(request.rawBody, signature);
   }
 
   @Post('cod')

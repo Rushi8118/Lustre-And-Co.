@@ -13,7 +13,7 @@ import type { OrderDocument } from '../orders/schemas/order.schema.js';
 import { CreatePaymentIntentDto } from './dto/create-intent.dto.js';
 import { VerifyPaymentDto } from './dto/verify-payment.dto.js';
 import { CodPaymentDto } from './dto/cod-payment.dto.js';
-import { getRazorpayCredentials } from '../../common/utils/payments.js';
+import { getRazorpayCredentials, getRazorpayWebhookSecret } from '../../common/utils/payments.js';
 import { SupabaseService } from '../../database/supabase.service.js';
 import { escapeLike, toDoc, unwrap } from '../../common/utils/db.js';
 
@@ -22,12 +22,14 @@ export class PaymentsService {
   private readonly logger = new Logger(PaymentsService.name);
   private readonly razorpay: any;
   private readonly credentials: ReturnType<typeof getRazorpayCredentials>;
+  private readonly webhookSecret: string;
 
   constructor(
     @Inject(SupabaseService) private readonly db: SupabaseService,
     @Inject(ConfigService) private readonly configService: ConfigService,
   ) {
     this.credentials = getRazorpayCredentials(this.configService);
+    this.webhookSecret = getRazorpayWebhookSecret(this.configService);
 
     if (this.credentials.configured) {
       this.razorpay = new Razorpay({
@@ -143,20 +145,50 @@ export class PaymentsService {
       throw new BadRequestException('Payment signature verification failed.');
     }
 
+    await this.markOrderPaid(order, {
+      razorpayOrderId: dto.razorpayOrderId,
+      razorpayPaymentId: dto.razorpayPaymentId,
+      razorpaySignature: dto.razorpaySignature,
+    });
+
+    return {
+      success: true,
+      message: 'Payment verified successfully.',
+      orderId: order.orderId,
+      paymentStatus: 'paid',
+      transactionId: dto.razorpayPaymentId,
+    };
+  }
+
+  /** Records a successful payment against the order. Safe to call twice. */
+  private async markOrderPaid(
+    order: OrderDocument,
+    details: { razorpayOrderId?: string; razorpayPaymentId: string; razorpaySignature?: string },
+  ) {
+    if (order.payment?.status === 'paid') {
+      return;
+    }
+
     const paidAt = new Date().toISOString();
+    const payment = {
+      ...order.payment,
+      status: 'paid',
+      transactionId: details.razorpayPaymentId,
+      razorpayOrderId: details.razorpayOrderId ?? order.payment?.razorpayOrderId,
+      razorpayPaymentId: details.razorpayPaymentId,
+      ...(details.razorpaySignature ? { razorpaySignature: details.razorpaySignature } : {}),
+      paidAt,
+    };
+
     unwrap(
       await this.db
         .from('orders')
         .update({
-          payment: {
-            ...order.payment,
-            status: 'paid',
-            transactionId: dto.razorpayPaymentId,
-            razorpayPaymentId: dto.razorpayPaymentId,
-            razorpaySignature: dto.razorpaySignature,
-            paidAt,
-          },
-          statusHistory: [...(order.statusHistory || []), { status: order.status, note: 'Payment received', at: paidAt }],
+          payment,
+          statusHistory: [
+            ...(order.statusHistory || []),
+            { status: order.status, note: 'Payment received', at: paidAt },
+          ],
         })
         .eq('id', order.id),
     );
@@ -166,22 +198,55 @@ export class PaymentsService {
         .from('payments')
         .update({
           status: 'paid',
-          transactionId: dto.razorpayPaymentId,
-          razorpayOrderId: dto.razorpayOrderId,
-          razorpayPaymentId: dto.razorpayPaymentId,
-          razorpaySignature: dto.razorpaySignature,
+          transactionId: details.razorpayPaymentId,
+          razorpayOrderId: payment.razorpayOrderId,
+          razorpayPaymentId: details.razorpayPaymentId,
+          ...(details.razorpaySignature ? { razorpaySignature: details.razorpaySignature } : {}),
           paidAt,
         })
         .eq('orderId', order.orderId),
     );
+  }
 
-    return {
-      success: true,
-      message: 'Payment verified successfully.',
-      orderId: order.orderId,
-      paymentStatus: 'paid',
-      transactionId: dto.razorpayPaymentId,
-    };
+  /**
+   * Razorpay calls this when a payment is captured. It is the safety net for
+   * customers who close the browser before the confirmation page loads.
+   */
+  async handleWebhook(rawBody: Buffer | undefined, signature: string | undefined) {
+    if (!this.webhookSecret) {
+      throw new BadRequestException('Payment webhooks are not configured on this store.');
+    }
+    if (!rawBody || !signature) {
+      throw new BadRequestException('Missing webhook payload or signature.');
+    }
+
+    const expected = crypto.createHmac('sha256', this.webhookSecret).update(rawBody).digest('hex');
+    const expectedBuf = Buffer.from(expected);
+    const receivedBuf = Buffer.from(signature);
+    if (expectedBuf.length !== receivedBuf.length || !crypto.timingSafeEqual(expectedBuf, receivedBuf)) {
+      throw new BadRequestException('Webhook signature verification failed.');
+    }
+
+    const event = JSON.parse(rawBody.toString('utf8'));
+    const entity = event?.payload?.payment?.entity;
+    if (event?.event !== 'payment.captured' || !entity) {
+      // Other events (refunds, failures) need no action here.
+      return { received: true };
+    }
+
+    const orderId = entity.notes?.orderId;
+    if (!orderId) {
+      this.logger.warn(`Razorpay webhook for payment ${entity.id} carried no orderId note.`);
+      return { received: true };
+    }
+
+    const order = await this.findOrder(orderId);
+    await this.markOrderPaid(order, {
+      razorpayOrderId: entity.order_id,
+      razorpayPaymentId: entity.id,
+    });
+    this.logger.log(`Razorpay webhook marked order ${order.orderId} as paid.`);
+    return { received: true };
   }
 
   async confirmCodPayment(dto: CodPaymentDto) {
