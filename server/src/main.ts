@@ -4,7 +4,8 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module.js';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  // rawBody keeps the untouched payload needed to verify Razorpay webhook signatures.
+  const app = await NestFactory.create(AppModule, { rawBody: true });
 
   // 1. Enable CORS for Vite Frontend
   // Browsers send an Origin with no trailing slash, so normalise configured values.

@@ -15,3 +15,14 @@ export function getRazorpayCredentials(config: ConfigService) {
     configured: looksReal(keyId) && looksReal(keySecret),
   };
 }
+
+/**
+ * Razorpay signs webhook deliveries with a secret you choose in the dashboard.
+ * Without it we cannot trust webhook calls, so the endpoint stays disabled.
+ */
+export function getRazorpayWebhookSecret(config: ConfigService) {
+  const secret = config.get<string>('RAZORPAY_WEBHOOK_SECRET') || '';
+  const looksReal =
+    secret.length > 0 && !PLACEHOLDER_MARKERS.some((marker) => secret.includes(marker));
+  return looksReal ? secret : '';
+}
