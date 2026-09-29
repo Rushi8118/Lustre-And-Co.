@@ -18,6 +18,9 @@ export default defineConfig({
           if (/[\\/]node_modules[\\/](react|react-dom|react-router|react-router-dom|scheduler)[\\/]/.test(id)) {
             return "vendor-react";
           }
+          // Icons are used by every page. Left alone, Rollup emits one tiny chunk
+          // per icon, so each navigation waits on a handful of extra requests.
+          if (/[\\/]node_modules[\\/]lucide-react[\\/]/.test(id)) return "vendor-icons";
           return undefined;
         },
       },

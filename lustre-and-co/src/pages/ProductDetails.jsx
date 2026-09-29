@@ -53,12 +53,14 @@ export default function ProductDetails() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { addToCart, toggleWishlist, isWishlisted, showToast, user } = useStore();
+  const { addToCart, toggleWishlist, isWishlisted, showToast, user, products } = useStore();
   const { settings } = useSettings();
   const { commerce } = settings;
 
-  const [product, setProduct] = useState(null);
-  const [status, setStatus] = useState("loading");
+  const [product, setProduct] = useState(() => products.find((item) => item.slug === slug) || null);
+  const [status, setStatus] = useState(() =>
+    products.some((item) => item.slug === slug) ? "ready" : "loading"
+  );
   const [related, setRelated] = useState([]);
   const [reviewData, setReviewData] = useState({ reviews: [], distribution: [] });
 
@@ -103,37 +105,64 @@ export default function ProductDetails() {
 
   useEffect(() => {
     let active = true;
-    setStatus("loading");
     setActiveImage(0);
     setQuantity(1);
     setReviewMessage(null);
 
+    // The catalogue is already in memory, so show the piece straight away and
+    // refresh it from the server in the background. Waiting on that request
+    // left the page blank for about a second on every product.
+    const known = products.find((item) => item.slug === slug);
+    if (known) {
+      setProduct(known);
+      setSelectedColor(known.availableColors?.[0] || "Gold");
+      setSelectedSize(known.availableSizes?.[0] || "");
+      setStatus("ready");
+      trackViewItem(known);
+    } else {
+      setStatus("loading");
+    }
+
     (async () => {
       try {
-        const { data } = await api.get(`/products/${slug}`);
+        // Related items and reviews are not needed to paint the page, so they
+        // are requested alongside the product rather than after it.
+        const [productRes, relatedRes] = await Promise.allSettled([
+          api.get(`/products/${slug}`),
+          api.get(`/products/${slug}/related`),
+          loadReviews(slug)
+        ]);
         if (!active) return;
-        const loaded = normalizeProduct(data);
-        setProduct(loaded);
-        trackViewItem(loaded);
-        setSelectedColor(loaded.availableColors?.[0] || "Gold");
-        setSelectedSize(loaded.availableSizes?.[0] || "");
-        setStatus("ready");
 
-        const [relatedRes] = await Promise.allSettled([api.get(`/products/${slug}/related`), loadReviews(slug)]);
-        if (!active) return;
+        if (productRes.status === "fulfilled") {
+          const loaded = normalizeProduct(productRes.value.data);
+          setProduct(loaded);
+          if (!known) {
+            setSelectedColor(loaded.availableColors?.[0] || "Gold");
+            setSelectedSize(loaded.availableSizes?.[0] || "");
+            trackViewItem(loaded);
+          }
+          setStatus("ready");
+        } else if (!known) {
+          const err = productRes.reason;
+          setStatus(err?.response?.status === 404 ? "not-found" : "error");
+          return;
+        }
+
         if (relatedRes.status === "fulfilled") {
           const items = relatedRes.value.data.map(normalizeProduct);
           setRelated(items);
           setSelectedBundleIds(items.slice(0, 3).map((item) => item.slug));
         }
-      } catch (err) {
-        if (active) setStatus(err.response?.status === 404 ? "not-found" : "error");
+      } catch {
+        if (active && !known) setStatus("error");
       }
     })();
 
     return () => {
       active = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug]);
 
   const deliveryRange = useMemo(() => {

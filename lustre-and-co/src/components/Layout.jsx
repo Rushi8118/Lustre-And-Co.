@@ -1,6 +1,6 @@
 import { Suspense, useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import Header from "./Header";
 import Footer from "./Footer";
 import BottomNav from "./BottomNav";
@@ -33,22 +33,20 @@ export default function Layout() {
     <div className="app-shell">
       <Header />
 
-      {/* Short transitions: with mode="wait" the next page cannot start until the old one exits. */}
-      <AnimatePresence mode="wait">
-        <motion.main
-          key={location.pathname}
-          className="page-shell"
-          initial={{ opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.14, ease: "easeOut" }}
-        >
-          {/* Keeps the header and footer on screen while a page chunk loads. */}
-          <Suspense fallback={<PageLoader />}>
-            <Outlet />
-          </Suspense>
-        </motion.main>
-      </AnimatePresence>
+      {/* No exit animation: waiting for the old page to fade out delayed every
+          navigation. The new page mounts at once and fades in over it. */}
+      <motion.main
+        key={location.pathname}
+        className="page-shell"
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.14, ease: "easeOut" }}
+      >
+        {/* Keeps the header and footer on screen while a page chunk loads. */}
+        <Suspense fallback={<PageLoader />}>
+          <Outlet />
+        </Suspense>
+      </motion.main>
 
       <Footer />
       <BottomNav />
