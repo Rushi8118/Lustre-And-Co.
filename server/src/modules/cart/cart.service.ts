@@ -6,6 +6,12 @@ import { SettingsService } from '../settings/settings.service.js';
 import { SupabaseService } from '../../database/supabase.service.js';
 import { idOrColumn, isUuid, toDoc, toDocs, unwrap } from '../../common/utils/db.js';
 
+/**
+ * The abandoned-cart migration has not run yet: PostgREST reports a missing
+ * write column as PGRST204 and a missing filter column as Postgres 42703.
+ */
+const MISSING_COLUMN_CODES = ['PGRST204', '42703'];
+
 const toKey = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
 @Injectable()
@@ -25,7 +31,20 @@ export class CartService {
   }
 
   private async saveItems(cartId: string, items: CartItem[]) {
-    unwrap(await this.db.from('carts').update({ items }).eq('id', cartId));
+    // Clearing the stamp lets an abandoned-cart reminder be sent again after
+    // the shopper comes back and changes their cart. The column is added by a
+    // migration, so fall back to a plain save on databases without it yet
+    // rather than failing the shopper's cart update.
+    const result = await this.db
+      .from('carts')
+      .update({ items, abandonedEmailSentAt: null })
+      .eq('id', cartId);
+
+    if (result.error && MISSING_COLUMN_CODES.includes(result.error.code)) {
+      unwrap(await this.db.from('carts').update({ items }).eq('id', cartId));
+      return;
+    }
+    unwrap(result);
   }
 
   private async formatCart(cart: CartDocument) {

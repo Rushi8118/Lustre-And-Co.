@@ -3,6 +3,7 @@ import {
   NotFoundException,
   BadRequestException,
   Inject,
+  Logger,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import crypto from 'crypto';
@@ -11,6 +12,7 @@ import type { ProductDocument } from '../products/schemas/product.schema.js';
 import { DiscountsService } from '../discounts/discounts.service.js';
 import { CreateOrderDto } from './dto/create-order.dto.js';
 import { SettingsService } from '../settings/settings.service.js';
+import { SmtpService } from '../auth/smtp/smtp.service.js';
 import type { UserDocument } from '../users/schemas/user.schema.js';
 import { SupabaseService } from '../../database/supabase.service.js';
 import {
@@ -29,11 +31,14 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 
 @Injectable()
 export class OrdersService {
+  private readonly logger = new Logger(OrdersService.name);
+
   constructor(
     @Inject(SupabaseService) private readonly db: SupabaseService,
     @Inject(DiscountsService) private readonly discountsService: DiscountsService,
     @Inject(SettingsService) private readonly settingsService: SettingsService,
     @Inject(ConfigService) private readonly configService: ConfigService,
+    @Inject(SmtpService) private readonly smtpService: SmtpService,
   ) {}
 
   private async generateOrderId(): Promise<string> {
@@ -233,7 +238,46 @@ export class OrdersService {
       unwrap(await this.db.from('carts').update({ items: [] }).eq('user', userId.toString()));
     }
 
+    // Notifications must never fail a placed order, so they run detached.
+    this.smtpService
+      .sendOrderStatusEmail(order as any)
+      .catch((err) => this.logger.error(`Order confirmation email failed for ${order.orderId}: ${err.message}`));
+    this.notifyLowStock(lines, commerce.lowStockThreshold).catch((err) =>
+      this.logger.error(`Low stock alert failed for ${order.orderId}: ${err.message}`),
+    );
+
     return order;
+  }
+
+  /**
+   * Emails the owner when this order is what took a product down to the
+   * low-stock level, so repeat sales of an already-low product stay quiet.
+   */
+  private async notifyLowStock(
+    lines: Array<{ product: ProductDocument; quantity: number }>,
+    threshold: number,
+  ) {
+    const soldQuantity = new Map<string, number>();
+    for (const line of lines) {
+      soldQuantity.set(line.product.id, (soldQuantity.get(line.product.id) || 0) + line.quantity);
+    }
+
+    const rows = unwrap(
+      await this.db
+        .from('products')
+        .select('name, stockQuantity, id')
+        .in('id', [...soldQuantity.keys()]),
+    );
+
+    const crossed = (rows || []).filter((row: any) => {
+      const sold = soldQuantity.get(row.id) || 0;
+      const before = Number(row.stockQuantity) + sold;
+      return Number(row.stockQuantity) <= threshold && before > threshold;
+    });
+
+    if (crossed.length) {
+      await this.smtpService.sendLowStockEmail(crossed as any, threshold);
+    }
   }
 
   async getMyOrders(userId: string): Promise<OrderDocument[]> {

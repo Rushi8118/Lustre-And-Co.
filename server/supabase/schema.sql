@@ -113,9 +113,13 @@ create table if not exists carts (
   "user" uuid not null unique references users (id) on delete cascade,
   -- [{ id, product (uuid), quantity, selectedColor, selectedSize }]
   items jsonb not null default '[]'::jsonb,
+  -- Set once an abandoned-cart reminder goes out; cleared when the cart changes.
+  "abandonedEmailSentAt" timestamptz,
   "createdAt" timestamptz not null default now(),
   "updatedAt" timestamptz not null default now()
 );
+-- Existing databases: add the column without recreating the table.
+alter table carts add column if not exists "abandonedEmailSentAt" timestamptz;
 
 create table if not exists orders (
   id uuid primary key default gen_random_uuid(),

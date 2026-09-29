@@ -23,6 +23,8 @@ class StoreSettingsDto {
   @IsOptional() @IsString() whatsappNumber?: string;
   @IsOptional() @IsString() address?: string;
   @IsOptional() @IsString() hours?: string;
+  /** Printed on customer invoices; blank when the seller is not GST registered. */
+  @IsOptional() @IsString() gstin?: string;
 }
 
 class SocialSettingsDto {

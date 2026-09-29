@@ -128,6 +128,7 @@ export default function AdminSettings() {
               <Field label="Support phone"><input value={store.supportPhone} onChange={set("store", "supportPhone")} /></Field>
               <Field label="WhatsApp number" hint="Digits with country code, e.g. 919876543210"><input value={store.whatsappNumber} onChange={set("store", "whatsappNumber")} /></Field>
               <Field label="Support hours"><input value={store.hours} onChange={set("store", "hours")} /></Field>
+              <Field label="GSTIN" hint="Shown on customer invoices; leave blank if not registered"><input value={store.gstin || ""} onChange={set("store", "gstin")} /></Field>
               <Field label="Address" full><input value={store.address} onChange={set("store", "address")} /></Field>
               <Field label="Store description (footer)" full><textarea value={store.description} onChange={set("store", "description")} /></Field>
             </Card>

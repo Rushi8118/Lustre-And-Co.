@@ -1,8 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Heart, Menu, Search, ShoppingBag, UserRound, X, ChevronDown } from "lucide-react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useStore } from "../context/StoreContext";
 import { useSettings } from "../context/SettingsContext";
+import { trackSearch } from "../services/analytics";
+import { formatPrice } from "../data/products";
 
 export function BrandName({ name }) {
   const [left, right] = (name || "").split("&").map((part) => part.trim());
@@ -18,7 +20,7 @@ export function BrandName({ name }) {
 
 export default function Header() {
   const navigate = useNavigate();
-  const { cartCount, wishlist, user } = useStore();
+  const { cartCount, wishlist, user, products } = useStore();
   const { settings, categories } = useSettings();
 
   const [menuOpen, setMenuOpen] = useState(false);
@@ -42,12 +44,42 @@ export default function Header() {
     return () => document.body.classList.remove("menu-is-open");
   }, [menuOpen]);
 
+  // The whole catalogue is already loaded, so suggestions need no extra request.
+  const suggestions = useMemo(() => {
+    const term = query.trim().toLowerCase();
+    if (term.length < 2) return [];
+    const scored = [];
+    for (const product of products) {
+      const name = (product.name || "").toLowerCase();
+      const haystack = `${name} ${product.category || ""} ${product.material || ""} ${(product.tags || []).join(" ")}`.toLowerCase();
+      if (!haystack.includes(term)) continue;
+      // Name matches first, then earlier matches within the name.
+      const rank = name.startsWith(term) ? 0 : name.includes(term) ? 1 : 2;
+      scored.push({ product, rank });
+    }
+    return scored
+      .sort((a, b) => a.rank - b.rank || a.product.name.localeCompare(b.product.name))
+      .slice(0, 6)
+      .map((entry) => entry.product);
+  }, [query, products]);
+
+  function closeSearch() {
+    setSearchOpen(false);
+    setQuery("");
+  }
+
   function submitSearch(event) {
     event.preventDefault();
     if (!query.trim()) return;
+    trackSearch(query.trim());
     navigate(`/shop?search=${encodeURIComponent(query.trim())}`);
-    setSearchOpen(false);
-    setQuery("");
+    closeSearch();
+  }
+
+  function openSuggestion(product) {
+    trackSearch(query.trim());
+    navigate(`/product/${product.slug}`);
+    closeSearch();
   }
 
   return (
@@ -234,7 +266,7 @@ export default function Header() {
         <div className="search-overlay" role="dialog" aria-modal="true">
           <button
             className="search-overlay-close icon-button"
-            onClick={() => setSearchOpen(false)}
+            onClick={closeSearch}
             aria-label="Close search"
           >
             <X size={22} />
@@ -254,6 +286,34 @@ export default function Header() {
             <button className="button button-dark" type="submit">
               Search
             </button>
+
+            {query.trim().length >= 2 && (
+              <div className="search-suggestions" role="listbox" aria-label="Search suggestions">
+                {suggestions.length === 0 ? (
+                  <p className="search-suggestion-empty">
+                    Nothing matches “{query.trim()}”. Press Search to browse the full collection.
+                  </p>
+                ) : (
+                  suggestions.map((product) => (
+                    <button
+                      type="button"
+                      key={product.slug}
+                      className="search-suggestion"
+                      role="option"
+                      aria-selected="false"
+                      onClick={() => openSuggestion(product)}
+                    >
+                      <img src={product.image} alt="" loading="lazy" />
+                      <span className="search-suggestion-text">
+                        <span className="search-suggestion-name">{product.name}</span>
+                        <span className="search-suggestion-meta">{product.category}</span>
+                      </span>
+                      <span className="search-suggestion-price">{formatPrice(product.price)}</span>
+                    </button>
+                  ))
+                )}
+              </div>
+            )}
           </form>
         </div>
       )}

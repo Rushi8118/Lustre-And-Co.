@@ -3,6 +3,7 @@ import {
   ConflictException,
   Inject,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import slugify from 'slugify';
@@ -11,6 +12,7 @@ import { SupabaseService } from '../../database/supabase.service.js';
 import { USER_PUBLIC_COLUMNS, type UserDocument } from '../users/schemas/user.schema.js';
 import type { OrderDocument } from '../orders/schemas/order.schema.js';
 import { SettingsService } from '../settings/settings.service.js';
+import { SmtpService } from '../auth/smtp/smtp.service.js';
 import { AdminCreateProductDto } from './dto/create-product.dto.js';
 import { AdminUpdateProductDto } from './dto/update-product.dto.js';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto.js';
@@ -53,9 +55,12 @@ const startOfDay = (date: Date) => {
 
 @Injectable()
 export class AdminService {
+  private readonly logger = new Logger(AdminService.name);
+
   constructor(
     @Inject(SupabaseService) private readonly db: SupabaseService,
     @Inject(SettingsService) private readonly settingsService: SettingsService,
+    @Inject(SmtpService) private readonly smtpService: SmtpService,
   ) {}
 
   // ---------------------------------------------------------------------------
@@ -423,6 +428,13 @@ export class AdminService {
       'payment',
       'statusHistory',
     ]);
+
+    // Tell the customer the status changed. Email must not fail the request.
+    if (statusChanged) {
+      this.smtpService
+        .sendOrderStatusEmail(saved as any)
+        .catch((err) => this.logger.error(`Order status email failed for ${saved.orderId}: ${err.message}`));
+    }
 
     return {
       success: true,

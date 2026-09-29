@@ -11,6 +11,7 @@ import { CartModule } from './modules/cart/cart.module.js';
 import { WishlistModule } from './modules/wishlist/wishlist.module.js';
 import { PaymentsModule } from './modules/payments/payments.module.js';
 import { AdminModule } from './modules/admin/admin.module.js';
+import { JobsModule } from './modules/jobs/jobs.module.js';
 import { SettingsModule } from './modules/settings/settings.module.js';
 import { CategoriesModule } from './modules/categories/categories.module.js';
 import { ReviewsModule } from './modules/reviews/reviews.module.js';
@@ -40,6 +41,7 @@ import { SupabaseModule } from './database/supabase.module.js';
     CmsModule,
     EngagementModule,
     AdminModule,
+    JobsModule,
     DatabaseModule,
   ],
   controllers: [AppController],

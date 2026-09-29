@@ -1,0 +1,45 @@
+name: Store jobs
+
+# The free hosting plan sleeps an idle server, so scheduled work is triggered
+# from here instead of a timer inside the app.
+# Needs a repository secret named JOB_SECRET, matching the server's JOB_SECRET.
+on:
+  schedule:
+    # Abandoned-cart reminders: hourly at :23.
+    - cron: "23 * * * *"
+    # Low-stock digest: once a day at 03:40 UTC (09:10 IST).
+    - cron: "40 3 * * *"
+  workflow_dispatch:
+    inputs:
+      job:
+        description: Which job to run
+        required: true
+        default: abandoned-carts
+        type: choice
+        options:
+          - abandoned-carts
+          - low-stock-digest
+
+env:
+  API: https://lustre-and-co.onrender.com/api
+
+jobs:
+  abandoned-carts:
+    if: github.event.schedule == '23 * * * *' || github.event.inputs.job == 'abandoned-carts'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send abandoned cart reminders
+        run: |
+          curl -fsS -X POST "$API/jobs/abandoned-carts" \
+            -H "x-job-secret: ${{ secrets.JOB_SECRET }}" \
+            --retry 5 --retry-delay 15 --max-time 120
+
+  low-stock-digest:
+    if: github.event.schedule == '40 3 * * *' || github.event.inputs.job == 'low-stock-digest'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send low stock digest
+        run: |
+          curl -fsS -X POST "$API/jobs/low-stock-digest" \
+            -H "x-job-secret: ${{ secrets.JOB_SECRET }}" \
+            --retry 5 --retry-delay 15 --max-time 120
