@@ -24,6 +24,7 @@ import { useStore } from "../context/StoreContext";
 import { useSettings } from "../context/SettingsContext";
 import ProductCard from "../components/ProductCard";
 import api, { getErrorMessage } from "../services/api";
+import { trackViewItem } from "../services/analytics";
 
 function parseDayRange(text, fallback) {
   const numbers = String(text || "").match(/\d+/g);
@@ -113,6 +114,7 @@ export default function ProductDetails() {
         if (!active) return;
         const loaded = normalizeProduct(data);
         setProduct(loaded);
+        trackViewItem(loaded);
         setSelectedColor(loaded.availableColors?.[0] || "Gold");
         setSelectedSize(loaded.availableSizes?.[0] || "");
         setStatus("ready");

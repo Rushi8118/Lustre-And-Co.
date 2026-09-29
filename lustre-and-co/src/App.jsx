@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ScrollToTop from "./components/ScrollToTop";
+import AnalyticsTracker from "./components/AnalyticsTracker";
 import PageLoader from "./components/PageLoader";
 
 // The landing page loads eagerly so first paint is not delayed by an extra request.
@@ -15,6 +16,7 @@ const Wishlist = lazy(() => import("./pages/Wishlist"));
 const Cart = lazy(() => import("./pages/Cart"));
 const Checkout = lazy(() => import("./pages/Checkout"));
 const OrderConfirmation = lazy(() => import("./pages/OrderConfirmation"));
+const Invoice = lazy(() => import("./pages/Invoice"));
 const Auth = lazy(() => import("./pages/Auth"));
 const OAuthCallback = lazy(() => import("./pages/OAuthCallback"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
@@ -35,6 +37,7 @@ export default function App() {
   return (
     <>
       <ScrollToTop />
+      <AnalyticsTracker />
       <Suspense fallback={<PageLoader fullScreen />}>
         <Routes>
           <Route element={<Layout />}>
@@ -52,6 +55,7 @@ export default function App() {
             <Route path="/cart" element={<Cart />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/order-confirmation/:orderId" element={<OrderConfirmation />} />
+            <Route path="/invoice/:orderId" element={<Invoice />} />
 
             <Route path="/account/login" element={<Auth mode="login" />} />
             <Route path="/account/signup" element={<Auth mode="signup" />} />

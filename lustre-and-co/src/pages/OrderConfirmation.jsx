@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { ArrowRight, ShoppingBag, Truck, MapPin, Gift, ShieldCheck, Clock, CreditCard } from "lucide-react";
+import { ArrowRight, ShoppingBag, Truck, MapPin, Gift, ShieldCheck, Clock, CreditCard, FileText } from "lucide-react";
 import { formatPrice } from "../data/products";
 import { useStore } from "../context/StoreContext";
 import { useSettings } from "../context/SettingsContext";
@@ -108,6 +108,17 @@ export default function OrderConfirmation() {
             <p className="confirmation-friendly-message">Your jewelry is being prepared with care.</p>
             <p className="confirmation-email-notice">
               Keep your order number handy — you can track it anytime with <strong>{customer.email}</strong>.
+            </p>
+
+            <p className="confirmation-invoice-link">
+              <Link
+                className="text-link"
+                to={`/invoice/${encodeURIComponent(order.orderId)}${
+                  customer.email ? `?email=${encodeURIComponent(customer.email)}` : ""
+                }`}
+              >
+                <FileText size={14} /> View or download your invoice
+              </Link>
             </p>
 
             {awaitingOnlinePayment && (

@@ -9,6 +9,7 @@ export const DEFAULT_SETTINGS = {
     whatsappNumber: '',
     address: '742 Evergreen Terrace, Suite 4B, San Francisco, CA 94107',
     hours: 'Mon – Sat: 9:00 AM – 7:00 PM EST',
+    gstin: '',
   },
   social: {
     instagram: 'https://instagram.com',

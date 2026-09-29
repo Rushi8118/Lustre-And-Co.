@@ -9,6 +9,7 @@ import React, {
 } from "react";
 import { Link } from "react-router-dom";
 import api, { TOKEN_KEY, getErrorMessage } from "../services/api";
+import { trackAddToCart, trackPurchase } from "../services/analytics";
 import { cartItemId, formatPrice, normalizeProduct } from "../data/products";
 import { useSettings } from "./SettingsContext";
 
@@ -322,6 +323,7 @@ export function StoreProvider({ children }) {
           );
         }
 
+        trackAddToCart(product, quantity);
         showToast({
           title: "Added to Bag",
           message: product.name,
@@ -544,6 +546,7 @@ export function StoreProvider({ children }) {
       });
 
       setLastOrder(data);
+      trackPurchase(data);
       // Only the reference is persisted, so order details are not left in browser storage.
       writeStorage(LAST_ORDER_KEY, { orderId: data.orderId, email: data.customer?.email });
       setCart([]);

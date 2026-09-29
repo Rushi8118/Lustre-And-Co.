@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   ShieldCheck,
@@ -18,6 +18,7 @@ import { useStore } from "../context/StoreContext";
 import { useSettings } from "../context/SettingsContext";
 import api, { getErrorMessage } from "../services/api";
 import { payOrderOnline } from "../services/payments";
+import { trackBeginCheckout } from "../services/analytics";
 
 const COUNTRIES = ["India", "United States", "United Kingdom", "Canada", "Australia", "United Arab Emirates", "Singapore"];
 
@@ -55,6 +56,19 @@ export default function Checkout() {
   } = useStore();
   const { settings } = useSettings();
   const { commerce, payments, store } = settings;
+
+  // Reported once per visit to checkout, so the drop-off between bag and paid
+  // order is visible in Analytics. The bag is restored after mount, so this
+  // waits for it rather than firing on an empty cart.
+  const checkoutReported = useRef(false);
+  useEffect(() => {
+    if (checkoutReported.current || !cart.length) return;
+    checkoutReported.current = true;
+    trackBeginCheckout(
+      cart.map((item) => ({ ...item.product, quantity: item.quantity })),
+      cartSubtotal
+    );
+  }, [cart, cartSubtotal]);
 
   const paymentOptions = [payments.onlineEnabled && "razorpay", payments.codEnabled && "cod"].filter(Boolean);
 
