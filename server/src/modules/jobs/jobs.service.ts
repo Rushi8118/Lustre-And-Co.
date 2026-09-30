@@ -36,10 +36,19 @@ export class JobsService {
   assertSecret(provided?: string) {
     const expected = this.configService.get<string>('JOB_SECRET') || '';
     if (!expected) {
-      throw new UnauthorizedException('Background jobs are not enabled on this store.');
+      // Not 401: nothing the caller sends can work until the server is
+      // configured, so say that rather than blaming the request.
+      const message =
+        'Background jobs are disabled because JOB_SECRET is not set on the server. ' +
+        'Add it to the hosting environment variables and redeploy, then use the same ' +
+        'value as the JOB_SECRET repository secret.';
+      this.logger.error(message);
+      throw new ServiceUnavailableException(message);
     }
     if (provided !== expected) {
-      throw new UnauthorizedException('Invalid job secret.');
+      throw new UnauthorizedException(
+        'Invalid job secret. The x-job-secret header must match the server JOB_SECRET.',
+      );
     }
   }
 
