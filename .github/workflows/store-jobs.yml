@@ -30,9 +30,25 @@ jobs:
     steps:
       - name: Send abandoned cart reminders
         run: |
-          curl -fsS -X POST "$API/jobs/abandoned-carts" \
+          if [ -z "${{ secrets.JOB_SECRET }}" ]; then
+            echo "::error::The JOB_SECRET repository secret is not set."
+            echo "Add it under Settings -> Secrets and variables -> Actions,"
+            echo "using the same value as JOB_SECRET on the server."
+            exit 1
+          fi
+          # The server explains refusals in the response body, so print it
+          # instead of letting curl -f swallow the reason.
+          code=$(curl -sS -o response.txt -w '%{http_code}' \
+            -X POST "$API/jobs/abandoned-carts" \
             -H "x-job-secret: ${{ secrets.JOB_SECRET }}" \
-            --retry 5 --retry-delay 15 --max-time 120
+            --retry 5 --retry-delay 15 --retry-connrefused --max-time 120)
+          echo "HTTP $code"
+          cat response.txt
+          echo
+          if [ "$code" -lt 200 ] || [ "$code" -ge 300 ]; then
+            echo "::error::Abandoned cart job failed with HTTP $code (see the response above)."
+            exit 1
+          fi
 
   low-stock-digest:
     if: github.event.schedule == '40 3 * * *' || github.event.inputs.job == 'low-stock-digest'
@@ -40,6 +56,20 @@ jobs:
     steps:
       - name: Send low stock digest
         run: |
-          curl -fsS -X POST "$API/jobs/low-stock-digest" \
+          if [ -z "${{ secrets.JOB_SECRET }}" ]; then
+            echo "::error::The JOB_SECRET repository secret is not set."
+            echo "Add it under Settings -> Secrets and variables -> Actions,"
+            echo "using the same value as JOB_SECRET on the server."
+            exit 1
+          fi
+          code=$(curl -sS -o response.txt -w '%{http_code}' \
+            -X POST "$API/jobs/low-stock-digest" \
             -H "x-job-secret: ${{ secrets.JOB_SECRET }}" \
-            --retry 5 --retry-delay 15 --max-time 120
+            --retry 5 --retry-delay 15 --retry-connrefused --max-time 120)
+          echo "HTTP $code"
+          cat response.txt
+          echo
+          if [ "$code" -lt 200 ] || [ "$code" -ge 300 ]; then
+            echo "::error::Low stock digest failed with HTTP $code (see the response above)."
+            exit 1
+          fi
