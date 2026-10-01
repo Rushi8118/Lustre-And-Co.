@@ -30,11 +30,15 @@ jobs:
     steps:
       - name: Send abandoned cart reminders
         run: |
+          # Not an error: the store simply has not been set up for jobs yet.
+          # Failing here would email a failure every hour for a feature that is
+          # not switched on. Once the secret exists, real problems still fail.
           if [ -z "${{ secrets.JOB_SECRET }}" ]; then
-            echo "::error::The JOB_SECRET repository secret is not set."
-            echo "Add it under Settings -> Secrets and variables -> Actions,"
-            echo "using the same value as JOB_SECRET on the server."
-            exit 1
+            echo "::warning::Skipped: the JOB_SECRET repository secret is not set."
+            echo "To switch these reminders on, set JOB_SECRET in the hosting"
+            echo "environment variables, then add the same value under"
+            echo "Settings -> Secrets and variables -> Actions."
+            exit 0
           fi
           # The server explains refusals in the response body, so print it
           # instead of letting curl -f swallow the reason.
@@ -56,11 +60,15 @@ jobs:
     steps:
       - name: Send low stock digest
         run: |
+          # Not an error: the store simply has not been set up for jobs yet.
+          # Failing here would email a failure every hour for a feature that is
+          # not switched on. Once the secret exists, real problems still fail.
           if [ -z "${{ secrets.JOB_SECRET }}" ]; then
-            echo "::error::The JOB_SECRET repository secret is not set."
-            echo "Add it under Settings -> Secrets and variables -> Actions,"
-            echo "using the same value as JOB_SECRET on the server."
-            exit 1
+            echo "::warning::Skipped: the JOB_SECRET repository secret is not set."
+            echo "To switch these reminders on, set JOB_SECRET in the hosting"
+            echo "environment variables, then add the same value under"
+            echo "Settings -> Secrets and variables -> Actions."
+            exit 0
           fi
           code=$(curl -sS -o response.txt -w '%{http_code}' \
             -X POST "$API/jobs/low-stock-digest" \
