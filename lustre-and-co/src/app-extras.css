@@ -1,0 +1,297 @@
+/* Styles for data-driven states added when the storefront was connected to the API. */
+
+.app-boot {
+  display: grid;
+  min-height: 100vh;
+  place-content: center;
+  justify-items: center;
+  gap: 14px;
+  padding: 40px 20px;
+  background: var(--ivory);
+  color: var(--muted);
+  font-family: var(--sans);
+  text-align: center;
+}
+
+.app-boot-inline {
+  min-height: 50vh;
+}
+
+.app-boot-mark {
+  color: var(--gold);
+  font-size: 28px;
+  animation: app-boot-pulse 1.6s ease-in-out infinite;
+}
+
+.app-boot-error h1 {
+  max-width: 520px;
+  color: var(--black);
+  font-family: var(--serif);
+  font-size: clamp(26px, 4vw, 38px);
+  font-weight: 500;
+}
+
+.app-boot-error .app-boot-mark {
+  animation: none;
+}
+
+@keyframes app-boot-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.92);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+.catalog-loading {
+  padding: 40px 0;
+  color: var(--muted);
+  font-size: 14px;
+  text-align: center;
+}
+
+.inline-alert {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 14px 0;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.inline-alert-error {
+  border-color: rgba(173, 91, 88, 0.35);
+  background: rgba(173, 91, 88, 0.07);
+  color: #8f3f3b;
+}
+
+.inline-alert-success {
+  border-color: rgba(94, 128, 97, 0.35);
+  background: rgba(94, 128, 97, 0.08);
+  color: #3f6443;
+}
+
+.inline-alert-warning {
+  border-color: rgba(214, 181, 109, 0.5);
+  background: rgba(214, 181, 109, 0.12);
+  color: #6f5520;
+}
+
+.cms-paragraph {
+  max-width: 760px;
+  margin-bottom: 18px;
+  color: var(--muted);
+  line-height: 1.75;
+}
+
+.review-login-note {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.review-login-note a {
+  color: var(--black);
+  text-decoration: underline;
+}
+
+.tracking-details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 14px;
+  margin: 26px 0;
+}
+
+.tracking-details-grid div {
+  display: grid;
+  gap: 4px;
+  padding: 14px;
+  border: 1px solid var(--line);
+}
+
+.tracking-details-grid span {
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.tracking-history {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 22px;
+  padding-left: 18px;
+  font-size: 13px;
+}
+
+.tracking-history time {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.wishlist-trending {
+  margin-top: 4rem;
+  padding-top: 3rem;
+  border-top: 1px solid var(--line);
+}
+
+.wishlist-trending-heading {
+  margin-bottom: 2.5rem;
+  text-align: center;
+}
+
+.wishlist-trending-heading h3 {
+  margin-top: 0.5rem;
+  font-family: var(--serif);
+  font-size: 1.85rem;
+  font-weight: 500;
+}
+
+.account-empty-note {
+  padding: 16px 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.account-empty-note a {
+  color: var(--black);
+  text-decoration: underline;
+}
+
+.account-admin-portal-card {
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  border: 1px solid rgba(214, 181, 109, 0.4);
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(214, 181, 109, 0.16), rgba(34, 34, 34, 0.04));
+}
+
+.account-admin-portal-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.account-admin-portal-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #8c6b24;
+  font-size: 12.5px;
+}
+
+.account-tab-header-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.account-danger-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  color: #a8564e;
+}
+
+.order-status-badge.cancelled {
+  background: rgba(173, 91, 88, 0.1);
+  color: #a8564e;
+}
+
+.account-modal-backdrop {
+  position: fixed;
+  z-index: 9999;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+}
+
+.account-modal-content {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 28px;
+  border-radius: 18px;
+  background: var(--white);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.25);
+}
+
+.account-modal-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  padding: 4px;
+  border: 0;
+  background: transparent;
+  color: #777;
+  cursor: pointer;
+}
+
+.account-modal-title {
+  margin: 0 0 6px;
+  font-family: var(--serif);
+  font-size: 22px;
+}
+
+.account-modal-sub {
+  margin: 0 0 20px;
+  color: #777;
+  font-size: 12.5px;
+}
+
+.account-modal-form {
+  display: grid;
+  gap: 14px;
+}
+
+.account-modal-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+
+.account-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.checkout-saved-addresses {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.checkout-saved-label {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+@media (max-width: 600px) {
+  .account-modal-content .form-row-2 {
+    grid-template-columns: 1fr;
+  }
+}
