@@ -4,6 +4,7 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useStore } from "../context/StoreContext";
 import { useSettings } from "../context/SettingsContext";
 import api from "../services/api";
+import MegaMenu from "./MegaMenu";
 
 export function BrandName({ name }) {
   const [left, right] = (name || "").split("&").map((part) => part.trim());
@@ -171,70 +172,6 @@ export default function Header() {
             <BrandName name={settings.store.name} />
           </Link>
 
-          <nav className="desktop-navigation" aria-label="Main navigation">
-            <div
-              className="nav-dropdown"
-              onMouseEnter={() => setShopOpen(true)}
-              onMouseLeave={() => setShopOpen(false)}
-            >
-              <button
-                className="nav-link nav-dropdown-trigger"
-                aria-haspopup="true"
-                aria-expanded={shopOpen}
-                onClick={() => setShopOpen((open) => !open)}
-              >
-                Shop <ChevronDown size={14} />
-              </button>
-
-              {shopOpen && (
-                <div className="mega-menu">
-                  {feature?.enabled && (
-                    <div className="mega-menu-feature">
-                      <div className="mega-menu-feature-image">
-                        <img src={feature.image} alt={feature.eyebrow} />
-                      </div>
-                      <div>
-                        <span className="eyebrow">{feature.eyebrow}</span>
-                        <h3>{feature.title}</h3>
-                        <Link to={feature.ctaLink} className="text-link">
-                          {feature.ctaLabel}
-                        </Link>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="mega-menu-links">
-                    {shopLinks.map(([label, path]) => (
-                      <Link key={path} to={path}>
-                        {label}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <NavLink className="nav-link" to="/collections/bridal">
-              Collections
-            </NavLink>
-            <NavLink className="nav-link" to="/bundles">
-              Bundles & Sets
-            </NavLink>
-            <NavLink className="nav-link" to="/new-arrivals">
-              New Arrivals
-            </NavLink>
-            <NavLink className="nav-link" to="/best-sellers">
-              Best Sellers
-            </NavLink>
-            <NavLink className="nav-link" to="/about">
-              About Us
-            </NavLink>
-            {user?.role === "admin" && (
-              <NavLink className="nav-link" to="/admin">
-                Admin
-              </NavLink>
-            )}
-          </nav>
 
           <div className="header-actions">
             <button className="icon-button" aria-label="Search jewelry catalog" onClick={() => setSearchOpen(true)}>
@@ -268,6 +205,8 @@ export default function Header() {
             </Link>
           </div>
         </div>
+
+        <MegaMenu categories={categories} showAdmin={user?.role === "admin"} />
 
         <nav
           id="mobile-navigation-drawer"
