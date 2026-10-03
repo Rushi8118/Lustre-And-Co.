@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { ArrowUpRight, Star } from "lucide-react";
 import { motion } from "framer-motion";
 import { lazy, Suspense } from "react";
-const ThreeHero = lazy(() => import("../components/ThreeHero"));
+const JewelryShowcase = lazy(() => import("../components/JewelryShowcase"));
 import SectionHeading from "../components/SectionHeading";
 import ProductGrid from "../components/ProductGrid";
 import PromotionalBanner from "../components/PromotionalBanner";
@@ -59,69 +59,16 @@ export default function Home() {
     <>
       <HeroCarousel slides={carouselSlides} />
 
-      <section className="home-hero">
-        <div className="home-hero-noise" />
-        <div className="container home-hero-grid">
-          <motion.div
-            className="home-hero-copy"
-            initial={{ opacity: 0, x: -25 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.7 }}
-          >
-            <span className="eyebrow">{hero.eyebrow}</span>
-            <h1>
-              {hero.title} {hero.highlight && <em>{hero.highlight}</em>}
-            </h1>
+      <section className="showcase-section">
+        <div className="container showcase-inner">
+          <div className="showcase-copy">
+            <span className="eyebrow">Crafted to be seen</span>
+            <h2>{hero.title}</h2>
             <p>{hero.subtitle}</p>
-
-            <div className="hero-actions">
-              {hero.primaryCtaLabel && (
-                <Link to={hero.primaryCtaLink || "/shop"} className="button button-dark">
-                  {hero.primaryCtaLabel}
-                  <ArrowUpRight size={17} />
-                </Link>
-              )}
-              {hero.secondaryCtaLabel && (
-                <Link to={hero.secondaryCtaLink || "/shop"} className="text-link">
-                  {hero.secondaryCtaLabel}
-                </Link>
-              )}
-            </div>
-
-            {stats.reviewCount > 0 && (
-              <div className="hero-proof">
-                <div className="hero-proof-avatars" aria-hidden="true">
-                  <span>
-                    <Star size={13} fill="currentColor" />
-                  </span>
-                </div>
-                <div>
-                  <strong>
-                    {stats.averageRating}/5 from {stats.reviewCount} {stats.reviewCount === 1 ? "review" : "reviews"}
-                  </strong>
-                  <small>Rated by customers who wear our pieces.</small>
-                </div>
-              </div>
-            )}
-          </motion.div>
-
-          <motion.div
-            className="home-hero-visual"
-            initial={{ opacity: 0, scale: 0.92 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.9, delay: 0.15 }}
-          >
-            <div className="hero-visual-ring hero-ring-one" />
-            <div className="hero-visual-ring hero-ring-two" />
-            {hero.cardTitle && (
-              <div className="hero-visual-card">
-                <span className="eyebrow">{hero.cardEyebrow}</span>
-                <strong>{hero.cardTitle}</strong>
-                <small>{hero.cardText}</small>
-              </div>
-            )}
-            <Suspense fallback={null}><ThreeHero /></Suspense>
-          </motion.div>
+          </div>
+          <Suspense fallback={<div className="jewelry-showcase-loading" aria-hidden="true" />}>
+            <JewelryShowcase />
+          </Suspense>
         </div>
       </section>
 
