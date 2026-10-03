@@ -1,4 +1,4 @@
-import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DEFAULT_SETTINGS, SETTINGS_SECTIONS, StoreSettings } from './settings.defaults.js';
 import { UpdateSettingsDto } from './dto/update-settings.dto.js';
@@ -26,17 +26,36 @@ function deepMerge<T>(base: T, override: unknown): T {
 
 @Injectable()
 export class SettingsService implements OnModuleInit {
+  private readonly logger = new Logger(SettingsService.name);
+
   constructor(
     @Inject(SupabaseService) private readonly db: SupabaseService,
     @Inject(ConfigService) private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
   async onModuleInit() {
-    unwrap(
-      await this.db
-        .from('settings')
-        .upsert({ key: 'store', ...DEFAULT_SETTINGS }, { onConflict: 'key', ignoreDuplicates: true }),
-    );
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        const { error } = await this.db
+          .from('settings')
+          .upsert({ key: 'store', ...DEFAULT_SETTINGS }, { onConflict: 'key', ignoreDuplicates: true });
+        if (error) {
+          if (attempt === 3) {
+            this.logger.warn(`Settings onModuleInit warning: ${error.message}`);
+          } else {
+            await new Promise((resolve) => setTimeout(resolve, 500 * attempt));
+            continue;
+          }
+        }
+        break;
+      } catch (err: any) {
+        if (attempt === 3) {
+          this.logger.warn(`Settings onModuleInit warning: ${err?.message || err}`);
+        } else {
+          await new Promise((resolve) => setTimeout(resolve, 500 * attempt));
+        }
+      }
+    }
   }
 
   /** Full settings with defaults filled in for any section or field not yet saved. */

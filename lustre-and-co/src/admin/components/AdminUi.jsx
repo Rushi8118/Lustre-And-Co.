@@ -64,22 +64,31 @@ export function StatusBadge({ tone = "warning", children }) {
   return <span className={`admin-status-badge ${tone}`}>{children}</span>;
 }
 
-export function Tabs({ tabs, value, onChange }) {
+export function Tabs({ tabs = [], value, active, onChange }) {
+  const currentVal = value !== undefined ? value : active;
   return (
     <div className="admin-tabs" role="tablist">
-      {tabs.map((tab) => (
-        <button
-          key={tab.value}
-          type="button"
-          role="tab"
-          aria-selected={value === tab.value}
-          className={`admin-tab ${value === tab.value ? "active" : ""}`}
-          onClick={() => onChange(tab.value)}
-        >
-          {tab.label}
-          {tab.count !== undefined && <span className="admin-tab-count">{tab.count}</span>}
-        </button>
-      ))}
+      {tabs.map((tab) => {
+        const tabVal = tab.value !== undefined ? tab.value : (tab.id !== undefined ? tab.id : tab);
+        const tabLabel = tab.label || tab.name || tab;
+        const isSelected = String(currentVal ?? "") === String(tabVal ?? "");
+        return (
+          <button
+            key={String(tabVal)}
+            type="button"
+            role="tab"
+            aria-selected={isSelected}
+            className={`admin-tab ${isSelected ? "active" : ""}`}
+            onClick={() => onChange(tabVal)}
+          >
+            {tabLabel}
+            {tab.count !== undefined && <span className="admin-tab-count">{tab.count}</span>}
+          </button>
+        );
+      })}
     </div>
   );
 }
+
+export { default as AdminDropdown } from "./AdminDropdown";
+

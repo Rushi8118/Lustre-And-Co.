@@ -1,7 +1,8 @@
-import { RefreshCw, Search } from "lucide-react";
+import { RefreshCw, Search, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import AdminTable from "../components/AdminTable";
+import AdminDropdown from "../components/AdminDropdown";
 import { ErrorState, LoadingState, StatusBadge } from "../components/AdminUi";
 import { PAYMENT_STATUSES, formatAdminPrice, formatDateTime, paymentMethodLabel, paymentTone } from "../utils";
 import { useSettings } from "../../context/SettingsContext";
@@ -90,16 +91,39 @@ export default function AdminPayments() {
             }}
           >
             <Search size={16} />
-            <input value={searchInput} onChange={(e) => setSearchInput(e.target.value)} placeholder="Order or transaction ID — press Enter" />
+            <input
+              value={searchInput}
+              onChange={(e) => {
+                setSearchInput(e.target.value);
+                if (!e.target.value && search) {
+                  setSearch("");
+                }
+              }}
+              placeholder="Order or transaction ID — press Enter"
+            />
+            {searchInput && (
+              <button
+                type="button"
+                className="admin-table-search-clear"
+                onClick={() => {
+                  setSearchInput("");
+                  setSearch("");
+                }}
+                title="Clear search"
+              >
+                <X size={13} />
+              </button>
+            )}
           </form>
-          <select className="admin-select" value={status} onChange={(e) => setStatus(e.target.value)}>
-            <option value="all">All statuses</option>
-            {PAYMENT_STATUSES.map((s) => (
-              <option key={s} value={s}>
-                {s}
-              </option>
-            ))}
-          </select>
+          <AdminDropdown
+            value={status}
+            onChange={setStatus}
+            options={[
+              { value: "all", label: "All statuses" },
+              ...PAYMENT_STATUSES.map((s) => ({ value: s, label: s })),
+            ]}
+            ariaLabel="Filter payment status"
+          />
         </div>
 
         {error && <ErrorState message={error} onRetry={load} />}

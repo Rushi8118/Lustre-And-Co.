@@ -1,7 +1,8 @@
-import { Mail, RefreshCw, Search, Trash2 } from "lucide-react";
+import { Mail, RefreshCw, Search, Trash2, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import { EmptyState, ErrorState, LoadingState, StatusBadge, Tabs } from "../components/AdminUi";
+import AdminDropdown from "../components/AdminDropdown";
 import { formatDateTime } from "../utils";
 import { useStore } from "../../context/StoreContext";
 import api, { getErrorMessage } from "../../services/api";
@@ -51,12 +52,17 @@ function MessageCard({ message, onUpdate, onDelete }) {
             >
               <Mail size={14} /> Reply by email
             </a>
-            <select className="admin-select" value={message.status} onChange={(e) => onUpdate(message, { status: e.target.value })}>
-              <option value="new">New</option>
-              <option value="read">Read</option>
-              <option value="replied">Replied</option>
-              <option value="archived">Archived</option>
-            </select>
+            <AdminDropdown
+              value={message.status}
+              onChange={(val) => onUpdate(message, { status: val })}
+              options={[
+                { value: "new", label: "New" },
+                { value: "read", label: "Read" },
+                { value: "replied", label: "Replied" },
+                { value: "archived", label: "Archived" },
+              ]}
+              ariaLabel="Message status"
+            />
             <button type="button" className="admin-button admin-button-dark" onClick={() => onUpdate(message, { adminNote: note })}>
               Save note
             </button>
@@ -157,7 +163,29 @@ export default function AdminMessages() {
             }}
           >
             <Search size={16} />
-            <input value={searchInput} onChange={(e) => setSearchInput(e.target.value)} placeholder="Name, email, order, or text — press Enter" />
+            <input
+              value={searchInput}
+              onChange={(e) => {
+                setSearchInput(e.target.value);
+                if (!e.target.value && search) {
+                  setSearch("");
+                }
+              }}
+              placeholder="Name, email, order, or text — press Enter"
+            />
+            {searchInput && (
+              <button
+                type="button"
+                className="admin-table-search-clear"
+                onClick={() => {
+                  setSearchInput("");
+                  setSearch("");
+                }}
+                title="Clear search"
+              >
+                <X size={13} />
+              </button>
+            )}
           </form>
         </div>
 

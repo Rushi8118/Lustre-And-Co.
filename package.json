@@ -1,0 +1,12 @@
+{
+  "name": "lustre-and-co-workspace",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Lustre & Co. luxury e-commerce platform root workspace",
+  "scripts": {
+    "dev:server": "npm --prefix server run start:dev",
+    "dev:client": "npm --prefix lustre-and-co run dev",
+    "build:server": "npm --prefix server run build",
+    "build:client": "npm --prefix lustre-and-co run build"
+  }
+}

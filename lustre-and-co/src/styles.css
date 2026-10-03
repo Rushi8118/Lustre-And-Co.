@@ -11602,10 +11602,14 @@ textarea {
 button:focus-visible,
 a:focus-visible,
 input:focus-visible,
-select:focus-visible,
 textarea:focus-visible {
   outline: 2px solid var(--gold, #d6b56d);
   outline-offset: 2px;
+}
+
+select:focus,
+select:focus-visible {
+  outline: none !important;
 }
 
 /* Embedded inputs inside custom search and input wrappers */

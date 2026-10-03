@@ -24,16 +24,21 @@ import {
   Truck,
   Users,
   Warehouse,
-  X
+  X,
+  Eye,
+  Sun,
+  Moon
 } from "lucide-react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import { useStore } from "../../context/StoreContext";
 import { useSettings } from "../../context/SettingsContext";
+import { useAdminTheme } from "../context/AdminThemeContext";
 import { initials } from "../utils";
 
 export default function AdminSidebar({ sidebarOpen, setSidebarOpen, attention }) {
   const { user, logout } = useStore();
   const { settings } = useSettings();
+  const { theme, setTheme, isDark } = useAdminTheme();
   const navigate = useNavigate();
 
   const navigation = [
@@ -158,6 +163,41 @@ export default function AdminSidebar({ sidebarOpen, setSidebarOpen, attention })
             <div>
               <strong>{user?.name}</strong>
               <span>Administrator</span>
+            </div>
+          </div>
+
+          <div className="admin-sidebar-theme-card">
+            <div className="admin-sidebar-theme-head">
+              <span className="admin-sidebar-theme-title">
+                <Eye size={13} />
+                <span>Eye Comfort</span>
+              </span>
+              <span className="admin-sidebar-theme-badge">
+                {isDark ? "Dark" : "Light"}
+              </span>
+            </div>
+
+            <div className="admin-sidebar-theme-segments">
+              <button
+                type="button"
+                className={`theme-segment-btn ${!isDark ? "is-active" : ""}`}
+                onClick={() => setTheme("light")}
+                title="Switch to Light Theme"
+                aria-label="Light mode"
+              >
+                <Sun size={12} />
+                <span>Light</span>
+              </button>
+              <button
+                type="button"
+                className={`theme-segment-btn ${isDark ? "is-active" : ""}`}
+                onClick={() => setTheme("dark")}
+                title="Switch to Dark (Eye Comfort) Theme"
+                aria-label="Dark mode"
+              >
+                <Moon size={12} />
+                <span>Dark</span>
+              </button>
             </div>
           </div>
 

@@ -1,8 +1,9 @@
-import { Eye, Search, UserPlus, RefreshCw, UserX, UserCheck } from "lucide-react";
+import { Eye, Search, UserPlus, RefreshCw, UserX, UserCheck, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import AdminTable from "../components/AdminTable";
 import AdminModal from "../components/AdminModal";
+import AdminDropdown from "../components/AdminDropdown";
 import { CheckboxField, ErrorState, Field, FormError, LoadingState, StatusBadge } from "../components/AdminUi";
 import { formatAdminPrice, formatDate, formatDateTime, orderStatusTone } from "../utils";
 import { useStore } from "../../context/StoreContext";
@@ -323,19 +324,51 @@ export default function AdminCustomers() {
             }}
           >
             <Search size={16} />
-            <input value={searchInput} onChange={(e) => setSearchInput(e.target.value)} placeholder="Name, email, or phone — press Enter" />
+            <input
+              value={searchInput}
+              onChange={(e) => {
+                setSearchInput(e.target.value);
+                if (!e.target.value && filters.search) {
+                  setFilters((f) => ({ ...f, search: "" }));
+                }
+              }}
+              placeholder="Name, email, or phone — press Enter"
+            />
+            {searchInput && (
+              <button
+                type="button"
+                className="admin-table-search-clear"
+                onClick={() => {
+                  setSearchInput("");
+                  setFilters((f) => ({ ...f, search: "" }));
+                }}
+                title="Clear search"
+              >
+                <X size={13} />
+              </button>
+            )}
           </form>
           <div className="admin-toolbar-group">
-            <select className="admin-select" value={filters.role} onChange={(e) => setFilters((f) => ({ ...f, role: e.target.value }))}>
-              <option value="all">All roles</option>
-              <option value="customer">Customers</option>
-              <option value="admin">Admins</option>
-            </select>
-            <select className="admin-select" value={filters.status} onChange={(e) => setFilters((f) => ({ ...f, status: e.target.value }))}>
-              <option value="all">All statuses</option>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-            </select>
+            <AdminDropdown
+              value={filters.role}
+              onChange={(val) => setFilters((f) => ({ ...f, role: val }))}
+              options={[
+                { value: "all", label: "All roles" },
+                { value: "customer", label: "Customers" },
+                { value: "admin", label: "Admins" },
+              ]}
+              ariaLabel="Filter by role"
+            />
+            <AdminDropdown
+              value={filters.status}
+              onChange={(val) => setFilters((f) => ({ ...f, status: val }))}
+              options={[
+                { value: "all", label: "All statuses" },
+                { value: "active", label: "Active" },
+                { value: "inactive", label: "Inactive" },
+              ]}
+              ariaLabel="Filter by status"
+            />
           </div>
         </div>
 

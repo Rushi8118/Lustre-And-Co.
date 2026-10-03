@@ -82,9 +82,23 @@ export function StoreProvider({ children }) {
   const toastTimer = useRef(null);
 
   const showToast = useCallback((payload, type = "default") => {
-    const toastData =
-      typeof payload === "string" ? { message: payload, type } : { type, ...payload };
-    setToast(toastData);
+    let message = "";
+    let toastType = type;
+    let extra = {};
+
+    if (typeof payload === "string") {
+      message = payload;
+    } else if (payload && typeof payload === "object") {
+      message = payload.message || payload.text || payload.msg || payload.title || "";
+      if (payload.type) toastType = payload.type;
+      extra = payload;
+    }
+
+    if (!message && !extra.product) {
+      message = "Action updated successfully";
+    }
+
+    setToast({ message, type: toastType, ...extra });
     window.clearTimeout(toastTimer.current);
     toastTimer.current = window.setTimeout(() => setToast(null), 4200);
   }, []);
@@ -724,7 +738,7 @@ export function StoreProvider({ children }) {
           ) : (
             <div className="toast-standard-inner">
               <span className="toast-mark">✦</span>
-              <span className="toast-standard-text">{toast.message}</span>
+              <span className="toast-standard-text">{toast.message || "Notification"}</span>
               <button
                 type="button"
                 className="toast-dismiss-btn"

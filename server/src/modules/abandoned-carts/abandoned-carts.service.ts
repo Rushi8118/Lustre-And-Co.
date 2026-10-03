@@ -380,14 +380,21 @@ export class AbandonedCartsService {
     }
 
     const stats = {
-      totalAbandoned: enriched.filter((cart) => cart.status !== 'recovered')
+      totalAll: enriched.length,
+      activePending: enriched.filter((cart) => cart.status !== 'recovered')
+        .length,
+      totalAbandoned: enriched.filter((cart) => cart.status === 'abandoned')
         .length,
       totalAbandonedValue: enriched
         .filter((cart) => cart.status !== 'recovered')
         .reduce((sum, cart) => sum + cart.subtotal, 0),
       recoveryEmailsSent: enriched.filter(
-        (cart) => cart.recoveryEmailCount > 0,
+        (cart) => cart.status === 'recovery_sent',
       ).length,
+      emailsSentTotal: enriched.reduce(
+        (sum, cart) => sum + (cart.recoveryEmailCount || 0),
+        0,
+      ),
       recoveredCount: enriched.filter((cart) => cart.status === 'recovered')
         .length,
       recoveredValue: enriched

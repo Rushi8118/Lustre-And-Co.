@@ -8,6 +8,7 @@ import {
   ChevronDown,
   ChevronUp,
   Search,
+  X,
   XCircle,
   TrendingDown,
   ClipboardList,
@@ -350,6 +351,20 @@ export default function AdminInventory() {
                 onChange={handleSearchChange}
                 placeholder="Search name, SKU, or barcode…"
               />
+              {search && (
+                <button
+                  type="button"
+                  className="inv-search-clear"
+                  onClick={() => {
+                    setSearch("");
+                    clearTimeout(searchTimer.current);
+                    load("");
+                  }}
+                  title="Clear search"
+                >
+                  <X size={13} />
+                </button>
+              )}
             </div>
             <div className="inv-filter-group">
               {[

@@ -3,12 +3,14 @@ import { Outlet, useLocation } from "react-router-dom";
 import AdminSidebar from "./AdminSidebar";
 import AdminTopbar from "./AdminTopbar";
 import api from "../../services/api";
+import { useAdminTheme } from "../context/AdminThemeContext";
 
 const EMPTY_ATTENTION = { pendingReviews: 0, newMessages: 0, openOrders: 0, lowStock: 0 };
 
 export default function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [attention, setAttention] = useState(EMPTY_ATTENTION);
+  const { theme, toggleTheme, isDark } = useAdminTheme();
   const location = useLocation();
 
   const refreshAttention = useCallback(async () => {
@@ -25,14 +27,14 @@ export default function AdminLayout() {
   }, [refreshAttention, location.pathname]);
 
   return (
-    <div className="admin-shell">
+    <div className={`admin-shell ${isDark ? "admin-dark" : "admin-light"}`} data-theme={theme}>
       <AdminSidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} attention={attention} />
 
       <div className="admin-main">
         <AdminTopbar onMenuClick={() => setSidebarOpen(true)} attention={attention} />
 
         <main className="admin-content">
-          <Outlet context={{ attention, refreshAttention }} />
+          <Outlet context={{ attention, refreshAttention, theme, toggleTheme, isDark }} />
         </main>
       </div>
     </div>

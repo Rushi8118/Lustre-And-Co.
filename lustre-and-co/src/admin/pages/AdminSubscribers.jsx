@@ -1,4 +1,4 @@
-import { Download, RefreshCw, Search, Trash2 } from "lucide-react";
+import { Download, RefreshCw, Search, Trash2, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import AdminTable from "../components/AdminTable";
 import { ErrorState, LoadingState, StatusBadge } from "../components/AdminUi";
@@ -118,7 +118,29 @@ export default function AdminSubscribers() {
             }}
           >
             <Search size={16} />
-            <input value={searchInput} onChange={(e) => setSearchInput(e.target.value)} placeholder="Search email — press Enter" />
+            <input
+              value={searchInput}
+              onChange={(e) => {
+                setSearchInput(e.target.value);
+                if (!e.target.value && search) {
+                  setSearch("");
+                }
+              }}
+              placeholder="Search email — press Enter"
+            />
+            {searchInput && (
+              <button
+                type="button"
+                className="admin-table-search-clear"
+                onClick={() => {
+                  setSearchInput("");
+                  setSearch("");
+                }}
+                title="Clear search"
+              >
+                <X size={13} />
+              </button>
+            )}
           </form>
         </div>
         {error && <ErrorState message={error} onRetry={load} />}

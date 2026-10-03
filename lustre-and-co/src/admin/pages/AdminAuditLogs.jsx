@@ -15,6 +15,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ExternalLink,
+  X,
 } from "lucide-react";
 import api, { getErrorMessage } from "../../services/api";
 
@@ -211,17 +212,31 @@ export default function AdminAuditLogs() {
             ))}
           </select>
 
-          <input
-            type="text"
-            placeholder="Filter by resource (e.g. orders, users)"
-            value={filterResource}
-            onChange={(e) => {
-              setFilterResource(e.target.value);
-              setPage(1);
-            }}
-            className="admin-input"
-            style={{ padding: "8px 12px", borderRadius: "6px", fontSize: "13px", minWidth: "220px" }}
-          />
+          <div className="admin-search-wrap" style={{ minWidth: "240px", maxWidth: "340px" }}>
+            <Search size={15} />
+            <input
+              type="text"
+              placeholder="Filter by resource (e.g. orders, users)"
+              value={filterResource}
+              onChange={(e) => {
+                setFilterResource(e.target.value);
+                setPage(1);
+              }}
+            />
+            {filterResource && (
+              <button
+                type="button"
+                className="admin-search-clear-btn"
+                onClick={() => {
+                  setFilterResource("");
+                  setPage(1);
+                }}
+                title="Clear filter"
+              >
+                <X size={13} />
+              </button>
+            )}
+          </div>
 
           {(filterAction || filterResource) && (
             <button
@@ -505,10 +520,12 @@ export default function AdminAuditLogs() {
               </div>
               <button
                 type="button"
+                className="admin-modal-close"
                 onClick={() => setSelectedLog(null)}
-                style={{ background: "none", border: "none", fontSize: "20px", cursor: "pointer", color: "#78716c" }}
+                aria-label="Close dialog"
+                title="Close (Esc)"
               >
-                ×
+                <X size={18} strokeWidth={2.2} />
               </button>
             </div>
 

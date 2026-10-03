@@ -18,6 +18,7 @@ import {
   Filter,
   Settings,
   ShieldCheck,
+  X,
 } from "lucide-react";
 import {
   cancelShipment,
@@ -52,6 +53,20 @@ const STATUS_CONFIG = {
 function StatusBadge({ status }) {
   const cfg = STATUS_CONFIG[status] || { label: status, color: "muted" };
   return <span className={`shipment-status-badge shipment-status-${cfg.color}`}>{cfg.label}</span>;
+}
+
+function formatShipmentDate(val) {
+  if (!val) return "Recently";
+  const d = new Date(val);
+  return isNaN(d.getTime())
+    ? "Recently"
+    : d.toLocaleString("en-IN", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
 }
 
 export default function AdminShipments({ orderId }) {
@@ -336,7 +351,7 @@ export default function AdminShipments({ orderId }) {
 
       {isStandalone && (
         <div className="admin-toolbar" style={{ marginBottom: 20, display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <div className="admin-tabs" role="tablist">
             {[
               { id: "all", label: "All" },
               { id: "created", label: "Created" },
@@ -347,7 +362,9 @@ export default function AdminShipments({ orderId }) {
             ].map((tab) => (
               <button
                 key={tab.id}
-                className={`admin-tab-btn ${statusFilter === tab.id ? "is-active" : ""}`}
+                role="tab"
+                aria-selected={statusFilter === tab.id}
+                className={`admin-tab ${statusFilter === tab.id ? "active" : ""}`}
                 onClick={() => setStatusFilter(tab.id)}
               >
                 {tab.label}
@@ -355,16 +372,24 @@ export default function AdminShipments({ orderId }) {
             ))}
           </div>
 
-          <div style={{ position: "relative", minWidth: 260 }}>
-            <Search size={15} style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "#888" }} />
+          <div className="admin-search-wrap">
+            <Search size={15} />
             <input
               type="text"
               placeholder="Search tracking, order ID, courier…"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="admin-search-input"
-              style={{ paddingLeft: 34, width: "100%", height: 38 }}
             />
+            {searchQuery && (
+              <button
+                type="button"
+                className="admin-search-clear-btn"
+                onClick={() => setSearchQuery("")}
+                title="Clear search"
+              >
+                <X size={13} />
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -424,10 +449,12 @@ export default function AdminShipments({ orderId }) {
               </div>
             </div>
 
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 12, color: "var(--admin-muted, #666)", margin: "8px 0", flexWrap: "wrap", gap: 8 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13, color: "var(--admin-muted)", margin: "10px 0", flexWrap: "wrap", gap: 8 }}>
               <div>
-                Created: {new Date(shipment.createdAt).toLocaleString()}
-                {shipment.deliveredAt && ` · Delivered: ${new Date(shipment.deliveredAt).toLocaleString()}`}
+                Created: <strong style={{ color: "var(--admin-text)", fontWeight: 500 }}>{formatShipmentDate(shipment.createdAt || shipment.created_at || shipment.orderDate || shipment.date)}</strong>
+                {shipment.deliveredAt && (
+                  <span> · Delivered: <strong style={{ color: "var(--admin-green)", fontWeight: 500 }}>{formatShipmentDate(shipment.deliveredAt)}</strong></span>
+                )}
               </div>
               {shipment.shippingCost > 0 && (
                 <div>
@@ -525,7 +552,7 @@ export default function AdminShipments({ orderId }) {
                           {event.description && <span className="event-desc">{event.description}</span>}
                           {event.location && <span className="event-location"><MapPin size={11} /> {event.location}</span>}
                           <time className="event-time">
-                            <Clock size={10} /> {new Date(event.event_time).toLocaleString()}
+                            <Clock size={12} /> {formatShipmentDate(event.event_time || event.createdAt || event.timestamp)}
                           </time>
                         </div>
                       </li>
@@ -593,10 +620,12 @@ export default function AdminShipments({ orderId }) {
               </h3>
               <button
                 type="button"
-                className="admin-button admin-button-sm"
+                className="admin-modal-close"
                 onClick={() => setProvidersModalOpen(false)}
+                aria-label="Close dialog"
+                title="Close (Esc)"
               >
-                ✕ Close
+                <X size={18} strokeWidth={2.2} />
               </button>
             </div>
             <p style={{ fontSize: 13, color: "var(--admin-muted, #777)", margin: "0 0 16px 0" }}>

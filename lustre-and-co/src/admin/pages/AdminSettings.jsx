@@ -1,8 +1,9 @@
-import { Check, CreditCard, Globe, Lock, ShieldCheck, ShoppingBag, Store, Truck, UserRound } from "lucide-react";
+import { Check, CreditCard, Globe, Lock, ShieldCheck, ShoppingBag, Store, Truck, UserRound, Eye, Sun, Moon } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { CheckboxField, ErrorState, Field, FormError, LoadingState, StatusBadge } from "../components/AdminUi";
 import { useSettings } from "../../context/SettingsContext";
 import { useStore } from "../../context/StoreContext";
+import { useAdminTheme } from "../context/AdminThemeContext";
 import api, { getErrorMessage } from "../../services/api";
 import {
   getRecoverySettings,
@@ -27,6 +28,7 @@ const NUMERIC_COMMERCE = ["freeShippingThreshold", "shippingFee", "expressShippi
 export default function AdminSettings() {
   const { settings: publicSettings, reload } = useSettings();
   const { user, updateUser, showToast } = useStore();
+  const { theme, setTheme, isDark } = useAdminTheme();
 
   const [draft, setDraft] = useState(null);
   const [error, setError] = useState("");
@@ -166,6 +168,7 @@ export default function AdminSettings() {
 
       <div className="admin-settings-layout">
         <aside className="admin-settings-nav">
+          <a href="#appearance"><Eye size={16} /> Appearance &amp; Eye Comfort</a>
           <a href="#store"><Store size={16} /> Store profile</a>
           <a href="#social"><Globe size={16} /> Social links</a>
           <a href="#commerce"><Truck size={16} /> Shipping &amp; tax</a>
@@ -176,6 +179,68 @@ export default function AdminSettings() {
         </aside>
 
         <div className="admin-settings-content">
+          <Card id="appearance" eyebrow="Workspace Display" title="Appearance & Eye Comfort">
+            <div className="admin-form-full">
+              <p className="admin-appearance-intro">
+                Choose your admin workspace theme. Dark theme features an eye-comfort palette engineered with reduced glare and soothing warm gold accents to minimize visual strain during extended work hours.
+              </p>
+
+              <div className="admin-theme-selection-grid">
+                <div
+                  className={`admin-theme-card-option ${!isDark ? "selected" : ""}`}
+                  onClick={() => setTheme("light")}
+                  role="button"
+                  tabIndex={0}
+                >
+                  <div className="theme-card-preview light-preview">
+                    <div className="preview-topbar" />
+                    <div className="preview-body">
+                      <div className="preview-sidebar" />
+                      <div className="preview-content">
+                        <div className="preview-row" />
+                        <div className="preview-row short" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="theme-card-meta">
+                    <div className="theme-card-title">
+                      <Sun size={15} />
+                      <strong>Light Studio</strong>
+                      {!isDark && <span className="theme-active-tag">Active</span>}
+                    </div>
+                    <p>Clean ivory and warm cream tones, ideal for bright daytime environments.</p>
+                  </div>
+                </div>
+
+                <div
+                  className={`admin-theme-card-option ${isDark ? "selected" : ""}`}
+                  onClick={() => setTheme("dark")}
+                  role="button"
+                  tabIndex={0}
+                >
+                  <div className="theme-card-preview dark-preview">
+                    <div className="preview-topbar" />
+                    <div className="preview-body">
+                      <div className="preview-sidebar" />
+                      <div className="preview-content">
+                        <div className="preview-row" />
+                        <div className="preview-row short" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="theme-card-meta">
+                    <div className="theme-card-title">
+                      <Moon size={15} />
+                      <strong>Dark Studio (Eye Comfort)</strong>
+                      {isDark && <span className="theme-active-tag">Active</span>}
+                    </div>
+                    <p>Deep onyx and soft gold palette designed for eye comfort, low light, and less glare.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Card>
+
           <form onSubmit={save} className="admin-settings-content">
             <Card id="store" eyebrow="Store profile" title="Public store details">
               <Field label="Store name"><input value={store.name} onChange={set("store", "name")} required /></Field>

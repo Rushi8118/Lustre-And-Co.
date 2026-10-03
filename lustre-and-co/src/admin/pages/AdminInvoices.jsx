@@ -9,6 +9,7 @@ import {
   Building,
   CreditCard,
   Package,
+  X,
 } from "lucide-react";
 import {
   getCompanyDetails,
@@ -62,10 +63,10 @@ export default function AdminInvoices() {
       header: "Order / Invoice ID",
       cell: (o) => (
         <div>
-          <strong style={{ fontFamily: "monospace" }}>#{o.orderId}</strong>
-          <div style={{ fontSize: "11px", color: "#777" }}>
+          <strong style={{ fontFamily: "monospace", fontSize: "13.5px", color: "var(--admin-text)" }}>#{o.orderId}</strong>
+          <div style={{ fontSize: "12px", color: "var(--admin-muted)", marginTop: "2px" }}>
             {o.invoice_number ? (
-              <span style={{ color: "#16a34a", fontWeight: 600 }}>{o.invoice_number}</span>
+              <span style={{ color: "var(--admin-green)", fontWeight: 600 }}>{o.invoice_number}</span>
             ) : (
               "Tax Invoice Available"
             )}
@@ -77,9 +78,9 @@ export default function AdminInvoices() {
       header: "Customer",
       cell: (o) => (
         <div>
-          <strong>{o.customer?.fullName}</strong>
-          <div style={{ fontSize: "11px", color: "#666" }}>
-            {o.shippingAddress?.city}, {o.shippingAddress?.state}
+          <strong style={{ fontSize: "13.5px", color: "var(--admin-text)" }}>{o.customer?.fullName}</strong>
+          <div style={{ fontSize: "12px", color: "var(--admin-muted)", marginTop: "2px" }}>
+            {o.shippingAddress?.city ? `${o.shippingAddress.city}, ${o.shippingAddress.state}` : (o.customer?.email || "—")}
           </div>
         </div>
       ),
@@ -88,8 +89,8 @@ export default function AdminInvoices() {
       header: "Taxable Value",
       cell: (o) => (
         <div>
-          <span>{formatAdminPrice(o.subtotal - (o.discount || 0))}</span>
-          <div style={{ fontSize: "11px", color: "#777" }}>
+          <span style={{ fontSize: "13.5px", color: "var(--admin-text)", fontWeight: 500 }}>{formatAdminPrice(o.subtotal - (o.discount || 0))}</span>
+          <div style={{ fontSize: "12px", color: "var(--admin-muted)", marginTop: "2px" }}>
             Tax (3% GST): {formatAdminPrice(o.tax)}
           </div>
         </div>
@@ -97,12 +98,12 @@ export default function AdminInvoices() {
     },
     {
       header: "Total Amount",
-      cell: (o) => <strong>{formatAdminPrice(o.total)}</strong>,
+      cell: (o) => <strong style={{ fontSize: "14px", color: "var(--admin-text)" }}>{formatAdminPrice(o.total)}</strong>,
     },
     {
       header: "Date Placed",
       cell: (o) => (
-        <span style={{ fontSize: "12px", color: "#666" }}>
+        <span style={{ fontSize: "12.5px", color: "var(--admin-muted)" }}>
           {formatDateTime(o.createdAt)}
         </span>
       ),
@@ -113,57 +114,57 @@ export default function AdminInvoices() {
         <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
           <button
             type="button"
-            className="admin-button admin-button-secondary"
+            className="admin-button admin-button-light"
             onClick={() => openDocumentInNewTab(getInvoiceHtmlUrl(o.orderId || o.id))}
             title="Download GST Compliant Tax Invoice"
-            style={{ padding: "4px 8px", fontSize: "11px" }}
+            style={{ padding: "6px 10px", fontSize: "12px" }}
           >
-            <FileText size={12} style={{ marginRight: "3px" }} /> Tax Invoice
+            <FileText size={13} style={{ marginRight: "4px" }} /> Tax Invoice
           </button>
           <button
             type="button"
-            className="admin-button admin-button-secondary"
+            className="admin-button admin-button-light"
             onClick={() => openDocumentInNewTab(getPackingSlipHtmlUrl(o.orderId || o.id))}
             title="Download Warehouse Packing Slip"
-            style={{ padding: "4px 8px", fontSize: "11px" }}
+            style={{ padding: "6px 10px", fontSize: "12px" }}
           >
-            <Package size={12} style={{ marginRight: "3px" }} /> Packing Slip
+            <Package size={13} style={{ marginRight: "4px" }} /> Packing Slip
           </button>
           <button
             type="button"
-            className="admin-button admin-button-secondary"
+            className="admin-button admin-button-light"
             onClick={() => openDocumentInNewTab(getShippingLabelHtmlUrl(o.orderId || o.id))}
             title="Download Printable Shipping Label with Barcode"
-            style={{ padding: "4px 8px", fontSize: "11px" }}
+            style={{ padding: "6px 10px", fontSize: "12px" }}
           >
-            <Printer size={12} style={{ marginRight: "3px" }} /> Shipping Label
+            <Printer size={13} style={{ marginRight: "4px" }} /> Shipping Label
           </button>
           <button
             type="button"
-            className="admin-button admin-button-secondary"
+            className="admin-button admin-button-light"
             onClick={() => openDocumentInNewTab(getOrderSummaryHtmlUrl(o.orderId || o.id))}
             title="Download Customer Order Summary"
-            style={{ padding: "4px 8px", fontSize: "11px" }}
+            style={{ padding: "6px 10px", fontSize: "12px" }}
           >
-            <Download size={12} style={{ marginRight: "3px" }} /> Summary
+            <Download size={13} style={{ marginRight: "4px" }} /> Summary
           </button>
           {o.return_id && (
             <>
               <button
                 type="button"
-                className="admin-button admin-button-secondary"
+                className="admin-button admin-button-light"
                 onClick={() => openDocumentInNewTab(getCreditNoteHtmlUrl(o.return_id))}
                 title="Download Credit Note"
-                style={{ padding: "4px 8px", fontSize: "11px", color: "#d97706" }}
+                style={{ padding: "6px 10px", fontSize: "12px", color: "var(--admin-gold)" }}
               >
                 Credit Note
               </button>
               <button
                 type="button"
-                className="admin-button admin-button-secondary"
+                className="admin-button admin-button-light"
                 onClick={() => openDocumentInNewTab(getRefundReceiptHtmlUrl(o.return_id))}
                 title="Download Refund Receipt"
-                style={{ padding: "4px 8px", fontSize: "11px", color: "#16a34a" }}
+                style={{ padding: "6px 10px", fontSize: "12px", color: "var(--admin-green)" }}
               >
                 Refund Receipt
               </button>
@@ -187,48 +188,49 @@ export default function AdminInvoices() {
       {company && (
         <div
           style={{
-            background: "#faf8f5",
-            border: "1px solid #e2dcd2",
-            borderRadius: "10px",
+            background: "var(--admin-surface)",
+            border: "1px solid var(--admin-border)",
+            borderRadius: "8px",
             padding: "20px",
             marginBottom: "24px",
             display: "grid",
             gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
             gap: "16px",
-            fontSize: "13px",
+            fontSize: "13.5px",
+            color: "var(--admin-text)",
           }}
         >
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: "6px", color: "#8a6d3b", marginBottom: "4px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "var(--admin-gold)", marginBottom: "6px" }}>
               <Building size={16} />
-              <strong style={{ fontSize: "12px", textTransform: "uppercase" }}>Registered Entity</strong>
+              <strong style={{ fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Registered Entity</strong>
             </div>
-            <strong>{company.companyName}</strong>
-            <div style={{ fontSize: "11px", color: "#666", marginTop: "2px" }}>
+            <strong style={{ fontSize: "14px" }}>{company.companyName}</strong>
+            <div style={{ fontSize: "12px", color: "var(--admin-muted)", marginTop: "4px" }}>
               CIN: <strong>{company.cin}</strong>
             </div>
           </div>
 
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: "6px", color: "#8a6d3b", marginBottom: "4px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "var(--admin-gold)", marginBottom: "6px" }}>
               <ShieldCheck size={16} />
-              <strong style={{ fontSize: "12px", textTransform: "uppercase" }}>Tax Identifiers</strong>
+              <strong style={{ fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Tax Identifiers</strong>
             </div>
             <div>
               GSTIN: <strong>{company.gstin}</strong>
             </div>
-            <div style={{ fontSize: "11px", color: "#666" }}>
+            <div style={{ fontSize: "12px", color: "var(--admin-muted)", marginTop: "4px" }}>
               PAN: <strong>{company.pan}</strong> | State Code: <strong>{company.stateCode} ({company.state})</strong>
             </div>
           </div>
 
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: "6px", color: "#8a6d3b", marginBottom: "4px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "var(--admin-gold)", marginBottom: "6px" }}>
               <CreditCard size={16} />
-              <strong style={{ fontSize: "12px", textTransform: "uppercase" }}>Settlement Wire</strong>
+              <strong style={{ fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Settlement Wire</strong>
             </div>
             <div>{company.bankDetails?.bankName}</div>
-            <div style={{ fontSize: "11px", color: "#666" }}>
+            <div style={{ fontSize: "12px", color: "var(--admin-muted)", marginTop: "4px" }}>
               A/C: {company.bankDetails?.accountNumber} | IFSC: {company.bankDetails?.ifsc}
             </div>
           </div>
@@ -245,6 +247,16 @@ export default function AdminInvoices() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
+          {searchTerm && (
+            <button
+              type="button"
+              className="admin-search-clear-btn"
+              onClick={() => setSearchTerm("")}
+              title="Clear search"
+            >
+              <X size={13} />
+            </button>
+          )}
         </div>
       </div>
 

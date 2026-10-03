@@ -24,7 +24,7 @@ export function SettingsProvider({ children }) {
   const [status, setStatus] = useState("loading");
   const [error, setError] = useState("");
 
-  const reload = useCallback(async () => {
+  const reload = useCallback(async (isRetry = false) => {
     try {
       const [settingsRes, categoriesRes] = await Promise.all([
         api.get("/settings"),
@@ -37,6 +37,11 @@ export function SettingsProvider({ children }) {
       setError("");
       setStatus("ready");
     } catch (err) {
+      if (!isRetry) {
+        // Give backend an extra 1.5s to respond in case it was still starting up
+        setTimeout(() => reload(true), 1500);
+        return;
+      }
       setError(getErrorMessage(err, "The store could not be loaded."));
       setStatus((current) => (current === "ready" ? "ready" : "error"));
     }

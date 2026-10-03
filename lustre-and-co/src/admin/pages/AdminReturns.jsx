@@ -13,6 +13,7 @@ import {
   Package,
   RefreshCw,
   AlertTriangle,
+  X,
 } from "lucide-react";
 import AdminTable from "../components/AdminTable";
 import AdminModal from "../components/AdminModal";
@@ -226,10 +227,10 @@ export default function AdminReturns() {
       header: "Case ID",
       cell: (r) => (
         <div>
-          <strong style={{ fontFamily: "monospace", color: "#1a1714" }}>
+          <strong style={{ fontFamily: "monospace", fontSize: "13.5px", color: "var(--admin-text)" }}>
             {r.returnNumber}
           </strong>
-          <div style={{ fontSize: "11px", color: "#777" }}>
+          <div style={{ fontSize: "12px", color: "var(--admin-muted)", marginTop: "2px" }}>
             {r.requestType === "exchange" ? "Exchange" : "Return"}
           </div>
         </div>
@@ -238,15 +239,15 @@ export default function AdminReturns() {
     {
       header: "Order",
       cell: (r) => (
-        <span style={{ fontFamily: "monospace" }}>#{r.orderNumber}</span>
+        <span style={{ fontFamily: "monospace", fontSize: "13px", fontWeight: 600, color: "var(--admin-text)" }}>#{r.orderNumber}</span>
       ),
     },
     {
       header: "Customer",
       cell: (r) => (
         <div>
-          <strong>{r.customer?.name}</strong>
-          <div style={{ fontSize: "11px", color: "#777" }}>
+          <strong style={{ fontSize: "13.5px", color: "var(--admin-text)" }}>{r.customer?.name}</strong>
+          <div style={{ fontSize: "12px", color: "var(--admin-muted)", marginTop: "2px" }}>
             {r.customer?.email}
           </div>
         </div>
@@ -256,8 +257,8 @@ export default function AdminReturns() {
       header: "Items & Value",
       cell: (r) => (
         <div>
-          <span>{r.totalItemsCount} piece(s)</span>
-          <div style={{ fontWeight: 600, color: "#1a1714" }}>
+          <span style={{ fontSize: "13px", color: "var(--admin-muted)" }}>{r.totalItemsCount} piece(s)</span>
+          <div style={{ fontWeight: 600, fontSize: "13.5px", color: "var(--admin-text)", marginTop: "2px" }}>
             {formatAdminPrice(r.actualRefundAmount || r.calculatedRefundAmount)}
           </div>
         </div>
@@ -272,7 +273,7 @@ export default function AdminReturns() {
     {
       header: "Requested",
       cell: (r) => (
-        <span style={{ fontSize: "12px", color: "#666" }}>
+        <span style={{ fontSize: "12.5px", color: "var(--admin-muted)" }}>
           {formatDateTime(r.createdAt)}
         </span>
       ),
@@ -282,9 +283,9 @@ export default function AdminReturns() {
       cell: (r) => (
         <button
           type="button"
-          className="admin-button admin-button-secondary"
+          className="admin-button admin-button-light"
           onClick={() => openDetailModal(r.id)}
-          style={{ padding: "4px 10px", fontSize: "12px" }}
+          style={{ padding: "6px 12px", fontSize: "12px" }}
         >
           <Eye size={13} style={{ marginRight: "4px" }} /> Manage
         </button>
@@ -301,7 +302,7 @@ export default function AdminReturns() {
         </div>
         <button
           type="button"
-          className="admin-button admin-button-secondary"
+          className="admin-button admin-button-light"
           onClick={loadData}
           disabled={loading}
         >
@@ -326,6 +327,16 @@ export default function AdminReturns() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
+          {searchTerm && (
+            <button
+              type="button"
+              className="admin-search-clear-btn"
+              onClick={() => setSearchTerm("")}
+              title="Clear search"
+            >
+              <X size={13} />
+            </button>
+          )}
         </div>
       </div>
 

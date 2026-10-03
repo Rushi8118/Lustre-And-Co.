@@ -1,8 +1,9 @@
-import { Download, Eye, Search, RefreshCw, FileText, Printer } from "lucide-react";
+import { Download, Eye, Search, RefreshCw, FileText, Printer, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useOutletContext, useSearchParams } from "react-router-dom";
 import AdminTable from "../components/AdminTable";
 import AdminModal from "../components/AdminModal";
+import AdminDropdown from "../components/AdminDropdown";
 import { ErrorState, FormError, LoadingState, StatusBadge, Tabs } from "../components/AdminUi";
 import {
   ORDER_STATUSES,
@@ -423,17 +424,40 @@ export default function AdminOrders() {
             }}
           >
             <Search size={16} />
-            <input value={searchInput} onChange={(e) => setSearchInput(e.target.value)} placeholder="Order ID, name, email, or phone — press Enter" />
+            <input
+              value={searchInput}
+              onChange={(e) => {
+                setSearchInput(e.target.value);
+                if (!e.target.value && search) {
+                  updateParams({ search: "", page: 1 });
+                }
+              }}
+              placeholder="Order ID, name, email, or phone — press Enter"
+            />
+            {searchInput && (
+              <button
+                type="button"
+                className="admin-table-search-clear"
+                onClick={() => {
+                  setSearchInput("");
+                  updateParams({ search: "", page: 1 });
+                }}
+                title="Clear search"
+              >
+                <X size={13} />
+              </button>
+            )}
           </form>
 
-          <select className="admin-select" value={paymentStatus} onChange={(e) => updateParams({ payment: e.target.value, page: 1 })}>
-            <option value="all">All payments</option>
-            {PAYMENT_STATUSES.map((s) => (
-              <option key={s} value={s}>
-                Payment {s}
-              </option>
-            ))}
-          </select>
+          <AdminDropdown
+            value={paymentStatus}
+            onChange={(val) => updateParams({ payment: val, page: 1 })}
+            options={[
+              { value: "all", label: "All payments" },
+              ...PAYMENT_STATUSES.map((s) => ({ value: s, label: `Payment ${s}` })),
+            ]}
+            ariaLabel="Filter payment status"
+          />
         </div>
 
         {error && <ErrorState message={error} onRetry={load} />}

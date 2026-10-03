@@ -1,7 +1,8 @@
-import { Edit3, Eye, EyeOff, Plus, Search, Trash2, RefreshCw, ExternalLink } from "lucide-react";
+import { Edit3, Eye, EyeOff, Plus, Search, Trash2, RefreshCw, ExternalLink, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useOutletContext, useSearchParams } from "react-router-dom";
 import AdminModal from "../components/AdminModal";
+import AdminDropdown from "../components/AdminDropdown";
 import { CheckboxField, EmptyState, ErrorState, Field, FormError, LoadingState, StatusBadge } from "../components/AdminUi";
 import { arrayToLines, csvToArray, formatAdminPrice, linesToArray } from "../utils";
 import { useSettings } from "../../context/SettingsContext";
@@ -257,23 +258,39 @@ export default function AdminProducts() {
           <div className="admin-table-search">
             <Search size={16} />
             <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search name, SKU, or slug…" />
+            {query && (
+              <button
+                type="button"
+                className="admin-table-search-clear"
+                onClick={() => setQuery("")}
+                title="Clear search"
+              >
+                <X size={13} />
+              </button>
+            )}
           </div>
 
           <div className="admin-toolbar-group">
-            <select className="admin-select" value={category} onChange={(event) => setCategory(event.target.value)}>
-              <option value="all">All categories</option>
-              {categories.map((c) => (
-                <option key={c.slug} value={c.slug}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-            <select className="admin-select" value={status} onChange={(event) => setStatus(event.target.value)}>
-              <option value="all">All statuses</option>
-              <option value="active">Visible</option>
-              <option value="hidden">Hidden</option>
-              <option value="low">Low stock (≤ {commerce.lowStockThreshold})</option>
-            </select>
+            <AdminDropdown
+              value={category}
+              onChange={setCategory}
+              options={[
+                { value: "all", label: "All categories" },
+                ...categories.map((c) => ({ value: c.slug, label: c.name })),
+              ]}
+              ariaLabel="Filter by category"
+            />
+            <AdminDropdown
+              value={status}
+              onChange={setStatus}
+              options={[
+                { value: "all", label: "All statuses" },
+                { value: "active", label: "Visible" },
+                { value: "hidden", label: "Hidden" },
+                { value: "low", label: `Low stock (≤ ${commerce.lowStockThreshold})` },
+              ]}
+              ariaLabel="Filter by status"
+            />
           </div>
         </div>
 

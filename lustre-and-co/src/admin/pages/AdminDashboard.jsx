@@ -5,6 +5,7 @@ import StatCard from "../components/StatCard";
 import SalesChart from "../components/SalesChart";
 import AdminTable from "../components/AdminTable";
 import { ErrorState, LoadingState, StatusBadge } from "../components/AdminUi";
+import AdminDropdown from "../components/AdminDropdown";
 import { formatAdminPrice, formatDate, orderStatusTone, paymentTone } from "../utils";
 import { useStore } from "../../context/StoreContext";
 import api, { getErrorMessage } from "../../services/api";
@@ -92,16 +93,16 @@ export default function AdminDashboard() {
         </div>
 
         <div className="admin-heading-actions">
-          <select
-            className="admin-select"
+          <AdminDropdown
             value={days}
-            onChange={(event) => setDays(Number(event.target.value))}
-            aria-label="Reporting period"
-          >
-            <option value={7}>Last 7 days</option>
-            <option value={30}>Last 30 days</option>
-            <option value={90}>Last 90 days</option>
-          </select>
+            onChange={(val) => setDays(Number(val))}
+            options={[
+              { value: 7, label: "Last 7 days" },
+              { value: 30, label: "Last 30 days" },
+              { value: 90, label: "Last 90 days" },
+            ]}
+            ariaLabel="Reporting period"
+          />
           <button type="button" className="admin-button admin-button-light" onClick={load} disabled={loading}>
             <RefreshCw size={15} className={loading ? "spin-icon" : ""} />
             Refresh

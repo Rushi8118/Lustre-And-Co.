@@ -45,8 +45,8 @@ export default function AdminModal({
             {text && <p>{text}</p>}
           </div>
 
-          <button className="admin-modal-close" onClick={onClose} aria-label="Close dialog" type="button">
-            <X size={19} />
+          <button className="admin-modal-close" onClick={onClose} aria-label="Close dialog" type="button" title="Close (Esc)">
+            <X size={18} strokeWidth={2.2} />
           </button>
         </div>
 

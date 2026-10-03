@@ -9,6 +9,7 @@ import {
   CheckCircle,
   AlertCircle,
   ExternalLink,
+  X,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -99,11 +100,16 @@ export default function AdminAbandonedCarts() {
   }
 
   const { stats = {} } = data;
+  const totalAll = stats.totalAll ?? ((stats.activePending !== undefined ? stats.activePending : stats.totalAbandoned) !== undefined ? (Number(stats.activePending ?? stats.totalAbandoned) + Number(stats.recoveredCount || 0)) : (data.total || 0));
+  const abandonedCount = stats.totalAbandoned ?? 0;
+  const reminderSentCount = stats.recoveryEmailsSent ?? 0;
+  const recoveredCount = stats.recoveredCount ?? 0;
+
   const statusTabs = [
-    { id: "all", label: `All (${data.total || 0})` },
-    { id: "abandoned", label: `Abandoned (${stats.totalAbandoned || 0})` },
-    { id: "recovery_sent", label: `Reminder Sent (${stats.recoveryEmailsSent || 0})` },
-    { id: "recovered", label: `Recovered (${stats.recoveredCount || 0})` },
+    { id: "all", label: `All (${totalAll})` },
+    { id: "abandoned", label: `Abandoned (${abandonedCount})` },
+    { id: "recovery_sent", label: `Reminder Sent (${reminderSentCount})` },
+    { id: "recovered", label: `Recovered (${recoveredCount})` },
   ];
 
   return (
@@ -137,7 +143,7 @@ export default function AdminAbandonedCarts() {
             <span className="admin-metric-title">Active Abandoned</span>
             <ShoppingBag size={18} className="admin-metric-icon" />
           </div>
-          <p className="admin-metric-value">{stats.totalAbandoned ?? 0}</p>
+          <p className="admin-metric-value">{stats.activePending ?? stats.totalAbandoned ?? 0}</p>
           <span className="admin-metric-sub">Pending customer recovery</span>
         </div>
 
@@ -165,35 +171,57 @@ export default function AdminAbandonedCarts() {
             <CheckCircle size={18} className="admin-metric-icon" />
           </div>
           <p className="admin-metric-value">
-            {stats.totalAbandoned + stats.recoveredCount > 0
+            {Number(stats.activePending ?? stats.totalAbandoned ?? 0) + Number(stats.recoveredCount ?? 0) > 0
               ? `${Math.round(
-                  (stats.recoveredCount / (stats.totalAbandoned + stats.recoveredCount)) * 100
+                  (Number(stats.recoveredCount ?? 0) /
+                    (Number(stats.activePending ?? stats.totalAbandoned ?? 0) + Number(stats.recoveredCount ?? 0))) *
+                    100
                 )}%`
               : "0%"}
           </p>
-          <span className="admin-metric-sub">{stats.recoveryEmailsSent ?? 0} reminder emails sent</span>
+          <span className="admin-metric-sub">{stats.emailsSentTotal ?? stats.recoveryEmailsSent ?? 0} reminder emails sent</span>
         </div>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="admin-filter-bar">
+      <div className="admin-toolbar" style={{ margin: "20px 0", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
         <Tabs tabs={statusTabs} active={status} onChange={(tab) => { setStatus(tab); setPage(1); }} />
 
         <form
-          className="admin-search-form"
+          className="admin-search-box"
           onSubmit={(e) => {
             e.preventDefault();
             setSearch(searchInput);
             setPage(1);
           }}
         >
-          <Search size={16} />
+          <Search size={16} className="admin-search-box-icon" />
           <input
-            type="search"
+            type="text"
             placeholder="Search customer, email, item…"
             value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
+            onChange={(e) => {
+              setSearchInput(e.target.value);
+              if (!e.target.value && search) {
+                setSearch("");
+                setPage(1);
+              }
+            }}
           />
+          {searchInput && (
+            <button
+              type="button"
+              className="admin-search-clear-btn"
+              onClick={() => {
+                setSearchInput("");
+                setSearch("");
+                setPage(1);
+              }}
+              title="Clear search"
+            >
+              <X size={14} />
+            </button>
+          )}
         </form>
       </div>
 
