@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import Header from "./Header";
-import SiteFooter from "./SiteFooter";
+import Footer from "./Footer";
 import BottomNav from "./BottomNav";
 
 export default function Layout() {
@@ -41,7 +41,7 @@ export default function Layout() {
         </motion.main>
       </AnimatePresence>
 
-      <SiteFooter />
+      <Footer />
       <BottomNav />
     </div>
   );

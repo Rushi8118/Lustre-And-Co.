@@ -157,12 +157,6 @@ export default function Footer() {
 
               <p className="footer-brand-bio">{store.description}</p>
 
-              <div className="footer-badges-pill" aria-label="Brand assurances">
-                <span>18K Gold Plated</span>
-                <span>Hypoallergenic</span>
-                <span>Water-Resistant</span>
-              </div>
-
               {socialLinks.length > 0 && (
                 <div className="footer-social-wrapper">
                   <span className="social-label">Follow Our Journey</span>
@@ -185,38 +179,24 @@ export default function Footer() {
             </div>
 
             <div className="footer-col">
-              <h3 className="footer-col-title">Shop Jewelry</h3>
+              <h3 className="footer-col-title">Shopping</h3>
               <ul className="footer-links-list">
                 <li>
-                  <Link to="/shop">All Collections</Link>
+                  <Link to="/shop">Shop All Jewelry</Link>
                 </li>
-                {categories.slice(0, 7).map((category) => (
-                  <li key={category.slug}>
-                    <Link to={`/category/${category.slug}`}>{category.name}</Link>
-                  </li>
-                ))}
-                <li>
-                  <Link to="/shop" className="footer-view-all-link">
-                    View All Categories &rarr;
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            <div className="footer-col">
-              <h3 className="footer-col-title">Curated Edits</h3>
-              <ul className="footer-links-list">
                 <li>
                   <Link to="/new-arrivals">New Arrivals</Link>
                 </li>
                 <li>
                   <Link to="/best-sellers">Best Sellers</Link>
                 </li>
+                {categories.map((category) => (
+                  <li key={category.slug}>
+                    <Link to={`/category/${category.slug}`}>{category.name}</Link>
+                  </li>
+                ))}
                 <li>
                   <Link to="/collections/bridal">Bridal &amp; Festive Edit</Link>
-                </li>
-                <li>
-                  <Link to="/bundles">Gift Sets &amp; Bundles</Link>
                 </li>
                 <li>
                   <Link to="/collections/sale" className="footer-sale-link">
@@ -227,7 +207,7 @@ export default function Footer() {
             </div>
 
             <div className="footer-col">
-              <h3 className="footer-col-title">Client Care</h3>
+              <h3 className="footer-col-title">Customer Service</h3>
               <ul className="footer-links-list">
                 <li>
                   <Link to="/track-order">Track Your Order</Link>
@@ -250,20 +230,35 @@ export default function Footer() {
                 <li>
                   <Link to="/contact">Help &amp; Support</Link>
                 </li>
+              </ul>
+            </div>
+
+            <div className="footer-col">
+              <h3 className="footer-col-title">About the Brand</h3>
+              <ul className="footer-links-list">
                 <li>
                   <Link to="/about">Our Story</Link>
+                </li>
+                <li>
+                  <Link to="/contact">Contact Us</Link>
+                </li>
+                <li>
+                  <Link to="/privacy">Privacy Policy</Link>
+                </li>
+                <li>
+                  <Link to="/terms">Terms &amp; Conditions</Link>
                 </li>
               </ul>
             </div>
 
             <div className="footer-col footer-col-contact">
-              <h3 className="footer-col-title">The Atelier</h3>
+              <h3 className="footer-col-title">Contact Us</h3>
               <div className="footer-contact-list">
                 {store.supportEmail && (
                   <div className="footer-contact-item">
                     <Mail size={16} className="contact-icon" />
                     <div>
-                      <span className="contact-sub">Email Support</span>
+                      <span className="contact-sub">Email</span>
                       <a href={`mailto:${store.supportEmail}`} className="contact-main">
                         {store.supportEmail}
                       </a>
@@ -275,7 +270,7 @@ export default function Footer() {
                   <div className="footer-contact-item">
                     <Phone size={16} className="contact-icon" />
                     <div>
-                      <span className="contact-sub">Direct Line</span>
+                      <span className="contact-sub">Phone Support</span>
                       <a href={`tel:${store.supportPhone.replace(/[^\d+]/g, "")}`} className="contact-main">
                         {store.supportPhone}
                       </a>
@@ -287,7 +282,7 @@ export default function Footer() {
                   <div className="footer-contact-item">
                     <MapPin size={16} className="contact-icon" />
                     <div>
-                      <span className="contact-sub">Boutique Studio</span>
+                      <span className="contact-sub">Studio</span>
                       <address className="contact-address">{store.address}</address>
                     </div>
                   </div>
@@ -302,11 +297,6 @@ export default function Footer() {
                     </div>
                   </div>
                 )}
-
-                <div className="concierge-live-badge">
-                  <span className="live-pulse-dot" />
-                  <span>Concierge Active</span>
-                </div>
               </div>
             </div>
           </div>
@@ -315,11 +305,11 @@ export default function Footer() {
             <div className="footer-trust-security">
               <div className="trust-security-badge">
                 <Lock size={15} />
-                <span>Secure 256-bit checkout</span>
+                <span>Secure checkout</span>
               </div>
               <div className="trust-security-badge">
                 <ShieldCheck size={15} />
-                <span>Certified hypoallergenic</span>
+                <span>Quality checked before dispatch</span>
               </div>
               <div className="trust-security-badge">
                 <Truck size={15} />
@@ -332,12 +322,11 @@ export default function Footer() {
             </div>
 
             <div className="footer-payment-methods" aria-label="Accepted payment methods">
-              <div className="payment-badge" title="UPI payments">
-                <span className="payment-text">UPI / NetBanking</span>
-              </div>
-              <div className="payment-badge" title="Cards">
-                <span className="payment-text">Visa / Mastercard / RuPay</span>
-              </div>
+              {payments.onlineEnabled && (
+                <div className="payment-badge" title="Online payments">
+                  <span className="payment-text">UPI / Cards / NetBanking</span>
+                </div>
+              )}
               {payments.codEnabled && (
                 <div className="payment-badge" title="Cash on delivery">
                   <span className="payment-text">Cash on Delivery</span>
@@ -348,7 +337,7 @@ export default function Footer() {
 
           <div className="footer-bottom-bar">
             <div className="footer-copyright">
-              &copy; {year} {store.name}. All rights reserved.
+              © {year} {store.name} All rights reserved.
             </div>
 
             <div className="footer-tagline">{store.tagline}</div>
@@ -357,15 +346,15 @@ export default function Footer() {
               <Link to="/privacy" className="legal-link">
                 Privacy Policy
               </Link>
-              <span className="legal-dot">&bull;</span>
+              <span className="legal-dot">•</span>
               <Link to="/terms" className="legal-link">
-                Terms of Service
+                Terms and Conditions
               </Link>
-              <span className="legal-dot">&bull;</span>
+              <span className="legal-dot">•</span>
               <Link to="/shipping-returns" className="legal-link">
                 Shipping Policy
               </Link>
-              <span className="legal-dot">&bull;</span>
+              <span className="legal-dot">•</span>
               <Link to="/faq" className="legal-link">
                 Help &amp; FAQ
               </Link>
