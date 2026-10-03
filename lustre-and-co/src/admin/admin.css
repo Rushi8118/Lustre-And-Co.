@@ -233,15 +233,28 @@
   background: var(--admin-surface) !important;
 }
 
-.admin-search input {
+.admin-search input,
+.admin-search-input {
   flex: 1;
   width: 100%;
-  border: 0;
-  outline: 0;
-  background: transparent;
+  border: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
   color: var(--admin-text);
   font-size: 13.5px;
   font-weight: 500;
+  padding: 0;
+}
+
+.admin-search input:focus,
+.admin-search-input:focus {
+  border: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
 }
 
 .admin-search-icon {
@@ -976,14 +989,27 @@
 .inv-search-wrap input {
   flex: 1;
   width: 100%;
-  border: 0;
-  outline: 0;
-  background: transparent;
+  border: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
   color: var(--admin-text);
   font-family: inherit;
   font-size: 13px;
   font-weight: 500;
   padding: 0;
+}
+
+.admin-table-search input:focus,
+.admin-search-box input:focus,
+.admin-search-wrap input:focus,
+.inv-search-wrap input:focus {
+  border: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
 }
 
 .admin-table-search svg,
@@ -1745,11 +1771,30 @@
 }
 
 .admin-shell.admin-dark .admin-search input,
+.admin-shell.admin-dark .admin-search-input,
 .admin-shell.admin-dark .admin-table-search input,
 .admin-shell.admin-dark .admin-search-box input,
 .admin-shell.admin-dark .admin-search-wrap input,
 .admin-shell.admin-dark .inv-search-wrap input {
   color: #f6f3ee !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+
+.admin-shell.admin-dark .admin-search input:focus,
+.admin-shell.admin-dark .admin-search-input:focus,
+.admin-shell.admin-dark .admin-table-search input:focus,
+.admin-shell.admin-dark .admin-search-box input:focus,
+.admin-shell.admin-dark .admin-search-wrap input:focus,
+.admin-shell.admin-dark .inv-search-wrap input:focus {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
 }
 
 .admin-shell.admin-dark .admin-search input::placeholder,
@@ -1811,6 +1856,33 @@
 .admin-shell.admin-dark textarea:focus {
   border-color: var(--admin-gold);
   box-shadow: 0 0 0 3px rgba(223, 190, 118, 0.15);
+}
+
+/* Ensure search inputs never inherit solid dark backgrounds or borders */
+.admin-shell.admin-dark .admin-search input,
+.admin-shell.admin-dark .admin-search-input,
+.admin-shell.admin-dark .admin-table-search input,
+.admin-shell.admin-dark .admin-search-box input,
+.admin-shell.admin-dark .admin-search-wrap input,
+.admin-shell.admin-dark .inv-search-wrap input {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.admin-shell.admin-dark .admin-search input:focus,
+.admin-shell.admin-dark .admin-search-input:focus,
+.admin-shell.admin-dark .admin-table-search input:focus,
+.admin-shell.admin-dark .admin-search-box input:focus,
+.admin-shell.admin-dark .admin-search-wrap input:focus,
+.admin-shell.admin-dark .inv-search-wrap input:focus {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 .admin-shell.admin-dark select option {

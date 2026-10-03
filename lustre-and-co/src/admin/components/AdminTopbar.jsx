@@ -65,10 +65,12 @@ export default function AdminTopbar({ onMenuClick, attention }) {
           <Search size={16} className="admin-search-icon" />
           <input
             ref={searchInputRef}
+            className="admin-search-input"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Search orders by ID, name, email, phone…"
             aria-label="Search orders"
+            style={{ background: "transparent", backgroundColor: "transparent", border: "none", outline: "none", boxShadow: "none" }}
           />
           {search && (
             <button
