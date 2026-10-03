@@ -4,6 +4,7 @@ import {
   Get,
   Body,
   Inject,
+  Req,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { PaymentsService } from './payments.service.js';
@@ -67,5 +68,15 @@ export class PaymentsController {
   @ApiResponse({ status: 404, description: 'Order not found.' })
   async confirmCod(@Body() dto: CodPaymentDto) {
     return this.paymentsService.confirmCodPayment(dto);
+  }
+
+  @Post('webhook')
+  @ApiOperation({ summary: 'Razorpay webhook signature verification & event ingestion' })
+  async handleWebhook(
+    @Body() payload: any,
+    @Req() req: any,
+  ) {
+    const signature = (req.headers['x-razorpay-signature'] as string) || '';
+    return this.paymentsService.handleWebhook(payload, signature, req.rawBody);
   }
 }

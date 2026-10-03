@@ -34,9 +34,9 @@ export async function payOrderOnline(order, storeName) {
       description: `Order ${order.orderId}`,
       order_id: intent.razorpayOrderId,
       prefill: {
-        name: intent.customer?.name,
-        email: intent.customer?.email,
-        contact: intent.customer?.phone
+        name: order.customer?.fullName,
+        email: order.customer?.email,
+        contact: order.customer?.phone
       },
       handler: async (response) => {
         try {

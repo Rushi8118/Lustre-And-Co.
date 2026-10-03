@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -10,6 +10,7 @@ import { GoogleStrategy } from './strategies/google.strategy.js';
 import { GoogleAuthGuard } from './guards/google-auth.guard.js';
 import { SmtpModule } from './smtp/smtp.module.js';
 import { UsersModule } from '../users/users.module.js';
+import { getJwtSecret } from '../../common/utils/jwt-secret.js';
 
 const googleProviders = process.env.GOOGLE_CLIENT_ID
   ? [GoogleStrategy, GoogleAuthGuard]
@@ -18,6 +19,7 @@ const googleExports = process.env.GOOGLE_CLIENT_ID
   ? [GoogleAuthGuard, GoogleStrategy]
   : [];
 
+@Global()
 @Module({
   imports: [
     UsersModule,
@@ -26,9 +28,7 @@ const googleExports = process.env.GOOGLE_CLIENT_ID
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
-        secret:
-          configService.get<string>('JWT_SECRET') ||
-          'lustre_luxury_secret_key_2026_change_in_production',
+        secret: getJwtSecret(configService),
         signOptions: {
           expiresIn: (configService.get<string>('JWT_EXPIRATION') || '7d') as any,
         },

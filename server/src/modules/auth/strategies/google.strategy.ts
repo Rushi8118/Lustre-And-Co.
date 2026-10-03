@@ -15,10 +15,16 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
     @Inject(SupabaseService) private readonly db: SupabaseService,
     private readonly usersService: UsersService,
   ) {
+    const callbackURL =
+      configService.get<string>('GOOGLE_CALLBACK_URL') ||
+      (process.env.NODE_ENV === 'production'
+        ? 'https://lustre-and-co.onrender.com/api/auth/google/callback'
+        : 'http://localhost:5000/api/auth/google/callback');
+
     super({
       clientID: configService.get<string>('GOOGLE_CLIENT_ID') || '',
       clientSecret: configService.get<string>('GOOGLE_CLIENT_SECRET') || '',
-      callbackURL: configService.get<string>('GOOGLE_CALLBACK_URL') || 'http://localhost:5000/api/auth/google/callback',
+      callbackURL,
       scope: ['profile', 'email'],
     });
   }

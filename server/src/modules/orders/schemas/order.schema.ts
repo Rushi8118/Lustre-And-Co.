@@ -41,6 +41,17 @@ export interface Order {
   payment: OrderPayment;
   carrier: string;
   trackingNumber?: string | null;
+  tracking_number?: string | null;
+  awb_number?: string | null;
+  tracking_url?: string | null;
+  shipping_label_url?: string | null;
+  selected_shipping_method_id?: string | null;
+  shipping_provider?: string | null;
+  shipping_provider_code?: string | null;
+  shipping_shipment_id?: string | null;
+  shipping_quote_token?: string | null;
+  shipping_cost?: number;
+  shipping_status?: string | null;
   estimatedDeliveryDate: string;
   /** Set once stock has been returned to inventory for a cancelled order. */
   stockRestored: boolean;

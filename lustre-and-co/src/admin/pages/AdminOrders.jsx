@@ -1,4 +1,4 @@
-import { Download, Eye, Search, RefreshCw } from "lucide-react";
+import { Download, Eye, Search, RefreshCw, FileText, Printer } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useOutletContext, useSearchParams } from "react-router-dom";
 import AdminTable from "../components/AdminTable";
@@ -17,6 +17,12 @@ import {
 } from "../utils";
 import { useStore } from "../../context/StoreContext";
 import api, { getErrorMessage } from "../../services/api";
+import AdminShipments from "./AdminShipments";
+import {
+  getInvoiceHtmlUrl,
+  getPackingSlipHtmlUrl,
+  openDocumentInNewTab,
+} from "../../services/documents";
 
 const PAGE_SIZE = 25;
 
@@ -91,6 +97,23 @@ function OrderDetail({ orderId, onClose, onChanged }) {
 
       {order && (
         <>
+          <div style={{ display: "flex", gap: "10px", marginBottom: "16px", justifyContent: "flex-end" }}>
+            <button
+              type="button"
+              className="admin-button admin-button-secondary"
+              onClick={() => openDocumentInNewTab(getInvoiceHtmlUrl(order.orderId || orderId))}
+            >
+              <FileText size={14} /> Tax Invoice
+            </button>
+            <button
+              type="button"
+              className="admin-button admin-button-secondary"
+              onClick={() => openDocumentInNewTab(getPackingSlipHtmlUrl(order.orderId || orderId))}
+            >
+              <Printer size={14} /> Packing Slip
+            </button>
+          </div>
+
           <div className="admin-detail-grid">
             <div className="admin-detail-card">
               <h3>Customer</h3>
@@ -220,6 +243,10 @@ function OrderDetail({ orderId, onClose, onChanged }) {
                 </div>
               </form>
               {order.status === "Cancelled" && <p className="admin-muted">Cancelled orders cannot be reopened. Stock has been returned.</p>}
+            </div>
+
+            <div className="admin-detail-card full">
+              <AdminShipments orderId={order.id || orderId} />
             </div>
 
             {order.statusHistory?.length > 0 && (

@@ -9,9 +9,12 @@ export function getRazorpayCredentials(config: ConfigService) {
   const looksReal = (value: string) =>
     value.length > 0 && !PLACEHOLDER_MARKERS.some((marker) => value.includes(marker));
 
+  const webhookSecret = config.get<string>('RAZORPAY_WEBHOOK_SECRET') || keySecret;
+
   return {
     keyId,
     keySecret,
+    webhookSecret,
     configured: looksReal(keyId) && looksReal(keySecret),
   };
 }

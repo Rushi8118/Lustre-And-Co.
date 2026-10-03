@@ -82,6 +82,28 @@ export class ShippingAddressDto {
   country?: string = 'India';
 }
 
+export class OrderBundleItemDto {
+  @ApiProperty({ description: 'Bundle ID' })
+  @IsString()
+  bundleId!: string;
+
+  @ApiPropertyOptional({ default: 1 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  quantity?: number = 1;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsArray()
+  selectedItems?: Array<{
+    productId: string;
+    quantity: number;
+    groupKey?: string | null;
+  }>;
+}
+
 export class CreateOrderDto {
   @ApiProperty({ type: CustomerDetailsDto })
   @ValidateNested()
@@ -93,12 +115,21 @@ export class CreateOrderDto {
   @Type(() => ShippingAddressDto)
   shippingAddress: ShippingAddressDto;
 
-  @ApiProperty({ type: [OrderItemDto] })
+  @ApiPropertyOptional({ type: [OrderItemDto] })
+  @IsOptional()
   @IsArray()
   @ArrayMaxSize(50)
   @ValidateNested({ each: true })
   @Type(() => OrderItemDto)
-  items: OrderItemDto[];
+  items?: OrderItemDto[];
+
+  @ApiPropertyOptional({ type: [OrderBundleItemDto] })
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(50)
+  @ValidateNested({ each: true })
+  @Type(() => OrderBundleItemDto)
+  bundleItems?: OrderBundleItemDto[];
 
   @ApiPropertyOptional({ enum: ['standard', 'express'], default: 'standard' })
   @IsOptional()
@@ -120,4 +151,29 @@ export class CreateOrderDto {
   @IsString()
   @MaxLength(500)
   notes?: string;
+
+  @ApiPropertyOptional({ description: 'Inventory reservation token from checkout flow' })
+  @IsOptional()
+  @IsString()
+  reservationToken?: string;
+
+  @ApiPropertyOptional({ description: 'Server-validated shipping rate quote token' })
+  @IsOptional()
+  @IsString()
+  shippingQuoteToken?: string;
+
+  @ApiPropertyOptional({ description: 'Selected shipping provider name' })
+  @IsOptional()
+  @IsString()
+  shippingProvider?: string;
+
+  @ApiPropertyOptional({ description: 'Selected shipping provider code' })
+  @IsOptional()
+  @IsString()
+  shippingProviderCode?: string;
+
+  @ApiPropertyOptional({ description: 'Selected shipping method ID' })
+  @IsOptional()
+  @IsString()
+  selectedShippingMethodId?: string;
 }

@@ -1,11 +1,13 @@
 import { useSearchParams } from "react-router-dom";
-import { Package, Check, Truck, Home, XCircle } from "lucide-react";
+import { Package, Check, Truck, Home, XCircle, MapPin, Clock, ExternalLink } from "lucide-react";
 import { useState } from "react";
 import PageIntro from "../components/PageIntro";
+import ShipmentTracking from "../components/ShipmentTracking";
 import { useStore } from "../context/StoreContext";
 import { useSettings } from "../context/SettingsContext";
 import { formatPrice } from "../data/products";
 import api, { getErrorMessage } from "../services/api";
+import { getPublicTracking } from "../services/shipping";
 
 const stages = [
   { status: "Confirmed", title: "Order placed", icon: Check },
@@ -22,24 +24,38 @@ export default function TrackOrder() {
   const [orderNumber, setOrderNumber] = useState(searchParams.get("order") || "");
   const [email, setEmail] = useState(user?.email || lastOrder?.email || "");
   const [result, setResult] = useState(null);
+  const [carrierTracking, setCarrierTracking] = useState(null);
   const [error, setError] = useState("");
   const [isSearching, setIsSearching] = useState(false);
 
-  async function submit(event) {
-    event.preventDefault();
+  async function executeTrack(orderNum, emailAddr) {
+    if (!orderNum) return;
     setIsSearching(true);
     setError("");
     setResult(null);
+    setCarrierTracking(null);
     try {
       const { data } = await api.get("/orders/track", {
-        params: { orderId: orderNumber.trim(), email: email.trim() }
+        params: { orderId: orderNum.trim(), email: emailAddr ? emailAddr.trim() : undefined }
       });
       setResult(data);
+
+      try {
+        const live = await getPublicTracking(orderNum.trim());
+        setCarrierTracking(live);
+      } catch {
+        // Non-blocking if carrier tracking not yet available
+      }
     } catch (err) {
       setError(getErrorMessage(err, "We could not find that order."));
     } finally {
       setIsSearching(false);
     }
+  }
+
+  async function submit(event) {
+    event.preventDefault();
+    await executeTrack(orderNumber, email);
   }
 
   const isCancelled = result?.status === "Cancelled";
@@ -145,6 +161,57 @@ export default function TrackOrder() {
                   </strong>
                 </div>
               </div>
+
+              {carrierTracking && (
+                <div style={{ marginTop: 24, padding: "18px 20px", background: "#faf8f5", borderRadius: 8, border: "1px solid #ebd9c2" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, flexWrap: "wrap", gap: 8 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <Truck size={18} style={{ color: "#c5a059" }} />
+                      <strong style={{ fontSize: 14, color: "#1a1714" }}>Live Carrier Milestones</strong>
+                    </div>
+                    {carrierTracking.shipment?.courierName && (
+                      <span style={{ fontSize: 12, fontWeight: 600, color: "#7b5924", background: "#f4ede3", padding: "3px 9px", borderRadius: 4 }}>
+                        {carrierTracking.shipment.courierName}
+                      </span>
+                    )}
+                  </div>
+
+                  {carrierTracking.shipment?.trackingNumber && (
+                    <div style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 12, color: "#555", marginBottom: 14 }}>
+                      <span>Tracking: <strong>{carrierTracking.shipment.trackingNumber}</strong></span>
+                      {carrierTracking.shipment.trackingUrl && (
+                        <a href={carrierTracking.shipment.trackingUrl} target="_blank" rel="noreferrer" style={{ color: "#2563eb", display: "inline-flex", alignItems: "center", gap: 4, textDecoration: "underline" }}>
+                          Track on carrier website <ExternalLink size={12} />
+                        </a>
+                      )}
+                    </div>
+                  )}
+
+                  {carrierTracking.events?.length > 0 ? (
+                    <ol className="shipment-events-list">
+                      {carrierTracking.events.map((ev) => (
+                        <li key={ev.id} className="shipment-event-item">
+                          <div className="event-dot" />
+                          <div className="event-body">
+                            <span className="event-status">{ev.status}</span>
+                            {ev.description && <span className="event-desc">{ev.description}</span>}
+                            {ev.location && <span className="event-location"><MapPin size={11} /> {ev.location}</span>}
+                            <time className="event-time">
+                              <Clock size={10} /> {new Date(ev.event_time).toLocaleString()}
+                            </time>
+                          </div>
+                        </li>
+                      ))}
+                    </ol>
+                  ) : (
+                    <p style={{ margin: 0, fontSize: 12, color: "#888" }}>
+                      Shipment dispatched. Live tracking checkpoints update as the package is scanned at sorting hubs.
+                    </p>
+                  )}
+                </div>
+              )}
+
+              <ShipmentTracking orderId={result.id || result.orderId} />
 
               {result.statusHistory?.length > 0 && (
                 <ol className="tracking-history">

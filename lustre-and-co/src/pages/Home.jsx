@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import { ArrowUpRight, Star } from "lucide-react";
 import { motion } from "framer-motion";
-import ThreeHero from "../components/ThreeHero";
+import { lazy, Suspense } from "react";
+const ThreeHero = lazy(() => import("../components/ThreeHero"));
 import SectionHeading from "../components/SectionHeading";
 import ProductGrid from "../components/ProductGrid";
 import PromotionalBanner from "../components/PromotionalBanner";
@@ -91,7 +92,7 @@ export default function Home() {
                 <small>{hero.cardText}</small>
               </div>
             )}
-            <ThreeHero />
+            <Suspense fallback={null}><ThreeHero /></Suspense>
           </motion.div>
         </div>
       </section>

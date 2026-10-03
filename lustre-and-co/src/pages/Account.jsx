@@ -4,6 +4,7 @@ import {
   Clock,
   Compass,
   Copy,
+  Gift,
   Heart,
   LayoutDashboard,
   LogOut,
@@ -19,10 +20,17 @@ import {
   Truck,
   UserCog,
   X,
-  XCircle
+  XCircle,
+  FileText
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import PageIntro from "../components/PageIntro";
+import LoyaltyAccountCard from "../components/LoyaltyAccountCard";
+import LoyaltyLedger from "../components/LoyaltyLedger";
+import ReferralCard from "../components/ReferralCard";
+import ReturnRequestModal from "../components/ReturnRequestModal";
+import ReturnsHistoryTab from "../components/ReturnsHistoryTab";
+import { getInvoiceHtmlUrl, openDocumentInNewTab } from "../services/documents";
 import { useStore } from "../context/StoreContext";
 import { useSettings } from "../context/SettingsContext";
 import { formatPrice } from "../data/products";
@@ -80,6 +88,8 @@ export default function Account() {
   const [isSavingAddress, setIsSavingAddress] = useState(false);
   const [newAddress, setNewAddress] = useState(blankAddress);
   const [addressError, setAddressError] = useState("");
+  const [showReturnModal, setShowReturnModal] = useState(false);
+  const [returnModalOrderId, setReturnModalOrderId] = useState(null);
 
   useEffect(() => {
     let active = true;
@@ -214,12 +224,13 @@ export default function Account() {
   }
 
   const sidebarNav = [
-    { key: "overview", label: "Overview", icon: LayoutDashboard },
-    { key: "orders", label: "My Orders", icon: Package, badge: orders.length },
-    { key: "wishlist", label: "Wishlist", icon: Heart, badge: wishlist.length },
-    { key: "addresses", label: "Saved Addresses", icon: MapPin, badge: addresses.length },
-    { key: "profile", label: "Profile & Security", icon: UserCog },
-    { key: "returns", label: "Returns", icon: RotateCcw }
+    { key: "overview",  label: "Overview",           icon: LayoutDashboard },
+    { key: "orders",   label: "My Orders",           icon: Package,   badge: orders.length },
+    { key: "wishlist", label: "Wishlist",             icon: Heart,     badge: wishlist.length },
+    { key: "rewards",  label: "Rewards & Referrals", icon: Gift },
+    { key: "addresses",label: "Saved Addresses",     icon: MapPin,    badge: addresses.length },
+    { key: "profile",  label: "Profile & Security",  icon: UserCog },
+    { key: "returns",  label: "Returns",              icon: RotateCcw }
   ];
 
   const initials = (profile.name || "?")
@@ -260,6 +271,14 @@ export default function Account() {
               </div>
             </div>
             <div className="order-actions-group">
+              <button
+                type="button"
+                onClick={() => openDocumentInNewTab(getInvoiceHtmlUrl(order.orderId))}
+                className="button button-outline-dark button-sm"
+                title="View Tax Invoice"
+              >
+                <FileText size={12} />
+              </button>
               <Link to={`/track-order?order=${order.orderId}`} className="button button-dark button-sm">
                 Track
               </Link>
@@ -300,9 +319,38 @@ export default function Account() {
                     </button>
                   </span>
                 )}
+                {order.return_status && (
+                  <span style={{ marginLeft: "8px", background: "#fef3c7", color: "#92400e", padding: "2px 8px", borderRadius: "4px", fontSize: "11px", fontWeight: 700 }}>
+                    Return: {order.return_status}
+                  </span>
+                )}
               </div>
 
               <div className="order-actions-wrap">
+                <button
+                  type="button"
+                  onClick={() => openDocumentInNewTab(getInvoiceHtmlUrl(order.orderId))}
+                  className="button button-outline-dark button-sm"
+                  title="Download Tax Invoice"
+                  style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}
+                >
+                  <FileText size={13} />
+                  Invoice
+                </button>
+                {order.status === "Delivered" && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setReturnModalOrderId(order.orderId);
+                      setShowReturnModal(true);
+                    }}
+                    className="button button-outline-dark button-sm"
+                    style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}
+                  >
+                    <RotateCcw size={13} />
+                    {order.return_status ? "Return Details" : "Return / Exchange"}
+                  </button>
+                )}
                 <Link to={`/track-order?order=${order.orderId}`} className="button button-dark button-sm">
                   Track Order
                 </Link>
@@ -599,6 +647,18 @@ export default function Account() {
                 </div>
               )}
 
+              {loadState === "ready" && activeTab === "rewards" && (
+                <div className="account-tab-view account-rewards-view">
+                  <div className="account-tab-header">
+                    <h2>Rewards &amp; Referrals</h2>
+                    <p>Earn points on every purchase, review, and referral. Convert them to store credit.</p>
+                  </div>
+                  <LoyaltyAccountCard onUpdate={() => {}} />
+                  <ReferralCard />
+                  <LoyaltyLedger />
+                </div>
+              )}
+
               {loadState === "ready" && activeTab === "addresses" && (
                 <div className="account-tab-view account-addresses-view">
                   <div className="account-tab-header account-tab-header-row">
@@ -732,31 +792,33 @@ export default function Account() {
 
               {loadState === "ready" && activeTab === "returns" && (
                 <div className="account-tab-view account-returns-view">
-                  <div className="account-tab-header">
-                    <h2>Returns</h2>
-                    <p>Eligible items can be returned within {commerce.returnWindowDays} days of delivery.</p>
-                  </div>
+                  <ReturnsHistoryTab
+                    onOpenReturnModal={(orderId) => {
+                      setReturnModalOrderId(orderId);
+                      setShowReturnModal(true);
+                    }}
+                  />
 
-                  <div className="account-card returns-policy-card">
+                  <div className="account-card returns-policy-card" style={{ marginTop: "24px" }}>
                     <div className="returns-badge-row">
                       <div className="returns-perk">
                         <RotateCcw size={20} className="returns-perk-icon" />
                         <div>
-                          <h4>{commerce.returnWindowDays}-Day Returns</h4>
-                          <p>Unworn items in original packaging.</p>
+                          <h4>{commerce.returnWindowDays}-Day Return &amp; Exchange Window</h4>
+                          <p>Items in unworn condition with tags &amp; original presentation box.</p>
                         </div>
                       </div>
                       <div className="returns-perk">
                         <ShieldCheck size={20} className="returns-perk-icon" />
                         <div>
-                          <h4>Refunds</h4>
-                          <p>Approved refunds go to the original payment method.</p>
+                          <h4>Fast Refunds &amp; Store Credit</h4>
+                          <p>Instant store credit with 5% bonus or refund to original payment method.</p>
                         </div>
                       </div>
                     </div>
 
                     <div className="eligible-orders-box">
-                      <h3>Orders Eligible for Return</h3>
+                      <h3>Eligible Orders for Return or Exchange</h3>
                       {returnableOrders.length === 0 ? (
                         <p className="account-empty-note">
                           No delivered orders are currently within the return window. See our{" "}
@@ -766,15 +828,19 @@ export default function Account() {
                         returnableOrders.map((order) => (
                           <div key={order._id} className="eligible-order-row">
                             <div>
-                              <strong>{order.orderId}</strong>
+                              <strong>#{order.orderId}</strong>
                               <p>{order.items.map((i) => i.name).join(", ")}</p>
                             </div>
-                            <Link
-                              to={`/contact?reason=${encodeURIComponent("Returns and exchanges")}&order=${order.orderId}`}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setReturnModalOrderId(order.orderId);
+                                setShowReturnModal(true);
+                              }}
                               className="button button-dark button-sm"
                             >
-                              Request a Return
-                            </Link>
+                              Request Return / Exchange
+                            </button>
                           </div>
                         ))
                       )}
@@ -850,6 +916,21 @@ export default function Account() {
             </form>
           </div>
         </div>
+      )}
+
+      {showReturnModal && returnModalOrderId && (
+        <ReturnRequestModal
+          orderId={returnModalOrderId}
+          isOpen={showReturnModal}
+          onClose={() => {
+            setShowReturnModal(false);
+            setReturnModalOrderId(null);
+          }}
+          onSuccess={() => {
+            showToast("Return request submitted successfully.", "success");
+            setActiveTab("returns");
+          }}
+        />
       )}
     </>
   );

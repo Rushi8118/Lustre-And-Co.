@@ -1,7 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module.js';
 import { SeederService } from './database/seeder.service.js';
-// @ts-expect-error - plain JavaScript catalog data file
 import { products } from './database/seed-data/products.data.js';
 
 async function bootstrap() {

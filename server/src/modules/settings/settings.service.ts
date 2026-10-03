@@ -86,4 +86,13 @@ export class SettingsService implements OnModuleInit {
     unwrap(await this.db.from('settings').upsert({ key: 'store', ...next }, { onConflict: 'key' }));
     return next;
   }
+
+  async getSettings(): Promise<any> {
+    return this.get();
+  }
+
+  async updateSettings(dto: any): Promise<any> {
+    return this.update(dto);
+  }
 }
+
