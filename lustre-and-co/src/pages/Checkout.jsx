@@ -11,13 +11,16 @@ import {
   ArrowLeft,
   AlertCircle,
   ShoppingBag,
-  Loader2
+  Loader2,
+  Sparkles
 } from "lucide-react";
 import { formatPrice } from "../data/products";
-import { useStore } from "../context/StoreContext";
+import { useStore, useAbandonedCartTracking } from "../context/StoreContext";
 import { useSettings } from "../context/SettingsContext";
 import api, { getErrorMessage } from "../services/api";
 import { payOrderOnline } from "../services/payments";
+import useInventoryReservation from "../hooks/useInventoryReservation";
+import ShippingRateSelector from "../components/ShippingRateSelector";
 
 const COUNTRIES = ["India", "United States", "United Kingdom", "Canada", "Australia", "United Arab Emirates", "Singapore"];
 
@@ -41,6 +44,9 @@ export default function Checkout() {
   const navigate = useNavigate();
   const {
     cart,
+    cartBundles,
+    cartId,
+    cartCount,
     cartSubtotal,
     appliedPromo,
     discountAmount,
@@ -80,6 +86,36 @@ export default function Checkout() {
   const [notes, setNotes] = useState("");
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [errors, setErrors] = useState({});
+  const [selectedShippingRate, setSelectedShippingRate] = useState(null);
+
+  const { syncRecoveryEmail } = useAbandonedCartTracking({
+    cartId: cartId || user?._id || user?.id,
+    email: shippingData.email,
+    customerName: shippingData.fullName,
+    enabled: Boolean((cartId || user) && cart?.length > 0),
+  });
+
+  // Build reservation items from cart
+  const reservationItems = (cart || []).map((item) => ({
+    productId: item.productId || item.product || item.id,
+    quantity: Number(item.quantity || 1),
+  }));
+
+  const {
+    reservation,
+    loading: reservingStock,
+    error: reservationError,
+    reserve: reserveStock,
+    release: releaseStock,
+    reservationToken,
+    expiresAt: reservationExpiresAt,
+  } = useInventoryReservation({
+    cartId: cartId || null,
+    userId: user?.id || user?._id || null,
+    items: reservationItems,
+    enabled: reservationItems.length > 0,
+    durationMinutes: 15,
+  });
 
   // Prefill from the signed-in customer's profile and default address.
   useEffect(() => {
@@ -113,8 +149,20 @@ export default function Checkout() {
     };
   }, [user]);
 
-  const deliverySurcharge = deliveryOption === "express" ? commerce.expressShippingFee : 0;
-  const grandTotal = cartTotal + deliverySurcharge;
+  const effectiveShipping = selectedShippingRate
+    ? (appliedPromo?.freeShipping || cartSubtotal >= commerce.freeShippingThreshold ? 0 : Number(selectedShippingRate.amount || 0))
+    : (appliedPromo?.freeShipping || cartSubtotal >= commerce.freeShippingThreshold ? 0 : shipping);
+
+  const deliverySurcharge = !selectedShippingRate && deliveryOption === "express" ? commerce.expressShippingFee : 0;
+  const grandTotal = Math.max(0, cartSubtotal - discountAmount) + effectiveShipping + deliverySurcharge + estimatedTax;
+
+  function handlePincodeInferred(location) {
+    setShippingData((prev) => ({
+      ...prev,
+      city: prev.city || location.city || "",
+      state: prev.state || location.state || "",
+    }));
+  }
 
   function handleShippingChange(e) {
     const { name, value, type, checked } = e.target;
@@ -198,6 +246,21 @@ export default function Checkout() {
     };
 
     try {
+      // Step 1: Reserve inventory (server-authoritative, row-locked)
+      let activeReservation = reservation;
+      if (!activeReservation && reservationItems.length > 0) {
+        try {
+          activeReservation = await reserveStock();
+        } catch (reserveErr) {
+          setSubmitError(
+            reserveErr?.response?.data?.message ||
+            "One or more items in your bag are no longer available. Please update your bag."
+          );
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
       if (user && d.saveAddress) {
         const alreadySaved = savedAddresses.some(
           (a) => a.address === shippingAddress.address && a.postalCode === shippingAddress.postalCode
@@ -209,12 +272,17 @@ export default function Checkout() {
         }
       }
 
+      // Step 2: Place the order (server commits reservation after payment verification)
       const order = await placeOrder({
         customer: { fullName: d.fullName.trim(), email: d.email.trim(), phone: d.phone.trim() },
         shippingAddress,
         deliveryOption,
         paymentMethod,
-        notes
+        notes,
+        reservationToken: activeReservation?.reservationToken || null,
+        shippingQuoteToken: selectedShippingRate?.quoteToken || null,
+        shippingProvider: selectedShippingRate?.provider || selectedShippingRate?.providerCode || null,
+        shippingProviderCode: selectedShippingRate?.provider || selectedShippingRate?.providerCode || null,
       });
 
       if (paymentMethod === "razorpay") {
@@ -235,10 +303,15 @@ export default function Checkout() {
 
       navigate(`/order-confirmation/${order.orderId}`);
     } catch (err) {
+      // Release the reservation if the order could not be created
+      if (reservation) {
+        void releaseStock("released");
+      }
       setSubmitError(getErrorMessage(err, "We could not place your order. Please try again."));
     } finally {
       setIsSubmitting(false);
     }
+
   }
 
   const summaryLines = (
@@ -254,10 +327,10 @@ export default function Checkout() {
         </div>
       )}
       <div className="summary-line">
-        <span>Shipping</span>
-        <strong>{shipping === 0 ? "FREE" : formatPrice(shipping)}</strong>
+        <span>Shipping {selectedShippingRate ? `(${selectedShippingRate.serviceName})` : ""}</span>
+        <strong>{effectiveShipping === 0 ? "FREE" : formatPrice(effectiveShipping)}</strong>
       </div>
-      {deliverySurcharge > 0 && (
+      {!selectedShippingRate && deliverySurcharge > 0 && (
         <div className="summary-line">
           <span>Express Delivery</span>
           <strong>{formatPrice(deliverySurcharge)}</strong>
@@ -302,7 +375,7 @@ export default function Checkout() {
 
       <section className="section checkout-section">
         <div className="container">
-          {cart.length === 0 ? (
+          {cart.length === 0 && (!cartBundles || cartBundles.length === 0) ? (
             <div className="cart-empty-container">
               <div className="cart-empty-icon-wrap">
                 <ShoppingBag size={42} strokeWidth={1.2} />
@@ -347,6 +420,21 @@ export default function Checkout() {
                           <strong>{formatPrice(item.product.price * item.quantity)}</strong>
                         </div>
                       ))}
+                      {cartBundles?.map((bundle) => {
+                        const finalPrice = Number(bundle.price?.finalTotal ?? bundle.price ?? 0);
+                        return (
+                          <div key={bundle.bundleId} className="checkout-mini-item">
+                            <div className="bundle-mini-icon-badge">
+                              <Sparkles size={16} />
+                            </div>
+                            <div className="checkout-mini-item-info">
+                              <h5>{bundle.bundleName || "Product Bundle"}</h5>
+                              <span>Curated Package • Qty: {bundle.quantity || 1}</span>
+                            </div>
+                            <strong>{formatPrice(finalPrice)}</strong>
+                          </div>
+                        );
+                      })}
                     </div>
                     <div className="checkout-mini-totals summary-breakdown">
                       {summaryLines}
@@ -447,7 +535,18 @@ export default function Checkout() {
                             <input id="fullName" name="fullName" value={shippingData.fullName} onChange={handleShippingChange} className={errors.fullName ? "has-error" : ""} autoComplete="name" />
                           </Field>
                           <Field id="email" label="Email Address" error={errors.email}>
-                            <input id="email" type="email" name="email" value={shippingData.email} onChange={handleShippingChange} className={errors.email ? "has-error" : ""} autoComplete="email" />
+                            <input
+                              id="email"
+                              type="email"
+                              name="email"
+                              value={shippingData.email}
+                              onChange={handleShippingChange}
+                              onBlur={() => {
+                                if (shippingData.email) syncRecoveryEmail();
+                              }}
+                              className={errors.email ? "has-error" : ""}
+                              autoComplete="email"
+                            />
                           </Field>
                           <Field id="phone" label="Phone Number" error={errors.phone}>
                             <input id="phone" type="tel" name="phone" value={shippingData.phone} onChange={handleShippingChange} className={errors.phone ? "has-error" : ""} autoComplete="tel" />
@@ -474,6 +573,40 @@ export default function Checkout() {
                             <input id="postalCode" name="postalCode" value={shippingData.postalCode} onChange={handleShippingChange} className={errors.postalCode ? "has-error" : ""} autoComplete="postal-code" />
                           </Field>
                         </div>
+
+                        {shippingData.postalCode && (
+                          <div className="checkout-shipping-rates-wrapper" style={{ margin: "1.5rem 0 1rem 0" }}>
+                            <ShippingRateSelector
+                              origin={{
+                                postalCode: "400051",
+                                addressLine1: "Plot 42, Bandra-Kurla Complex",
+                                city: "Mumbai",
+                                state: "Maharashtra",
+                                country: "India",
+                              }}
+                              destination={{
+                                postalCode: shippingData.postalCode,
+                                addressLine1: shippingData.address || "Delivery Address",
+                                city: shippingData.city || "City",
+                                state: shippingData.state || "State",
+                                country: shippingData.country || "India",
+                              }}
+                              packages={[
+                                {
+                                  lengthCm: 20,
+                                  widthCm: 15,
+                                  heightCm: 8,
+                                  weightKg: 0.5,
+                                  quantity: 1,
+                                },
+                              ]}
+                              orderValue={cartSubtotal}
+                              paymentMethod={paymentMethod}
+                              value={selectedShippingRate}
+                              onChange={setSelectedShippingRate}
+                            />
+                          </div>
+                        )}
 
                         {user && (
                           <div className="checkout-checkbox-row">
@@ -559,6 +692,35 @@ export default function Checkout() {
                             )}
                           </div>
                         )}
+
+                        {/* ── Shipping Rate Selector ── */}
+                        <ShippingRateSelector
+                          origin={{
+                            name: import.meta.env.VITE_STORE_NAME || "Lustre & Co.",
+                            phone: import.meta.env.VITE_STORE_PHONE || "",
+                            addressLine1: import.meta.env.VITE_STORE_ADDRESS || "",
+                            city: import.meta.env.VITE_STORE_CITY || "",
+                            state: import.meta.env.VITE_STORE_STATE || "",
+                            country: "India",
+                            postalCode: import.meta.env.VITE_STORE_PINCODE || "",
+                          }}
+                          destination={{
+                            name: shippingData.fullName,
+                            phone: shippingData.phone,
+                            email: shippingData.email,
+                            addressLine1: shippingData.address,
+                            city: shippingData.city,
+                            state: shippingData.state,
+                            country: shippingData.country || "India",
+                            postalCode: shippingData.postalCode,
+                          }}
+                          items={cart || []}
+                          orderValue={cartSubtotal}
+                          paymentMethod={paymentMethod || "prepaid"}
+                          selectedRate={selectedShippingRate}
+                          onSelect={setSelectedShippingRate}
+                          onPincodeValidated={handlePincodeInferred}
+                        />
 
                         {errors.payment && (
                           <span className="field-error-msg" role="alert">
@@ -653,7 +815,7 @@ export default function Checkout() {
                       </div>
 
                       <div className="checkout-review-items-table">
-                        <h4>Items in Your Order ({cart.length})</h4>
+                        <h4>Items in Your Order ({cartCount})</h4>
                         <div className="review-items-list">
                           {cart.map((item) => (
                             <div key={item.id} className="review-item-row">
@@ -670,6 +832,23 @@ export default function Checkout() {
                               </div>
                             </div>
                           ))}
+                          {cartBundles?.map((bundle) => {
+                            const finalPrice = Number(bundle.price?.finalTotal ?? bundle.price ?? 0);
+                            return (
+                              <div key={bundle.bundleId} className="review-item-row review-bundle-row">
+                                <div className="bundle-mini-icon-badge">
+                                  <Sparkles size={18} />
+                                </div>
+                                <div className="review-item-details">
+                                  <h5>{bundle.bundleName || "Product Bundle"}</h5>
+                                  <span>Curated Package • Qty: {bundle.quantity || 1}</span>
+                                </div>
+                                <div className="review-item-price">
+                                  <strong>{formatPrice(finalPrice)}</strong>
+                                </div>
+                              </div>
+                            );
+                          })}
                         </div>
                       </div>
 
@@ -711,15 +890,27 @@ export default function Checkout() {
 
                         {submitError && <p className="inline-alert inline-alert-error">{submitError}</p>}
 
+                        {reservationError && (
+                          <p className="inline-alert inline-alert-error">
+                            <AlertCircle size={14} /> {reservationError}
+                          </p>
+                        )}
+
+                        {reservation?.expiresAt && (
+                          <p className="checkout-reservation-notice">
+                            ✦ Items reserved until {new Date(reservation.expiresAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                          </p>
+                        )}
+
                         <div className="checkout-final-action-row">
                           <button type="button" className="checkout-back-link" onClick={() => goTo(2)}>
                             <ArrowLeft size={16} /> Back to Payment
                           </button>
-                          <button type="submit" className="button button-gold checkout-place-order-btn" disabled={isSubmitting} id="place-order-button">
-                            {isSubmitting ? (
+                          <button type="submit" className="button button-gold checkout-place-order-btn" disabled={isSubmitting || reservingStock} id="place-order-button">
+                            {isSubmitting || reservingStock ? (
                               <>
                                 <Loader2 size={18} className="checkout-spinner" />
-                                <span>Placing Your Order...</span>
+                                <span>{reservingStock ? "Checking stock…" : "Placing Your Order..."}</span>
                               </>
                             ) : (
                               <>
@@ -734,12 +925,13 @@ export default function Checkout() {
                   )}
                 </div>
 
+
                 <aside className="checkout-sidebar-column">
                   <div className="checkout-order-summary-card">
                     <div className="summary-header">
                       <h3>Order Summary</h3>
                       <span className="summary-count-badge">
-                        {cart.length} {cart.length === 1 ? "Piece" : "Pieces"}
+                        {cartCount} {cartCount === 1 ? "Piece" : "Pieces"}
                       </span>
                     </div>
 
@@ -757,6 +949,22 @@ export default function Checkout() {
                           <strong className="item-price">{formatPrice(item.product.price * item.quantity)}</strong>
                         </div>
                       ))}
+                      {cartBundles?.map((bundle) => {
+                        const finalPrice = Number(bundle.price?.finalTotal ?? bundle.price ?? 0);
+                        return (
+                          <div key={bundle.bundleId} className="checkout-sidebar-item checkout-sidebar-bundle">
+                            <div className="item-thumb-wrap bundle-sidebar-thumb">
+                              <Sparkles size={16} />
+                              <span className="item-qty-badge">{bundle.quantity || 1}</span>
+                            </div>
+                            <div className="item-info">
+                              <h4 className="item-name">{bundle.bundleName || "Product Bundle"}</h4>
+                              <span className="item-variant">Curated Package</span>
+                            </div>
+                            <strong className="item-price">{formatPrice(finalPrice)}</strong>
+                          </div>
+                        );
+                      })}
                     </div>
 
                     <div className="summary-breakdown">
@@ -784,3 +992,52 @@ export default function Checkout() {
     </div>
   );
 }
+
+export function CheckoutRecoveryEmail({
+  cartId,
+  email,
+  customerName,
+}) {
+  const [value, setValue] = useState(email || '');
+  const [message, setMessage] = useState('');
+
+  const { syncRecoveryEmail } = useAbandonedCartTracking({
+    cartId,
+    email: value,
+    customerName,
+  });
+
+  useEffect(() => {
+    setValue(email || '');
+  }, [email]);
+
+  return (
+    <div className="checkout-recovery-email">
+      <label htmlFor="checkout-recovery-email">
+        Email address
+      </label>
+
+      <input
+        id="checkout-recovery-email"
+        type="email"
+        value={value}
+        onChange={(event) => setValue(event.target.value)}
+        onBlur={async () => {
+          if (!value) return;
+
+          try {
+            await syncRecoveryEmail();
+            setMessage('We saved your email for checkout updates.');
+          } catch {
+            setMessage('We could not save your email yet.');
+          }
+        }}
+        placeholder="you@example.com"
+        autoComplete="email"
+      />
+
+      {message ? <small>{message}</small> : null}
+    </div>
+  );
+}
+

@@ -1,33 +1,41 @@
+import { lazy, Suspense } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ScrollToTop from "./components/ScrollToTop";
 
-import Home from "./pages/Home";
-import CatalogPage from "./pages/CatalogPage";
-import ProductDetails from "./pages/ProductDetails";
-import Wishlist from "./pages/Wishlist";
-import Cart from "./pages/Cart";
-import Checkout from "./pages/Checkout";
-import OrderConfirmation from "./pages/OrderConfirmation";
-import Auth from "./pages/Auth";
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
-import Account from "./pages/Account";
-import TrackOrder from "./pages/TrackOrder";
-import About from "./pages/About";
-import Contact from "./pages/Contact";
-import FAQ from "./pages/FAQ";
-import ShippingReturns from "./pages/ShippingReturns";
-import JewelryCare from "./pages/JewelryCare";
-import Legal from "./pages/Legal";
+const Home = lazy(() => import("./pages/Home"));
+const CatalogPage = lazy(() => import("./pages/CatalogPage"));
+const ProductDetails = lazy(() => import("./pages/ProductDetails"));
+const Bundles = lazy(() => import("./pages/Bundles"));
+const BundleDetails = lazy(() => import("./pages/BundleDetails"));
+const Wishlist = lazy(() => import("./pages/Wishlist"));
+const Cart = lazy(() => import("./pages/Cart"));
+const Checkout = lazy(() => import("./pages/Checkout"));
+const OrderConfirmation = lazy(() => import("./pages/OrderConfirmation"));
+const Auth = lazy(() => import("./pages/Auth"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const Account = lazy(() => import("./pages/Account"));
+const TrackOrder = lazy(() => import("./pages/TrackOrder"));
+const About = lazy(() => import("./pages/About"));
+const Contact = lazy(() => import("./pages/Contact"));
+const FAQ = lazy(() => import("./pages/FAQ"));
+const ShippingReturns = lazy(() => import("./pages/ShippingReturns"));
+const JewelryCare = lazy(() => import("./pages/JewelryCare"));
+const Legal = lazy(() => import("./pages/Legal"));
 
-import AdminApp from "./admin/AdminApp";
+const AdminApp = lazy(() => import("./admin/AdminApp"));
+import useReferralTracking from "./hooks/useReferralTracking";
+import useAnalyticsTracking from "./hooks/useAnalyticsTracking";
 
 export default function App() {
+  useReferralTracking();
+  useAnalyticsTracking();
   return (
     <>
       <ScrollToTop />
+      <Suspense fallback={<div className="route-loading" aria-busy="true" />}>
       <Routes>
         <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
@@ -38,6 +46,8 @@ export default function App() {
         <Route path="/category/:slug" element={<CatalogPage type="category" />} />
         <Route path="/collections/bridal" element={<CatalogPage type="bridal" />} />
         <Route path="/collections/sale" element={<CatalogPage type="sale" />} />
+        <Route path="/bundles" element={<Bundles />} />
+        <Route path="/bundles/:slug" element={<BundleDetails />} />
 
         <Route path="/product/:slug" element={<ProductDetails />} />
         <Route path="/wishlist" element={<Wishlist />} />
@@ -72,6 +82,7 @@ export default function App() {
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+      </Suspense>
     </>
   );
 }

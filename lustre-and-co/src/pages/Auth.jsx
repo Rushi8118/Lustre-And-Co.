@@ -1,10 +1,10 @@
-import { useMemo, useState } from "react";
-import { ArrowRight, Check, Eye, EyeOff, Heart, LockKeyhole, Mail, Sparkles, UserRound, Github } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { ArrowRight, Check, Eye, EyeOff, Heart, LockKeyhole, Mail, Sparkles, UserRound, Github, ShieldCheck } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useStore } from "../context/StoreContext";
 import { useSettings } from "../context/SettingsContext";
-import { getErrorMessage } from "../services/api";
+import api, { getErrorMessage } from "../services/api";
 
 const benefits = ["Save your favorite pieces", "Track orders effortlessly", "Enjoy a faster checkout"];
 
@@ -88,9 +88,24 @@ export default function Auth({ mode = "login" }) {
   const isLogin = mode === "login";
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, register } = useStore();
+  const { login, register, completeSignIn } = useStore();
   const { settings } = useSettings();
   const storeName = settings.store.name;
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    if (searchParams.get("google") !== "success") return;
+
+    // The API set the session cookies during the Google redirect; load the profile with them.
+    api
+      .get("/auth/me")
+      .then(({ data }) => completeSignIn({ user: data.user }))
+      .then(() => {
+        const from = location.state?.from || "/account";
+        navigate(from, { replace: true });
+      })
+      .catch((err) => console.error("Google sign-in could not be completed:", err));
+  }, [location.search, completeSignIn, navigate, location.state]);
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -99,6 +114,12 @@ export default function Auth({ mode = "login" }) {
   const [agreed, setAgreed] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "" });
   const [touched, setTouched] = useState({});
+
+  // 2FA state
+  const [twoFactorData, setTwoFactorData] = useState(null);
+  const [twoFactorCode, setTwoFactorCode] = useState("");
+  const [isVerifying2FA, setIsVerifying2FA] = useState(false);
+  const [twoFactorError, setTwoFactorError] = useState("");
 
   const strength = useMemo(() => getPasswordStrength(form.password), [form.password]);
 
@@ -140,12 +161,48 @@ export default function Auth({ mode = "login" }) {
         ? await login({ email: form.email.trim(), password: form.password })
         : await register({ name: form.name.trim(), email: form.email.trim(), password: form.password });
 
-      const fallback = signedIn.role === "admin" ? "/admin" : "/account";
+      if (signedIn && signedIn.requires2FA) {
+        setTwoFactorData(signedIn);
+        return;
+      }
+
+      const role = signedIn?.role || "";
+      const isStaffOrAdmin = ["owner", "manager", "catalog-manager", "order-manager", "support-agent", "marketing-manager", "accountant", "admin"].includes(role);
+      const fallback = isStaffOrAdmin ? "/admin" : "/account";
       navigate(location.state?.from || fallback, { replace: true });
     } catch (err) {
       setFormError(getErrorMessage(err, "Authentication failed. Please check your details."));
     } finally {
       setIsSubmitting(false);
+    }
+  }
+
+  async function submit2FA(event) {
+    event.preventDefault();
+    if (!twoFactorCode.trim() || twoFactorCode.trim().length < 6) {
+      setTwoFactorError("Please enter the complete 6-digit verification code.");
+      return;
+    }
+
+    setIsVerifying2FA(true);
+    setTwoFactorError("");
+
+    try {
+      const { data } = await api.post("/auth/2fa/verify", {
+        tempToken: twoFactorData.tempToken,
+        code: twoFactorCode.trim(),
+      });
+
+      await completeSignIn(data);
+
+      const role = data.user?.role || "";
+      const isStaffOrAdmin = ["owner", "manager", "catalog-manager", "order-manager", "support-agent", "marketing-manager", "accountant", "admin"].includes(role);
+      const fallback = isStaffOrAdmin ? "/admin" : "/account";
+      navigate(location.state?.from || fallback, { replace: true });
+    } catch (err) {
+      setTwoFactorError(getErrorMessage(err, "Invalid or expired security code. Please check your email and try again."));
+    } finally {
+      setIsVerifying2FA(false);
     }
   }
 
@@ -218,165 +275,236 @@ export default function Auth({ mode = "login" }) {
               </Link>
             </div>
           </div>
-
           <div className="auth-form-content">
-            <div className="auth-form-heading">
-              <span className="auth-form-eyebrow">{isLogin ? "Welcome back" : "Join the community"}</span>
-              <h2>{isLogin ? "Sign in to your account." : "Create your account."}</h2>
-              <p>
-                {isLogin
-                  ? "Access your saved pieces, orders, and personal details."
-                  : "Keep your favorite pieces close and make checkout effortless."}
-              </p>
-            </div>
+            {twoFactorData ? (
+              <div className="auth-2fa-step">
+                <div className="auth-form-heading">
+                  <span className="auth-form-eyebrow">Security Challenge</span>
+                  <h2>Two-Factor Verification</h2>
+                  <p>{twoFactorData.message || "A 6-digit administrative verification code was dispatched to your email address."}</p>
+                </div>
 
-            <form className="auth-modern-form" onSubmit={submit} noValidate>
-              {!isLogin && (
-                <InputField
-                  label="Full name"
-                  name="name"
-                  value={form.name}
-                  onChange={updateField}
-                  onBlur={markTouched("name")}
-                  placeholder="Your full name"
-                  icon={UserRound}
-                  autoComplete="name"
-                  error={touched.name ? errors.name : ""}
-                />
-              )}
+                <form className="auth-modern-form" onSubmit={submit2FA} noValidate>
+                  <label className={`auth-field ${twoFactorError ? "has-error" : ""}`}>
+                    <span>Enter 6-Digit Code</span>
+                    <div className="auth-input-wrap">
+                      <ShieldCheck size={18} className="auth-input-icon" />
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        maxLength={6}
+                        value={twoFactorCode}
+                        onChange={(e) => {
+                          setTwoFactorCode(e.target.value.replace(/\D/g, "").slice(0, 6));
+                          setTwoFactorError("");
+                        }}
+                        placeholder="••••••"
+                        autoFocus
+                        style={{
+                          letterSpacing: "8px",
+                          fontSize: "20px",
+                          fontWeight: "700",
+                          textAlign: "center",
+                          fontFamily: "monospace",
+                        }}
+                      />
+                    </div>
+                    {twoFactorError && <small className="auth-field-error">{twoFactorError}</small>}
+                  </label>
 
-              <InputField
-                label="Email address"
-                name="email"
-                type="email"
-                value={form.email}
-                onChange={updateField}
-                onBlur={markTouched("email")}
-                placeholder="you@example.com"
-                icon={Mail}
-                autoComplete="email"
-                error={touched.email ? errors.email : ""}
-              />
+                  <button className="auth-submit-button" type="submit" disabled={isVerifying2FA}>
+                    <span>{isVerifying2FA ? "Verifying…" : "Verify & Continue"}</span>
+                    {!isVerifying2FA && <ArrowRight size={17} />}
+                  </button>
 
-              <InputField
-                label="Password"
-                name="password"
-                type={showPassword ? "text" : "password"}
-                value={form.password}
-                onChange={updateField}
-                onBlur={markTouched("password")}
-                placeholder="Enter your password"
-                icon={LockKeyhole}
-                autoComplete={isLogin ? "current-password" : "new-password"}
-                error={touched.password ? errors.password : ""}
-              >
-                <button
-                  type="button"
-                  className="auth-password-toggle"
-                  onClick={() => setShowPassword((visible) => !visible)}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
-                </button>
-              </InputField>
+                  <button
+                    type="button"
+                    className="auth-back-button"
+                    style={{
+                      background: "none",
+                      border: "none",
+                      color: "var(--brand-muted, #78716c)",
+                      fontSize: "13px",
+                      cursor: "pointer",
+                      padding: "10px",
+                      textAlign: "center",
+                      marginTop: "10px",
+                      width: "100%",
+                      textDecoration: "underline",
+                    }}
+                    onClick={() => {
+                      setTwoFactorData(null);
+                      setTwoFactorCode("");
+                      setTwoFactorError("");
+                    }}
+                  >
+                    ← Back to sign in
+                  </button>
+                </form>
+              </div>
+            ) : (
+              <>
+                <div className="auth-form-heading">
+                  <span className="auth-form-eyebrow">{isLogin ? "Welcome back" : "Join the community"}</span>
+                  <h2>{isLogin ? "Sign in to your account." : "Create your account."}</h2>
+                  <p>
+                    {isLogin
+                      ? "Access your saved pieces, orders, and personal details."
+                      : "Keep your favorite pieces close and make checkout effortless."}
+                  </p>
+                </div>
 
-              {!isLogin && (
-                <div className="auth-password-area">
+                <form className="auth-modern-form" onSubmit={submit} noValidate>
+                  {!isLogin && (
+                    <InputField
+                      label="Full name"
+                      name="name"
+                      value={form.name}
+                      onChange={updateField}
+                      onBlur={markTouched("name")}
+                      placeholder="Your full name"
+                      icon={UserRound}
+                      autoComplete="name"
+                      error={touched.name ? errors.name : ""}
+                    />
+                  )}
+
                   <InputField
-                    label="Confirm password"
-                    name="confirmPassword"
-                    type={showConfirmPassword ? "text" : "password"}
-                    value={form.confirmPassword}
+                    label="Email address"
+                    name="email"
+                    type="email"
+                    value={form.email}
                     onChange={updateField}
-                    onBlur={markTouched("confirmPassword")}
-                    placeholder="Repeat your password"
+                    onBlur={markTouched("email")}
+                    placeholder="you@example.com"
+                    icon={Mail}
+                    autoComplete="email"
+                    error={touched.email ? errors.email : ""}
+                  />
+
+                  <InputField
+                    label="Password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    value={form.password}
+                    onChange={updateField}
+                    onBlur={markTouched("password")}
+                    placeholder="Enter your password"
                     icon={LockKeyhole}
-                    autoComplete="new-password"
-                    error={touched.confirmPassword ? errors.confirmPassword : ""}
+                    autoComplete={isLogin ? "current-password" : "new-password"}
+                    error={touched.password ? errors.password : ""}
                   >
                     <button
                       type="button"
                       className="auth-password-toggle"
-                      onClick={() => setShowConfirmPassword((visible) => !visible)}
-                      aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                      onClick={() => setShowPassword((visible) => !visible)}
+                      aria-label={showPassword ? "Hide password" : "Show password"}
                     >
-                      {showConfirmPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+                      {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
                     </button>
                   </InputField>
 
-                  {form.password && (
-                    <div className={`password-strength ${strength.className}`}>
-                      <div className="password-strength-bars">
-                        {[1, 2, 3, 4].map((bar) => (
-                          <span key={bar} className={bar <= strength.level ? "filled" : ""} />
-                        ))}
-                      </div>
-                      <small>{strength.label}</small>
+                  {!isLogin && (
+                    <div className="auth-password-area">
+                      <InputField
+                        label="Confirm password"
+                        name="confirmPassword"
+                        type={showConfirmPassword ? "text" : "password"}
+                        value={form.confirmPassword}
+                        onChange={updateField}
+                        onBlur={markTouched("confirmPassword")}
+                        placeholder="Repeat your password"
+                        icon={LockKeyhole}
+                        autoComplete="new-password"
+                        error={touched.confirmPassword ? errors.confirmPassword : ""}
+                      >
+                        <button
+                          type="button"
+                          className="auth-password-toggle"
+                          onClick={() => setShowConfirmPassword((visible) => !visible)}
+                          aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                        >
+                          {showConfirmPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+                        </button>
+                      </InputField>
+
+                      {form.password && (
+                        <div className={`password-strength ${strength.className}`}>
+                          <div className="password-strength-bars">
+                            {[1, 2, 3, 4].map((bar) => (
+                              <span key={bar} className={bar <= strength.level ? "filled" : ""} />
+                            ))}
+                          </div>
+                          <small>{strength.label}</small>
+                        </div>
+                      )}
                     </div>
                   )}
-                </div>
-              )}
 
-              {isLogin && (
-                <div className="auth-options-row">
-                  <span />
-                  <Link to="/account/forgot-password">Forgot password?</Link>
-                </div>
-              )}
+                  {isLogin && (
+                    <div className="auth-options-row">
+                      <span />
+                      <Link to="/account/forgot-password">Forgot password?</Link>
+                    </div>
+                  )}
 
-              {!isLogin && (
-                <label className="auth-checkbox auth-terms-checkbox">
-                  <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} />
-                  <span>
-                    I agree to the <Link to="/terms">Terms</Link> and <Link to="/privacy">Privacy Policy</Link>.
-                  </span>
-                </label>
-              )}
+                  {!isLogin && (
+                    <label className="auth-checkbox auth-terms-checkbox">
+                      <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} />
+                      <span>
+                        I agree to the <Link to="/terms">Terms</Link> and <Link to="/privacy">Privacy Policy</Link>.
+                      </span>
+                    </label>
+                  )}
 
-              {formError && (
-                <p className="auth-form-error" role="alert">
-                  {formError}
+                  {formError && (
+                    <p className="auth-form-error" role="alert">
+                      {formError}
+                    </p>
+                  )}
+
+                  <button className="auth-submit-button" type="submit" disabled={isSubmitting}>
+                    <span>{isSubmitting ? "Please wait…" : isLogin ? "Sign in" : "Create account"}</span>
+                    {!isSubmitting && <ArrowRight size={17} />}
+                  </button>
+
+                  <div className="auth-divider">
+                    <span>or continue with</span>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="social-login-button"
+                    onClick={() => {
+                      const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+                      window.location.href = `${apiBase.replace(/\/+$/, '')}/auth/google`;
+                    }}
+                  >
+                    <GoogleIcon />
+                    <span>Continue with Google</span>
+                  </button>
+                </form>
+
+                <p className="auth-bottom-note">
+                  {isLogin ? (
+                    <>
+                      New to {storeName}?{" "}
+                      <Link to="/account/signup" state={location.state}>
+                        Create an account
+                      </Link>
+                    </>
+                  ) : (
+                    <>
+                      Already have an account?{" "}
+                      <Link to="/account/login" state={location.state}>
+                        Sign in here
+                      </Link>
+                    </>
+                  )}
                 </p>
-              )}
-
-              <button className="auth-submit-button" type="submit" disabled={isSubmitting}>
-                <span>{isSubmitting ? "Please wait…" : isLogin ? "Sign in" : "Create account"}</span>
-                {!isSubmitting && <ArrowRight size={17} />}
-              </button>
-
-              <div className="auth-divider">
-                <span>or continue with</span>
-              </div>
-
-              <button
-                type="button"
-                className="social-login-button"
-                onClick={() => {
-                  window.location.href = '/api/auth/google';
-                }}
-              >
-                <GoogleIcon />
-                <span>Continue with Google</span>
-              </button>
-            </form>
-
-            <p className="auth-bottom-note">
-              {isLogin ? (
-                <>
-                  New to {storeName}?{" "}
-                  <Link to="/account/signup" state={location.state}>
-                    Create an account
-                  </Link>
-                </>
-              ) : (
-                <>
-                  Already have an account?{" "}
-                  <Link to="/account/login" state={location.state}>
-                    Sign in here
-                  </Link>
-                </>
-              )}
-            </p>
+              </>
+            )}
           </div>
 
           <div className="auth-form-footer">

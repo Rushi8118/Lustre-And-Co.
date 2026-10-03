@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { ArrowRight, ShoppingBag, Truck, MapPin, Gift, ShieldCheck, Clock, CreditCard } from "lucide-react";
+import { ArrowRight, ShoppingBag, Truck, MapPin, Gift, ShieldCheck, Clock, CreditCard, FileText } from "lucide-react";
 import { formatPrice } from "../data/products";
+import ShipmentTracking from "../components/ShipmentTracking";
 import { useStore } from "../context/StoreContext";
 import { useSettings } from "../context/SettingsContext";
 import api, { getErrorMessage } from "../services/api";
 import { payOrderOnline } from "../services/payments";
+import { getInvoiceHtmlUrl, openDocumentInNewTab } from "../services/documents";
 
 export default function OrderConfirmation() {
   const { orderId } = useParams();
@@ -260,6 +262,56 @@ export default function OrderConfirmation() {
                   </div>
                 </div>
 
+                <div className="confirmation-card-panel">
+                  <div className="panel-header">
+                    <div className="panel-header-title">
+                      <Truck size={18} />
+                      <h3>Delivery & Logistics</h3>
+                    </div>
+                  </div>
+                  <div className="shipping-address-body">
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                      <span style={{ fontSize: 12, color: "#666" }}>Service Partner:</span>
+                      <strong style={{ fontSize: 13, color: "#1a1714" }}>
+                        {order.carrier || "Lustre Express Logistics"}
+                      </strong>
+                    </div>
+
+                    {order.tracking_number && (
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                        <span style={{ fontSize: 12, color: "#666" }}>
+                          {order.shipping_provider_code === "store_pickup" ? "Pickup Code:" : "Waybill / AWB:"}
+                        </span>
+                        <strong style={{ fontSize: 13, fontFamily: "monospace", letterSpacing: "1px", color: "#8a6d3b", background: "#fbf6ee", padding: "2px 6px", borderRadius: 4 }}>
+                          {order.tracking_number}
+                        </strong>
+                      </div>
+                    )}
+
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                      <span style={{ fontSize: 12, color: "#666" }}>Estimated Arrival:</span>
+                      <strong style={{ fontSize: 12, color: "#16a34a" }}>
+                        {order.estimatedDeliveryDate || "3–5 business days"}
+                      </strong>
+                    </div>
+
+                    {order.tracking_url && (
+                      <div style={{ marginTop: 10, paddingTop: 10, borderTop: "1px dashed #e5e5e5" }}>
+                        <a
+                          href={order.tracking_url}
+                          target="_blank"
+                          rel="noreferrer"
+                          style={{ fontSize: 12, color: "#2563eb", textDecoration: "underline" }}
+                        >
+                          View tracking on carrier website &rarr;
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <ShipmentTracking orderId={order.id || order.orderId} />
+
                 <div className="confirmation-perks-card">
                   <div className="perk-row">
                     <Gift size={20} className="perk-icon" />
@@ -287,6 +339,16 @@ export default function OrderConfirmation() {
             </div>
 
             <div className="confirmation-actions-row">
+              <button
+                type="button"
+                onClick={() => openDocumentInNewTab(getInvoiceHtmlUrl(order.orderId))}
+                className="button button-outline-dark confirmation-invoice-btn"
+                id="confirmation-download-invoice-btn"
+                style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}
+              >
+                <FileText size={16} />
+                <span>Tax Invoice</span>
+              </button>
               <Link to={`/track-order?order=${order.orderId}`} className="button button-dark confirmation-track-btn" id="confirmation-track-order-btn">
                 <span>Track Order</span>
                 <ArrowRight size={16} />

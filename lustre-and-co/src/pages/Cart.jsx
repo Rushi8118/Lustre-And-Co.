@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Trash2,
@@ -18,11 +18,14 @@ import { COLOR_SWATCHES, formatPrice } from "../data/products";
 import { useStore } from "../context/StoreContext";
 import { useSettings } from "../context/SettingsContext";
 import ProductCard from "../components/ProductCard";
+import RecommendationSection from "../components/RecommendationSection";
+import { getCartRecommendations } from "../services/recommendations";
 
 export default function Cart() {
   const navigate = useNavigate();
   const {
     cart,
+    cartBundles,
     cartCount,
     cartSubtotal,
     appliedPromo,
@@ -32,6 +35,7 @@ export default function Cart() {
     cartTotal,
     updateQuantity,
     removeFromCart,
+    removeBundleFromBag,
     moveToWishlist,
     applyPromoCode,
     removePromoCode,
@@ -51,13 +55,29 @@ export default function Cart() {
   const remainingForFreeShipping = Math.max(0, threshold - cartSubtotal);
   const freeShippingProgress = threshold > 0 ? Math.min(100, Math.round((cartSubtotal / threshold) * 100)) : 100;
 
-  const recommendedProducts = useMemo(() => {
-    const inBag = new Set(cart.map((item) => item.product.slug));
-    return products
-      .filter((product) => !inBag.has(product.slug))
-      .sort((a, b) => (b.salesCount || 0) - (a.salesCount || 0))
-      .slice(0, 4);
-  }, [cart, products]);
+  const [cartRecProducts, setCartRecProducts] = useState([]);
+
+  // Fetch server-side cart recommendations when cart changes
+  useEffect(() => {
+    const productIds = cart.map((item) => item.product?.id).filter(Boolean);
+    if (productIds.length === 0) { setCartRecProducts([]); return; }
+    let cancelled = false;
+    getCartRecommendations(productIds, 6)
+      .then((products) => { if (!cancelled) setCartRecProducts(products || []); })
+      .catch(() => {
+        // fallback: derive from local products list
+        if (!cancelled) {
+          const inBag = new Set(cart.map((item) => item.product.slug));
+          setCartRecProducts(
+            products
+              .filter((p) => !inBag.has(p.slug))
+              .sort((a, b) => (b.salesCount || 0) - (a.salesCount || 0))
+              .slice(0, 6)
+          );
+        }
+      });
+    return () => { cancelled = true; };
+  }, [cart]);
 
   async function handleApplyPromo(e) {
     e.preventDefault();
@@ -107,7 +127,7 @@ export default function Cart() {
 
           {isLoading ? (
             <p className="catalog-loading">Loading your bag…</p>
-          ) : cart.length === 0 ? (
+          ) : cart.length === 0 && (!cartBundles || cartBundles.length === 0) ? (
             <div className="cart-empty-container">
               <div className="cart-empty-icon-wrap">
                 <ShoppingBag size={42} strokeWidth={1.2} />
@@ -264,6 +284,79 @@ export default function Cart() {
                         </article>
                       );
                     })}
+
+                    {cartBundles?.map((bundle) => {
+                      const finalPrice = Number(bundle.price?.finalTotal ?? bundle.price ?? 0);
+                      const originalPrice = Number(bundle.price?.originalTotal ?? finalPrice);
+
+                      return (
+                        <article
+                          className="cart-item-card bundle-cart-card"
+                          key={bundle.bundleId}
+                          id={`cart-bundle-${bundle.bundleId}`}
+                        >
+                          <div className="cart-item-image-wrap bundle-cart-image-wrap">
+                            <div className="bundle-cart-icon-box">
+                              <Sparkles size={24} />
+                            </div>
+                          </div>
+
+                          <div className="cart-item-content">
+                            <div className="cart-item-top-row">
+                              <div>
+                                <span className="cart-item-category">
+                                  <Sparkles size={12} /> Curated Offer • Product Bundle
+                                </span>
+                                <h3 className="cart-item-title">
+                                  {bundle.bundleName || "Product Bundle"}
+                                </h3>
+                              </div>
+                              <div className="cart-item-total-price">
+                                <strong>{formatPrice(finalPrice)}</strong>
+                              </div>
+                            </div>
+
+                            <div className="cart-item-attributes">
+                              <div className="cart-item-badge-pill">
+                                <span>
+                                  Selected pieces: <strong>{bundle.selectedItems?.length || "Set"}</strong>
+                                </span>
+                              </div>
+                              {originalPrice > finalPrice && (
+                                <div className="cart-item-badge-pill bundle-saving-pill">
+                                  <span>
+                                    Bundle savings: <strong>{formatPrice(originalPrice - finalPrice)}</strong>
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+
+                            <div className="cart-item-unit-price">
+                              <span>
+                                Quantity: <strong>{bundle.quantity || 1} bundle</strong>
+                              </span>
+                              {originalPrice > finalPrice && (
+                                <del className="cart-item-unit-old-price">
+                                  {formatPrice(originalPrice)}
+                                </del>
+                              )}
+                            </div>
+
+                            <div className="cart-item-controls-row">
+                              <button
+                                type="button"
+                                className="cart-action-btn cart-remove-btn"
+                                onClick={() => removeBundleFromBag(bundle.bundleId)}
+                                aria-label={`Remove ${bundle.bundleName || "bundle"} from bag`}
+                              >
+                                <Trash2 size={15} />
+                                <span>Remove Bundle</span>
+                              </button>
+                            </div>
+                          </div>
+                        </article>
+                      );
+                    })}
                   </div>
 
                   <div className="cart-bottom-nav">
@@ -407,24 +500,15 @@ export default function Cart() {
         </div>
       </section>
 
-      {recommendedProducts.length > 0 && (
+      {cartRecProducts.length > 0 && (
         <section className="section cart-recommended-section">
           <div className="container">
-            <div className="section-heading">
-              <div>
-                <span className="eyebrow">Curated Complements</span>
-                <h2>You May Also Love</h2>
-              </div>
-              <Link to="/shop" className="pdp-see-all-link">
-                Explore all jewelry →
-              </Link>
-            </div>
-
-            <div className="product-grid" id="cart-recommended-grid">
-              {recommendedProducts.map((recProduct, idx) => (
-                <ProductCard key={recProduct.slug} product={recProduct} index={idx} showQuickView={true} />
-              ))}
-            </div>
+            <RecommendationSection
+              type="you_may_also_like"
+              label="You May Also Love"
+              products={cartRecProducts}
+              cardStyle="scroll"
+            />
           </div>
         </section>
       )}

@@ -8,9 +8,10 @@ import React, {
   useState
 } from "react";
 import { Link } from "react-router-dom";
-import api, { TOKEN_KEY, getErrorMessage } from "../services/api";
+import api, { getErrorMessage, hasSessionHint, setSessionHint } from "../services/api";
 import { cartItemId, formatPrice, normalizeProduct } from "../data/products";
 import { useSettings } from "./SettingsContext";
+import { identifyCart } from "../services/abandonedCarts";
 
 const StoreContext = createContext(null);
 
@@ -35,14 +36,6 @@ function writeStorage(key, value) {
     else localStorage.setItem(key, JSON.stringify(value));
   } catch {
     // Storage can be unavailable (private mode); the app still works in memory.
-  }
-}
-
-function readToken() {
-  try {
-    return localStorage.getItem(TOKEN_KEY);
-  } catch {
-    return null;
   }
 }
 
@@ -77,9 +70,11 @@ export function StoreProvider({ children }) {
 
   const [products, setProducts] = useState([]);
   const [productsStatus, setProductsStatus] = useState("loading");
-  const [user, setUser] = useState(() => (readToken() ? readStorage(USER_KEY, null) : null));
+  const [user, setUser] = useState(() => (hasSessionHint() ? readStorage(USER_KEY, null) : null));
   const [authReady, setAuthReady] = useState(false);
   const [cart, setCart] = useState([]);
+  const [cartId, setCartId] = useState(() => readStorage("lustre-cart-id", null));
+  const [cartBundles, setCartBundles] = useState(() => readStorage("lustre-cart-bundles", []));
   const [wishlist, setWishlist] = useState([]);
   const [appliedPromo, setAppliedPromo] = useState(() => readStorage(PROMO_KEY, null));
   const [lastOrder, setLastOrder] = useState(() => readStorage(LAST_ORDER_KEY, null));
@@ -125,18 +120,24 @@ export function StoreProvider({ children }) {
   const loadAccountCollections = useCallback(async () => {
     const [cartRes, wishlistRes] = await Promise.all([api.get("/cart"), api.get("/wishlist")]);
     setCart(fromServerCart(cartRes.data));
+    if (cartRes.data?.id) {
+      setCartId(cartRes.data.id);
+      writeStorage("lustre-cart-id", cartRes.data.id);
+    }
+    if (cartRes.data?.bundleItems) {
+      setCartBundles(cartRes.data.bundleItems);
+      writeStorage("lustre-cart-bundles", cartRes.data.bundleItems);
+    }
     setWishlist((wishlistRes.data || []).map(normalizeProduct));
   }, []);
 
   const clearSession = useCallback(() => {
-    try {
-      localStorage.removeItem(TOKEN_KEY);
-    } catch {
-      // ignore
-    }
+    setSessionHint(false);
     writeStorage(USER_KEY, null);
     setUser(null);
     setCart([]);
+    setCartBundles([]);
+    writeStorage("lustre-cart-bundles", []);
     setWishlist([]);
   }, []);
 
@@ -144,7 +145,7 @@ export function StoreProvider({ children }) {
     let cancelled = false;
 
     async function restoreSession() {
-      if (!readToken()) {
+      if (!hasSessionHint()) {
         setUser(null);
         setAuthReady(true);
         return;
@@ -198,11 +199,8 @@ export function StoreProvider({ children }) {
   }, [cart, wishlist, user, authReady, productsStatus]);
 
   const completeSignIn = useCallback(async (data) => {
-    try {
-      localStorage.setItem(TOKEN_KEY, data.token);
-    } catch {
-      // ignore
-    }
+    // The API has already set the httpOnly session cookies; only the flag and profile are kept here.
+    setSessionHint(true);
     writeStorage(USER_KEY, data.user);
     setUser(data.user);
 
@@ -221,6 +219,14 @@ export function StoreProvider({ children }) {
           })
         : await api.get("/cart");
       setCart(fromServerCart(cartRes.data));
+      if (cartRes.data?.id) {
+        setCartId(cartRes.data.id);
+        writeStorage("lustre-cart-id", cartRes.data.id);
+      }
+      if (cartRes.data?.bundleItems) {
+        setCartBundles(cartRes.data.bundleItems);
+        writeStorage("lustre-cart-bundles", cartRes.data.bundleItems);
+      }
 
       let serverWishlist = (await api.get("/wishlist")).data || [];
       const saved = new Set(serverWishlist.map((p) => p.slug));
@@ -244,8 +250,11 @@ export function StoreProvider({ children }) {
   const login = useCallback(
     async ({ email, password }) => {
       const { data } = await api.post("/auth/login", { email, password });
+      if (data.requires2FA) {
+        return data;
+      }
       await completeSignIn(data);
-      showToast(`Welcome back, ${data.user.name.split(" ")[0]}.`, "success");
+      showToast(`Welcome back, ${data.user?.name?.split(" ")[0] || "User"}.`, "success");
       return data.user;
     },
     [completeSignIn, showToast]
@@ -261,7 +270,8 @@ export function StoreProvider({ children }) {
     [completeSignIn, showToast]
   );
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    await api.post("/auth/logout").catch(() => {});
     clearSession();
     showToast("You have been signed out.");
   }, [clearSession, showToast]);
@@ -362,6 +372,8 @@ export function StoreProvider({ children }) {
 
   const clearCart = useCallback(async () => {
     setCart([]);
+    setCartBundles([]);
+    writeStorage("lustre-cart-bundles", []);
     if (user) {
       try {
         await api.delete("/cart");
@@ -370,6 +382,53 @@ export function StoreProvider({ children }) {
       }
     }
   }, [user]);
+
+  const removeBundleFromBag = useCallback(
+    async (bundleId) => {
+      try {
+        if (cartId) {
+          await api.delete(`/cart/${cartId}/bundles/${bundleId}`);
+        }
+      } catch {
+        // non-blocking
+      }
+      setCartBundles((prev) => {
+        const next = prev.filter((b) => b.bundleId !== bundleId);
+        writeStorage("lustre-cart-bundles", next);
+        return next;
+      });
+      showToast("Bundle removed from bag.");
+    },
+    [cartId, showToast]
+  );
+
+  const refreshCart = useCallback(async () => {
+    try {
+      if (user) {
+        const { data } = await api.get("/cart");
+        setCart(fromServerCart(data));
+        if (data?.bundleItems) {
+          setCartBundles(data.bundleItems);
+          writeStorage("lustre-cart-bundles", data.bundleItems);
+        }
+      } else if (cartId) {
+        const { data } = await api.post(`/cart/${cartId}/bundles/validate`);
+        if (data?.bundles) {
+          const loaded = data.bundles.map((b) => ({
+            bundleId: b.bundle.id,
+            bundleName: b.bundle.name,
+            quantity: b.price.quantity,
+            selectedItems: b.selectedItems,
+            price: b.price
+          }));
+          setCartBundles(loaded);
+          writeStorage("lustre-cart-bundles", loaded);
+        }
+      }
+    } catch {
+      // non-blocking
+    }
+  }, [user, cartId]);
 
   // ---------------------------------------------------------------------------
   // Wishlist
@@ -424,12 +483,17 @@ export function StoreProvider({ children }) {
   // Totals (mirror the server's order calculation)
   // ---------------------------------------------------------------------------
 
-  const cartCount = useMemo(() => cart.reduce((sum, item) => sum + item.quantity, 0), [cart]);
+  const cartCount = useMemo(() => {
+    const itemsCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+    const bundlesCount = cartBundles.reduce((sum, b) => sum + Number(b.quantity || 1), 0);
+    return itemsCount + bundlesCount;
+  }, [cart, cartBundles]);
 
-  const cartSubtotal = useMemo(
-    () => cart.reduce((sum, item) => sum + (item.product?.price || 0) * item.quantity, 0),
-    [cart]
-  );
+  const cartSubtotal = useMemo(() => {
+    const itemsSubtotal = cart.reduce((sum, item) => sum + (item.product?.price || 0) * item.quantity, 0);
+    const bundlesSubtotal = cartBundles.reduce((sum, b) => sum + Number(b.price?.finalTotal || 0), 0);
+    return itemsSubtotal + bundlesSubtotal;
+  }, [cart, cartBundles]);
 
   const discountAmount = useMemo(() => {
     if (!appliedPromo) return 0;
@@ -521,6 +585,11 @@ export function StoreProvider({ children }) {
           color: item.selectedColor,
           size: item.selectedSize
         })),
+        bundleItems: cartBundles.map((b) => ({
+          bundleId: b.bundleId,
+          quantity: b.quantity || 1,
+          selectedItems: b.selectedItems || [],
+        })),
         deliveryOption,
         paymentMethod,
         notes: notes || undefined,
@@ -531,12 +600,14 @@ export function StoreProvider({ children }) {
       // Only the reference is persisted, so order details are not left in browser storage.
       writeStorage(LAST_ORDER_KEY, { orderId: data.orderId, email: data.customer?.email });
       setCart([]);
+      setCartBundles([]);
+      writeStorage("lustre-cart-bundles", []);
       if (!user) writeStorage(GUEST_CART_KEY, []);
       setAppliedPromo(null);
       refreshProducts();
       return data;
     },
-    [cart, appliedPromo, user, refreshProducts]
+    [cart, cartBundles, appliedPromo, user, refreshProducts]
   );
 
   const value = useMemo(
@@ -545,6 +616,10 @@ export function StoreProvider({ children }) {
       productsStatus,
       refreshProducts,
       cart,
+      cartId,
+      cartBundles,
+      removeBundleFromBag,
+      refreshCart,
       wishlist,
       user,
       authReady,
@@ -570,6 +645,7 @@ export function StoreProvider({ children }) {
       login,
       register,
       logout,
+      completeSignIn,
       updateUser,
       placeOrder,
       showToast
@@ -579,6 +655,10 @@ export function StoreProvider({ children }) {
       productsStatus,
       refreshProducts,
       cart,
+      cartId,
+      cartBundles,
+      removeBundleFromBag,
+      refreshCart,
       wishlist,
       user,
       authReady,
@@ -603,6 +683,7 @@ export function StoreProvider({ children }) {
       login,
       register,
       logout,
+      completeSignIn,
       updateUser,
       placeOrder,
       showToast
@@ -668,3 +749,32 @@ export function useStore() {
   }
   return context;
 }
+
+export function useAbandonedCartTracking({
+  cartId,
+  email,
+  customerName,
+  enabled = true,
+}) {
+  const lastSentEmail = useRef('');
+
+  const syncRecoveryEmail = useCallback(async () => {
+    if (!enabled || !cartId || !email || email === lastSentEmail.current) {
+      return;
+    }
+
+    try {
+      await identifyCart(cartId, email, customerName);
+      lastSentEmail.current = email;
+    } catch {
+      // Background tracking: non-blocking
+    }
+  }, [cartId, email, customerName, enabled]);
+
+  useEffect(() => {
+    void syncRecoveryEmail();
+  }, [syncRecoveryEmail]);
+
+  return { syncRecoveryEmail };
+}
+

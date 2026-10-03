@@ -1,21 +1,72 @@
+import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module.js';
+import { SanitizePipe } from './common/pipes/sanitize.pipe.js';
+import { LoggingInterceptor } from './common/interceptors/logging.interceptor.js';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // 1. Enable CORS for Vite Frontend
+  // Render/Vercel sit in front of the API; trust one proxy hop so rate limits see the client IP.
+  app.getHttpAdapter().getInstance().set('trust proxy', 1);
+
+  // 1. Helmet Security Headers
+  app.use(
+    helmet({
+      contentSecurityPolicy: false,
+      crossOriginEmbedderPolicy: false,
+    }),
+  );
+
+  app.use(cookieParser());
+
+  // 2. CORS: only the known storefront origins may call the API from a browser
+  const defaultOrigins = [
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'http://localhost:5175',
+    'http://localhost:5176',
+    'http://localhost:5177',
+    'https://lustre-and-co.vercel.app',
+  ];
+
+  const envOrigins = (process.env.FRONTEND_URL || '')
+    .split(',')
+    .map((o) => o.trim().replace(/\/+$/, ''))
+    .filter(Boolean);
+
+  const allowedOrigins = [
+    ...new Set([
+      ...defaultOrigins.map((o) => o.replace(/\/+$/, '')),
+      ...envOrigins,
+    ]),
+  ];
+
   app.enableCors({
-    origin: (process.env.FRONTEND_URL || 'http://localhost:5177')
-      .split(',')
-      .map((origin) => origin.trim()),
+    origin: (
+      origin: string | undefined,
+      callback: (err: Error | null, allow?: boolean) => void,
+    ) => {
+      // No Origin header means a non-browser client (curl, server-to-server): allowed.
+      const normalizedOrigin = origin ? origin.replace(/\/+$/, '') : '';
+      callback(null, !origin || allowedOrigins.includes(normalizedOrigin));
+    },
     credentials: true,
+    exposedHeaders: ['Content-Disposition', 'Content-Type', 'X-Total-Count'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-session-id'],
   });
 
-  // 2. Global Validation Pipe for DTOs
+  // 3. Global Request Logging Interceptor
+  app.useGlobalInterceptors(new LoggingInterceptor());
+
+  // 4. Global Input Sanitization & Validation Pipes
   app.useGlobalPipes(
+    new SanitizePipe(),
     new ValidationPipe({
       whitelist: true,
       transform: true,
@@ -23,21 +74,21 @@ async function bootstrap() {
     }),
   );
 
-  // 3. API Global Prefix: /api
+  // 5. API Global Prefix: /api
   app.setGlobalPrefix('api');
 
-  // 4. Interactive Swagger Documentation
+  // 6. Interactive Swagger Documentation
   const config = new DocumentBuilder()
-    .setTitle('Lustre & Co. API')
-    .setDescription('NestJS + Supabase E-Commerce API for Imitation Jewelry')
-    .setVersion('1.0')
+    .setTitle('Lustre & Co. Enterprise API')
+    .setDescription('Production-Grade Imitation Jewelry Architecture (NestJS + Supabase + RBAC + 2FA)')
+    .setVersion('2.0')
     .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
 
   const port = process.env.PORT || 5000;
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
   console.log(`✨ Server running on: http://localhost:${port}/api`);
   console.log(`📖 Swagger Docs: http://localhost:${port}/api/docs`);
 }

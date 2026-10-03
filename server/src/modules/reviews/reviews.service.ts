@@ -4,6 +4,7 @@ import type { UserDocument } from '../users/schemas/user.schema.js';
 import { SettingsService } from '../settings/settings.service.js';
 import { SupabaseService } from '../../database/supabase.service.js';
 import { containsAny, countOf, idOrColumn, isUuid, toDoc, toDocs, unwrap } from '../../common/utils/db.js';
+import { LoyaltyService } from '../loyalty/loyalty.service.js';
 
 /** Public review fields (the reviewer's user id is not exposed). */
 const PUBLIC_REVIEW_COLUMNS =
@@ -14,6 +15,7 @@ export class ReviewsService {
   constructor(
     @Inject(SupabaseService) private readonly db: SupabaseService,
     @Inject(SettingsService) private readonly settingsService: SettingsService,
+    @Inject(LoyaltyService) private readonly loyaltyService: LoyaltyService,
   ) {}
 
   private async findProduct(idOrSlug: string) {
@@ -104,6 +106,10 @@ export class ReviewsService {
 
     if (review.status === 'approved') {
       await this.recalculateProductRating(product.id);
+      // Award review points (fire-and-forget, idempotent)
+      void this.loyaltyService
+        .awardReviewPoints({ userId: user.id, reviewId: review.id, productId: product.id })
+        .catch(() => null);
     }
 
     return {
@@ -142,6 +148,12 @@ export class ReviewsService {
     const review = unwrap(await this.db.from('reviews').update({ status }).eq('id', id).select().maybeSingle());
     if (!review) throw new NotFoundException('Review not found.');
     await this.recalculateProductRating(review.product);
+    // Award review points when admin approves a review (idempotent)
+    if (status === 'approved' && review.user) {
+      void this.loyaltyService
+        .awardReviewPoints({ userId: review.user, reviewId: review.id, productId: review.product })
+        .catch(() => null);
+    }
     return toDoc(review);
   }
 

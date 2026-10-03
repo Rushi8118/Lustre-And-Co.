@@ -4,6 +4,8 @@ import { AddCartItemDto } from './dto/add-cart-item.dto.js';
 import { SyncCartDto } from './dto/sync-cart.dto.js';
 import { SettingsService } from '../settings/settings.service.js';
 import { SupabaseService } from '../../database/supabase.service.js';
+import { BundlesService } from '../bundles/bundles.service.js';
+import { AddBundleToCartDto } from '../bundles/dto/add-bundle-to-cart.dto.js';
 import { idOrColumn, isUuid, toDoc, toDocs, unwrap } from '../../common/utils/db.js';
 
 const toKey = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -13,6 +15,7 @@ export class CartService {
   constructor(
     @Inject(SupabaseService) private readonly db: SupabaseService,
     @Inject(SettingsService) private readonly settingsService: SettingsService,
+    @Inject(BundlesService) private readonly bundlesService: BundlesService,
   ) {}
 
   private async getOrCreateCart(userId: string): Promise<CartDocument> {
@@ -42,11 +45,21 @@ export class CartService {
       .map((item) => ({ ...item, product: productsById.get(item.product) }))
       .filter((item: any) => item.product && item.product.isActive !== false);
 
-    const subtotal = items.reduce(
+    const itemSubtotal = items.reduce(
       (sum: number, item: any) => sum + Number(item.product.price || 0) * (item.quantity || 1),
       0,
     );
-    const cartCount = items.reduce((sum: number, item: any) => sum + (item.quantity || 0), 0);
+    const rawBundles = Array.isArray(cart.bundle_items) ? cart.bundle_items : [];
+    const bundleSubtotal = rawBundles.reduce(
+      (sum: number, b: any) => sum + Number(b.price?.finalTotal || 0),
+      0,
+    );
+    const subtotal = itemSubtotal + bundleSubtotal;
+
+    const itemCount = items.reduce((sum: number, item: any) => sum + (item.quantity || 0), 0);
+    const bundleCount = rawBundles.reduce((sum: number, b: any) => sum + Number(b.quantity || 1), 0);
+    const cartCount = itemCount + bundleCount;
+
     const freeShippingUnlocked = subtotal >= commerce.freeShippingThreshold;
     const shipping = subtotal === 0 || freeShippingUnlocked ? 0 : commerce.shippingFee;
 
@@ -60,6 +73,7 @@ export class CartService {
         selectedSize: item.selectedSize,
         product: item.product,
       })),
+      bundleItems: rawBundles,
       cartCount,
       subtotal,
       shipping,
@@ -167,4 +181,172 @@ export class CartService {
     await this.saveItems(cart.id, []);
     return this.getCart(userId);
   }
+
+  async setRecoveryEmail(cartId: string, email: string, customerName?: string) {
+    const payload: Record<string, unknown> = {
+      recoveryEmail: email.trim().toLowerCase(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    if (customerName) payload.customerName = customerName.trim();
+
+    const { data, error } = await this.db
+      .from('carts')
+      .update(payload)
+      .eq('id', cartId)
+      .select('*')
+      .maybeSingle();
+
+    if (error) throw new BadRequestException(error.message);
+    if (!data) throw new NotFoundException('Cart not found.');
+
+    return data;
+  }
+
+  async addBundleToCart(
+    cartId: string,
+    dto: AddBundleToCartDto,
+  ) {
+    const validation = await this.bundlesService.validateBundle(
+      dto.bundleId,
+      Number(dto.quantity || 1),
+      dto.selectedItems,
+    );
+
+    let cart: any = null;
+    if (cartId && isUuid(cartId)) {
+      const { data } = await this.db
+        .from('carts')
+        .select('*')
+        .eq('id', cartId)
+        .maybeSingle();
+      cart = data;
+    }
+
+    if (!cart) {
+      const { data: newCart, error: createError } = await this.db
+        .from('carts')
+        .insert({ items: [], bundle_items: [] })
+        .select('*')
+        .single();
+
+      if (createError || !newCart) {
+        throw new BadRequestException(createError?.message || 'Could not initialize shopping bag.');
+      }
+      cart = newCart;
+    }
+
+    const existingBundles = Array.isArray(cart.bundle_items)
+      ? [...cart.bundle_items]
+      : [];
+
+    const existingIndex = existingBundles.findIndex(
+      (item: any) => item.bundleId === dto.bundleId,
+    );
+
+    const bundleLine = {
+      bundleId: dto.bundleId,
+      bundleName: validation.bundle.name,
+      quantity: Number(dto.quantity || 1),
+      selectedItems: validation.selectedItems,
+      price: validation.price,
+      addedAt: new Date().toISOString(),
+    };
+
+    if (existingIndex >= 0) {
+      existingBundles[existingIndex] = bundleLine;
+    } else {
+      existingBundles.push(bundleLine);
+    }
+
+    const { data, error } = await this.db
+      .from('carts')
+      .update({
+        bundle_items: existingBundles,
+        updatedAt: new Date().toISOString(),
+      })
+      .eq('id', cart.id)
+      .select('*')
+      .single();
+
+    if (error) {
+      throw new BadRequestException(error.message);
+    }
+
+    return {
+      cart: data,
+      bundle: validation.bundle,
+      price: validation.price,
+    };
+  }
+
+  async removeBundleFromCart(cartId: string, bundleId: string) {
+    const { data: cart, error: cartError } = await this.db
+      .from('carts')
+      .select('*')
+      .eq('id', cartId)
+      .maybeSingle();
+
+    if (cartError || !cart) {
+      throw new NotFoundException('Cart not found.');
+    }
+
+    const bundleItems = Array.isArray(cart.bundle_items)
+      ? cart.bundle_items
+      : [];
+
+    const nextBundleItems = bundleItems.filter(
+      (item: any) => item.bundleId !== bundleId,
+    );
+
+    const { data, error } = await this.db
+      .from('carts')
+      .update({
+        bundle_items: nextBundleItems,
+        updatedAt: new Date().toISOString(),
+      })
+      .eq('id', cartId)
+      .select('*')
+      .single();
+
+    if (error) {
+      throw new BadRequestException(error.message);
+    }
+
+    return data;
+  }
+
+  async validateCartBundles(cartId: string) {
+    const { data: cart, error } = await this.db
+      .from('carts')
+      .select('bundle_items')
+      .eq('id', cartId)
+      .maybeSingle();
+
+    if (error || !cart) {
+      throw new NotFoundException('Cart not found.');
+    }
+
+    const bundleItems = Array.isArray(cart.bundle_items)
+      ? cart.bundle_items
+      : [];
+
+    const validatedBundles = [];
+
+    for (const item of bundleItems) {
+      const validation = await this.bundlesService.validateBundle(
+        item.bundleId,
+        Number(item.quantity || 1),
+        item.selectedItems,
+      );
+
+      validatedBundles.push(validation);
+    }
+
+    return {
+      valid: true,
+      bundles: validatedBundles,
+    };
+  }
 }
+

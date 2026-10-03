@@ -16,7 +16,8 @@ import {
   ShoppingBag,
   Sparkles,
   MapPin,
-  Award
+  Award,
+  Ruler
 } from "lucide-react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { COLOR_SWATCHES, formatPrice, isInStock, normalizeProduct } from "../data/products";
@@ -24,6 +25,10 @@ import { useStore } from "../context/StoreContext";
 import { useSettings } from "../context/SettingsContext";
 import ProductCard from "../components/ProductCard";
 import api, { getErrorMessage } from "../services/api";
+import { trackView, getProductRecommendations } from "../services/recommendations";
+import RecommendationSection from "../components/RecommendationSection";
+import BackInStockForm from "../components/BackInStockForm";
+import SizeGuideModal from "../components/SizeGuideModal";
 
 function parseDayRange(text, fallback) {
   const numbers = String(text || "").match(/\d+/g);
@@ -59,6 +64,7 @@ export default function ProductDetails() {
   const [product, setProduct] = useState(null);
   const [status, setStatus] = useState("loading");
   const [related, setRelated] = useState([]);
+  const [recSections, setRecSections] = useState([]);
   const [reviewData, setReviewData] = useState({ reviews: [], distribution: [] });
 
   const [activeImage, setActiveImage] = useState(0);
@@ -68,6 +74,7 @@ export default function ProductDetails() {
 
   const [selectedColor, setSelectedColor] = useState("");
   const [selectedSize, setSelectedSize] = useState("");
+  const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
@@ -117,7 +124,25 @@ export default function ProductDetails() {
         setSelectedSize(loaded.availableSizes?.[0] || "");
         setStatus("ready");
 
-        const [relatedRes] = await Promise.allSettled([api.get(`/products/${slug}/related`), loadReviews(slug)]);
+        // Track view and load secondary data in parallel
+        const [relatedRes, recsRes] = await Promise.allSettled([
+          api.get(`/products/${slug}/related`),
+          loadReviews(slug),
+          getProductRecommendations(loaded.id, [
+            'you_may_also_like',
+            'frequently_bought_together',
+            'recently_viewed',
+            'similar_products',
+            'customers_also_purchased',
+            'complete_the_look',
+          ], 8).then((sections) => {
+            if (active) setRecSections(sections || []);
+          }),
+        ]);
+
+        // Fire view tracking (fire-and-forget)
+        trackView(loaded.id);
+
         if (!active) return;
         if (relatedRes.status === "fulfilled") {
           const items = relatedRes.value.data.map(normalizeProduct);
@@ -506,11 +531,33 @@ export default function ProductDetails() {
                 </div>
               )}
 
-              {product.availableSizes?.length > 1 && (
+              {product.availableSizes?.length > 0 && (
                 <div className="pdp-option-group">
-                  <div className="pdp-option-header">
-                    <span className="pdp-option-label">Size:</span>
-                    <span className="pdp-option-selected-val">{selectedSize}</span>
+                  <div className="pdp-option-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div>
+                      <span className="pdp-option-label">Size:</span>
+                      <span className="pdp-option-selected-val">{selectedSize}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setSizeGuideOpen(true)}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        color: "var(--gold, #d4af37)",
+                        fontSize: "12px",
+                        fontWeight: "600",
+                        textDecoration: "underline",
+                        cursor: "pointer",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "4px",
+                        padding: 0,
+                      }}
+                      id="pdp-open-size-guide-btn"
+                    >
+                      <Ruler size={13} /> Size &amp; Fit Guide
+                    </button>
                   </div>
                   <div className="pdp-swatches-row" role="radiogroup" aria-label="Select size">
                     {product.availableSizes.map((size) => (
@@ -606,6 +653,10 @@ export default function ProductDetails() {
                 </button>
               </div>
 
+              {!inStock && product && (
+                <BackInStockForm productId={product.id} productName={product.name} />
+              )}
+
               <div className="pdp-delivery-card">
                 <div className="pdp-delivery-header">
                   <Truck size={18} className="pdp-delivery-truck-icon" />
@@ -638,6 +689,56 @@ export default function ProductDetails() {
                     {pinStatus.message}
                   </div>
                 )}
+              </div>
+
+              <div
+                className="pdp-fit-guarantee-card"
+                style={{
+                  background: "linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(26, 26, 26, 0.03) 100%)",
+                  border: "1px solid rgba(212, 175, 55, 0.25)",
+                  borderRadius: "12px",
+                  padding: "16px 20px",
+                  margin: "18px 0",
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
+                  gap: "12px",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
+                  <Award size={18} style={{ color: "var(--gold, #d4af37)", flexShrink: 0, marginTop: "2px" }} />
+                  <div>
+                    <strong style={{ display: "block", fontSize: "13px", color: "var(--ink, #1a1a1a)" }}>
+                      100% Certified
+                    </strong>
+                    <span style={{ fontSize: "11px", color: "var(--muted, #666)" }}>
+                      BIS Hallmarked &amp; Authenticated
+                    </span>
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
+                  <Sparkles size={18} style={{ color: "var(--gold, #d4af37)", flexShrink: 0, marginTop: "2px" }} />
+                  <div>
+                    <strong style={{ display: "block", fontSize: "13px", color: "var(--ink, #1a1a1a)" }}>
+                      Comfort Fit
+                    </strong>
+                    <span style={{ fontSize: "11px", color: "var(--muted, #666)" }}>
+                      Ergonomic contouring for daily wear
+                    </span>
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
+                  <ShieldCheck size={18} style={{ color: "var(--gold, #d4af37)", flexShrink: 0, marginTop: "2px" }} />
+                  <div>
+                    <strong style={{ display: "block", fontSize: "13px", color: "var(--ink, #1a1a1a)" }}>
+                      Hypoallergenic
+                    </strong>
+                    <span style={{ fontSize: "11px", color: "var(--muted, #666)" }}>
+                      Nickel-safe &amp; skin-friendly
+                    </span>
+                  </div>
+                </div>
               </div>
 
               <div className="pdp-accordions-group">
@@ -948,7 +1049,26 @@ export default function ProductDetails() {
         </section>
       )}
 
-      {related.length > 0 && (
+      {/* ── API-powered recommendation sections ── */}
+      {recSections.length > 0 && (
+        <div className="pdp-rec-sections-wrapper">
+          <div className="container">
+            {recSections.map((section) => (
+              <RecommendationSection
+                key={section.type}
+                type={section.type}
+                label={section.label}
+                products={section.products}
+                sourceProductId={product?.id}
+                cardStyle="scroll"
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── Fallback: static related products (shown only when API recs are empty) ── */}
+      {recSections.length === 0 && related.length > 0 && (
         <section className="section pdp-recommendations-section">
           <div className="container">
             <div className="section-heading">
@@ -960,7 +1080,6 @@ export default function ProductDetails() {
                 Explore all jewelry →
               </Link>
             </div>
-
             <div className="product-grid" id="pdp-you-may-also-like-grid">
               {related.map((relProduct, idx) => (
                 <ProductCard key={relProduct.slug} product={relProduct} index={idx} showQuickView={true} />
@@ -1013,6 +1132,13 @@ export default function ProductDetails() {
           </div>
         </div>
       </aside>
+
+      <SizeGuideModal
+        isOpen={sizeGuideOpen}
+        onClose={() => setSizeGuideOpen(false)}
+        category={product?.category}
+        onSelectSize={(sz) => setSelectedSize(sz)}
+      />
     </div>
   );
 }

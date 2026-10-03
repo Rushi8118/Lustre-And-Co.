@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '../decorators/roles.decorator.js';
+import { ADMIN_ROLES } from '../constants/roles-permissions.js';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -28,7 +29,14 @@ export class RolesGuard implements CanActivate {
       );
     }
 
-    const hasRole = requiredRoles.includes(user.role);
+    const userRole = String(user.role || '').toLowerCase().trim();
+    let hasRole = requiredRoles.includes(userRole);
+
+    // If endpoint requires admin, any administrative role satisfies it
+    if (!hasRole && requiredRoles.includes('admin') && ADMIN_ROLES.includes(userRole)) {
+      hasRole = true;
+    }
+
     if (!hasRole) {
       throw new ForbiddenException(
         `Access denied. Requires one of roles: [${requiredRoles.join(', ')}]`,

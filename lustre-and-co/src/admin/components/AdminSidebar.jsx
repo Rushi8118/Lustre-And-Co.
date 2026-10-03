@@ -1,20 +1,29 @@
 import {
+  BarChart3,
   ChevronRight,
   CreditCard,
+  Crown,
   FileText,
   FolderTree,
   HelpCircle,
+  Layers,
   LayoutDashboard,
   LayoutTemplate,
   LogOut,
   Mail,
+  Megaphone,
   MessageSquareText,
   Package,
   Percent,
+  RotateCcw,
   Settings,
+  ShieldCheck,
   ShoppingBag,
+  ShoppingCart,
   Star,
+  Truck,
   Users,
+  Warehouse,
   X
 } from "lucide-react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
@@ -36,6 +45,7 @@ export default function AdminSidebar({ sidebarOpen, setSidebarOpen, attention })
       label: "Catalog",
       items: [
         { label: "Products", path: "/admin/products", icon: Package, badge: attention.lowStock },
+        { label: "Bundles & Sets", path: "/admin/bundles", icon: Layers },
         { label: "Categories", path: "/admin/categories", icon: FolderTree },
         { label: "Reviews", path: "/admin/reviews", icon: Star, badge: attention.pendingReviews }
       ]
@@ -45,7 +55,18 @@ export default function AdminSidebar({ sidebarOpen, setSidebarOpen, attention })
       items: [
         { label: "Orders", path: "/admin/orders", icon: ShoppingBag, badge: attention.openOrders },
         { label: "Payments", path: "/admin/payments", icon: CreditCard },
-        { label: "Discounts", path: "/admin/discounts", icon: Percent }
+        { label: "Discounts", path: "/admin/discounts", icon: Percent },
+        { label: "Abandoned Carts", path: "/admin/abandoned-carts", icon: ShoppingCart }
+      ]
+    },
+    {
+      label: "Operations",
+      items: [
+        { label: "Inventory", path: "/admin/inventory", icon: Warehouse, badge: attention.lowStock },
+        { label: "Shipments & Logistics", path: "/admin/shipments", icon: Truck },
+        { label: "Shipping Settings", path: "/admin/shipping", icon: Settings },
+        { label: "Returns & Exchanges", path: "/admin/returns", icon: RotateCcw },
+        { label: "Invoices & Documents", path: "/admin/invoices", icon: FileText },
       ]
     },
     {
@@ -53,7 +74,15 @@ export default function AdminSidebar({ sidebarOpen, setSidebarOpen, attention })
       items: [
         { label: "Customers", path: "/admin/customers", icon: Users },
         { label: "Messages", path: "/admin/messages", icon: MessageSquareText, badge: attention.newMessages },
-        { label: "Subscribers", path: "/admin/subscribers", icon: Mail }
+        { label: "Subscribers", path: "/admin/subscribers", icon: Mail },
+        { label: "Loyalty & Referrals", path: "/admin/loyalty", icon: Crown }
+      ]
+    },
+    {
+      label: "Growth & Intelligence",
+      items: [
+        { label: "Analytics & BI", path: "/admin/analytics", icon: BarChart3 },
+        { label: "Marketing Campaigns", path: "/admin/marketing", icon: Megaphone }
       ]
     },
     {
@@ -65,8 +94,11 @@ export default function AdminSidebar({ sidebarOpen, setSidebarOpen, attention })
       ]
     },
     {
-      label: "Configuration",
-      items: [{ label: "Settings", path: "/admin/settings", icon: Settings }]
+      label: "Configuration & Security",
+      items: [
+        { label: "Security & Audit", path: "/admin/audit-logs", icon: ShieldCheck },
+        { label: "Settings", path: "/admin/settings", icon: Settings }
+      ]
     }
   ];
 

@@ -11,8 +11,15 @@ import type { ProductDocument } from '../products/schemas/product.schema.js';
 import { DiscountsService } from '../discounts/discounts.service.js';
 import { CreateOrderDto } from './dto/create-order.dto.js';
 import { SettingsService } from '../settings/settings.service.js';
+import { BundlesService } from '../bundles/bundles.service.js';
+import { validateOrderBundles } from './utils/order-bundle-validation.js';
 import type { UserDocument } from '../users/schemas/user.schema.js';
 import { SupabaseService } from '../../database/supabase.service.js';
+import { LoyaltyService } from '../loyalty/loyalty.service.js';
+import { InventoryService } from '../inventory/inventory.service.js';
+import { ShippingService } from '../shipping/shipping.service.js';
+import { AnalyticsService } from '../analytics/analytics.service.js';
+import { ADMIN_ROLES } from '../../common/constants/roles-permissions.js';
 import {
   countOf,
   escapeLike,
@@ -34,6 +41,11 @@ export class OrdersService {
     @Inject(DiscountsService) private readonly discountsService: DiscountsService,
     @Inject(SettingsService) private readonly settingsService: SettingsService,
     @Inject(ConfigService) private readonly configService: ConfigService,
+    @Inject(BundlesService) private readonly bundlesService: BundlesService,
+    @Inject(LoyaltyService) private readonly loyaltyService: LoyaltyService,
+    @Inject(InventoryService) private readonly inventoryService: InventoryService,
+    @Inject(ShippingService) private readonly shippingService: ShippingService,
+    @Inject(AnalyticsService) private readonly analyticsService: AnalyticsService,
   ) {}
 
   private async generateOrderId(): Promise<string> {
@@ -54,7 +66,9 @@ export class OrdersService {
   }
 
   async createOrder(dto: CreateOrderDto, userId?: string) {
-    if (!dto.items || dto.items.length === 0) {
+    const orderItems = dto.items || [];
+    const orderBundleItems = dto.bundleItems || [];
+    if (orderItems.length === 0 && orderBundleItems.length === 0) {
       throw new BadRequestException('Cannot create an order with an empty bag.');
     }
 
@@ -68,11 +82,28 @@ export class OrdersService {
       throw new BadRequestException('Online payments are not available right now. Please choose cash on delivery.');
     }
 
-    // 1. Price every line from the database (client prices are never trusted).
+    // 1. Validate bundles and compute bundle total server-side
+    const bundleValidation = await validateOrderBundles(
+      this.bundlesService,
+      orderBundleItems,
+    );
+
+    // 2. Price every line from the database (client prices are never trusted).
     const lines: Array<{ product: ProductDocument; quantity: number; color: string; size: string }> = [];
     const requestedByProduct = new Map<string, number>();
 
-    for (const item of dto.items) {
+    // Seed requestedByProduct with quantities from bundles
+    for (const bundle of bundleValidation.bundles) {
+      for (const item of bundle.selectedItems) {
+        const bundleRequested = item.quantity * bundle.price.quantity;
+        requestedByProduct.set(
+          item.productId,
+          (requestedByProduct.get(item.productId) || 0) + bundleRequested,
+        );
+      }
+    }
+
+    for (const item of orderItems) {
       const row = unwrap(
         await this.db
           .from('products')
@@ -106,9 +137,11 @@ export class OrdersService {
       });
     }
 
-    const subtotal = lines.reduce((sum, line) => sum + Number(line.product.price) * line.quantity, 0);
+    const productSubtotal = lines.reduce((sum, line) => sum + Number(line.product.price) * line.quantity, 0);
+    const bundleSubtotal = bundleValidation.bundleTotal;
+    const subtotal = productSubtotal + bundleSubtotal;
 
-    // 2. Promo code
+    // 3. Promo code
     let discount = 0;
     let freeShippingCoupon = false;
     let promoCode: string | undefined;
@@ -119,16 +152,34 @@ export class OrdersService {
       promoCode = promo.code;
     }
 
-    // 3. Shipping, tax, total — all from admin-managed settings.
+    // 4. Shipping quote validation & authoritative rate resolution
+    let validatedQuote: any = null;
+    if (dto.shippingQuoteToken) {
+      try {
+        validatedQuote = await this.shippingService.getQuote(dto.shippingQuoteToken);
+      } catch (err) {
+        throw new BadRequestException(
+          err instanceof Error ? err.message : 'Invalid or expired shipping quote. Please recalculate delivery options.',
+        );
+      }
+    }
+
     const qualifiesForFreeShipping = subtotal >= commerce.freeShippingThreshold || freeShippingCoupon;
-    const shippingFee = qualifiesForFreeShipping ? 0 : commerce.shippingFee;
+    let shippingFee = qualifiesForFreeShipping ? 0 : commerce.shippingFee;
+    let carrierName = 'Bluedart Air Express';
+
+    if (validatedQuote) {
+      shippingFee = qualifiesForFreeShipping ? 0 : Number(validatedQuote.amount || 0);
+      carrierName = validatedQuote.service_name || validatedQuote.serviceName || carrierName;
+    }
+
     const isExpress = dto.deliveryOption === 'express';
-    const deliverySurcharge = isExpress ? commerce.expressShippingFee : 0;
+    const deliverySurcharge = !validatedQuote && isExpress ? commerce.expressShippingFee : 0;
     const taxableAmount = Math.max(0, subtotal - discount);
     const tax = Math.round((taxableAmount * commerce.taxPercent) / 100);
     const total = taxableAmount + shippingFee + deliverySurcharge + tax;
 
-    // 4. Reserve stock atomically so two shoppers cannot buy the last unit.
+    // 5. Reserve stock atomically so two shoppers cannot buy the last unit.
     const reserved: Array<{ id: string; quantity: number }> = [];
     try {
       for (const line of lines) {
@@ -141,16 +192,34 @@ export class OrdersService {
         }
         reserved.push({ id: line.product.id, quantity: line.quantity });
       }
+
+      for (const bundle of bundleValidation.bundles) {
+        for (const item of bundle.selectedItems) {
+          const qtyToReserve = item.quantity * bundle.price.quantity;
+          const ok = await this.db.rpc<boolean>('reserve_product_stock', {
+            p_id: item.productId,
+            p_qty: qtyToReserve,
+          });
+          if (!ok) {
+            throw new BadRequestException(`A product in the bundle "${bundle.bundle.name}" just sold out.`);
+          }
+          reserved.push({ id: item.productId, quantity: qtyToReserve });
+        }
+      }
     } catch (err) {
       await this.releaseStock(reserved);
       throw err;
     }
 
-    // 5. Persist the order and its payment ledger entry.
+    // 6. Persist the order and its payment ledger entry.
     const now = new Date();
     const [startDays, endDays] = isExpress ? [1, 2] : [3, 5];
     const dateOpts: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' };
-    const estimatedDeliveryDate = `${new Date(now.getTime() + startDays * DAY_MS).toLocaleDateString('en-US', dateOpts)} – ${new Date(now.getTime() + endDays * DAY_MS).toLocaleDateString('en-US', dateOpts)}`;
+    let estimatedDeliveryDate = `${new Date(now.getTime() + startDays * DAY_MS).toLocaleDateString('en-US', dateOpts)} – ${new Date(now.getTime() + endDays * DAY_MS).toLocaleDateString('en-US', dateOpts)}`;
+
+    if (validatedQuote?.estimatedMinDays && validatedQuote?.estimatedMaxDays) {
+      estimatedDeliveryDate = `${new Date(now.getTime() + validatedQuote.estimatedMinDays * DAY_MS).toLocaleDateString('en-US', dateOpts)} – ${new Date(now.getTime() + validatedQuote.estimatedMaxDays * DAY_MS).toLocaleDateString('en-US', dateOpts)}`;
+    }
 
     let order: OrderDocument;
     try {
@@ -182,6 +251,15 @@ export class OrdersService {
               size: line.size,
               image: line.product.image,
             })),
+            bundle_items: bundleValidation.bundles.map((b) => ({
+              bundleId: b.bundle.id,
+              bundleName: b.bundle.name,
+              quantity: b.price.quantity,
+              selectedItems: b.selectedItems,
+              originalTotal: b.price.originalTotal,
+              discountTotal: b.price.discountTotal,
+              finalTotal: b.price.finalTotal,
+            })),
             subtotal,
             discount,
             promoCode: promoCode ?? null,
@@ -200,8 +278,15 @@ export class OrdersService {
                 ? { transactionId: `COD-${crypto.randomInt(100_000_000, 1_000_000_000)}` }
                 : {}),
             },
-            carrier: 'Bluedart Air Express',
+            carrier: carrierName,
+            selected_shipping_method_id: dto.selectedShippingMethodId || null,
+            shipping_provider_code: dto.shippingProvider || dto.shippingProviderCode || (validatedQuote ? validatedQuote.provider : null),
+            shipping_provider: dto.shippingProvider || dto.shippingProviderCode || (validatedQuote ? validatedQuote.provider : null),
+            shipping_quote_token: dto.shippingQuoteToken || null,
+            shipping_cost: shippingFee,
+            shipping_status: 'pending',
             estimatedDeliveryDate,
+            inventory_reservation_token: dto.reservationToken || null,
           })
           .select()
           .single(),
@@ -230,7 +315,72 @@ export class OrdersService {
     }
 
     if (userId) {
-      unwrap(await this.db.from('carts').update({ items: [] }).eq('user', userId.toString()));
+      unwrap(await this.db.from('carts').update({ items: [], bundle_items: [] }).eq('user', userId.toString()));
+    }
+
+    // Record server-side analytics purchase event (fire-and-forget)
+    void this.analyticsService
+      .recordEvent({
+        eventType: 'purchase',
+        userId: userId ? userId.toString() : undefined,
+        orderId: order.id,
+        value: Number(order.total || 0),
+        city: order.shippingAddress?.city,
+        state: order.shippingAddress?.state,
+        country: order.shippingAddress?.country,
+        source: 'web_storefront',
+      })
+      .catch((err: any) => console.warn(`Purchase analytics event failed: ${err?.message}`));
+
+    // Award loyalty points after confirmed order (fire-and-forget, idempotent)
+    if (userId && order.status !== 'Cancelled') {
+      const shouldAward =
+        paymentMethod === 'cod' ||
+        order.payment?.status === 'paid';
+
+      if (shouldAward) {
+        void this.loyaltyService
+          .awardPurchasePoints({
+            userId: userId.toString(),
+            orderId: order.id,
+            orderTotal: Number(order.total || 0),
+          })
+          .catch((err) => console.warn(`Loyalty award failed: ${err?.message}`));
+
+        void this.loyaltyService
+          .qualifyReferralFromOrder({
+            userId: userId.toString(),
+            orderId: order.id,
+            orderTotal: Number(order.total || 0),
+          })
+          .catch(() => null);
+      }
+    }
+
+    // Auto-create shipment if enabled or store pickup / COD confirmed
+    const chosenProvider = (dto.shippingProvider || dto.shippingProviderCode || (validatedQuote ? validatedQuote.provider : null)) as any;
+    const shippingSettings = typeof this.shippingService?.getSettings === 'function'
+      ? await this.shippingService.getSettings().catch(() => null)
+      : null;
+    if (
+      shippingSettings?.autoCreateShipments ||
+      paymentMethod === 'cod' ||
+      chosenProvider === 'store_pickup'
+    ) {
+      void this.shippingService
+        .createShipment({
+          orderId: order.id,
+          provider: chosenProvider || shippingSettings?.defaultProvider,
+          serviceCode: validatedQuote?.service_code || validatedQuote?.serviceCode,
+        })
+        .catch((err) => console.warn(`Shipment creation failed: ${err?.message}`));
+    }
+
+    // Commit inventory reservation after successful order creation (fire-and-forget, idempotent)
+    if (dto.reservationToken) {
+      void this.inventoryService
+        .commitReservation(dto.reservationToken, { orderId: order.id })
+        .catch((err) => console.warn(`Inventory commit failed: ${err?.message}`));
     }
 
     return order;
@@ -266,7 +416,7 @@ export class OrdersService {
     if (!order) throw notFound;
 
     const isOwner = Boolean(viewer && order.user && order.user === viewer.id);
-    const isAdmin = viewer?.role === 'admin';
+    const isAdmin = viewer ? ADMIN_ROLES.includes(String(viewer.role || '').toLowerCase().trim()) : false;
     const emailMatches = Boolean(email && order.customer?.email === email.toLowerCase().trim());
 
     if (!isOwner && !isAdmin && !emailMatches) throw notFound;
