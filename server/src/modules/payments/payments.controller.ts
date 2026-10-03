@@ -3,6 +3,7 @@ import {
   Post,
   Get,
   Body,
+  HttpCode,
   Inject,
   Req,
 } from '@nestjs/common';
@@ -11,6 +12,8 @@ import { PaymentsService } from './payments.service.js';
 import { CreatePaymentIntentDto } from './dto/create-intent.dto.js';
 import { VerifyPaymentDto } from './dto/verify-payment.dto.js';
 import { CodPaymentDto } from './dto/cod-payment.dto.js';
+import { CancelPaymentDto } from './dto/cancel-payment.dto.js';
+import { MockCompletePaymentDto } from './dto/mock-complete-payment.dto.js';
 
 @ApiTags('Payments')
 @Controller('payments')
@@ -68,6 +71,20 @@ export class PaymentsController {
   @ApiResponse({ status: 404, description: 'Order not found.' })
   async confirmCod(@Body() dto: CodPaymentDto) {
     return this.paymentsService.confirmCodPayment(dto);
+  }
+
+  @Post('cancel')
+  @HttpCode(200)
+  @ApiOperation({ summary: 'Record that the customer closed the payment window without paying' })
+  async cancelPayment(@Body() dto: CancelPaymentDto) {
+    return this.paymentsService.cancelPayment(dto);
+  }
+
+  @Post('mock/complete')
+  @HttpCode(200)
+  @ApiOperation({ summary: 'DEVELOPMENT ONLY: complete a mock payment with a chosen outcome' })
+  async completeMockPayment(@Body() dto: MockCompletePaymentDto) {
+    return this.paymentsService.completeMockPayment(dto);
   }
 
   @Post('webhook')

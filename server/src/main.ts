@@ -7,8 +7,12 @@ import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module.js';
 import { SanitizePipe } from './common/pipes/sanitize.pipe.js';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor.js';
+import { assertMockPaymentAllowed } from './common/utils/payment-mode.js';
 
 async function bootstrap() {
+  // Fail fast: mock payments must never run in production.
+  assertMockPaymentAllowed();
+
   const app = await NestFactory.create(AppModule);
 
   // Render/Vercel sit in front of the API; trust one proxy hop so rate limits see the client IP.
