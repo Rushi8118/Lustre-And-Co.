@@ -190,7 +190,7 @@ export default function Footer() {
                 <li>
                   <Link to="/best-sellers">Best Sellers</Link>
                 </li>
-                {categories.map((category) => (
+                {categories.slice(0, 8).map((category) => (
                   <li key={category.slug}>
                     <Link to={`/category/${category.slug}`}>{category.name}</Link>
                   </li>
