@@ -6,7 +6,6 @@ const JewelryShowcase = lazy(() => import("../components/JewelryShowcase"));
 import SectionHeading from "../components/SectionHeading";
 import ProductGrid from "../components/ProductGrid";
 import PromotionalBanner from "../components/PromotionalBanner";
-import HeroCarousel from "../components/HeroCarousel";
 import { imageUrl } from "../utils/image";
 import WhyShopWithUs from "../components/WhyShopWithUs";
 import { useSettings } from "../context/SettingsContext";
@@ -31,34 +30,8 @@ export default function Home() {
   const tagged = products.filter((product) => product.tags.includes("bestseller"));
   const bestProducts = (tagged.length ? tagged : [...products].sort((a, b) => b.salesCount - a.salesCount)).slice(0, 4);
 
-  const carouselSlides = [
-    {
-      key: "brand",
-      eyebrow: hero.eyebrow,
-      title: [hero.title, hero.highlight].filter(Boolean).join(" "),
-      text: hero.subtitle,
-      cta: "Shop the collection",
-      to: "/shop",
-      image: homeCategories.find((category) => category.image)?.image,
-    },
-    ...homeCategories
-      .filter((category) => category.image)
-      .slice(0, 5)
-      .map((category) => ({
-        key: category.slug,
-        eyebrow: category.eyebrow,
-        title: category.title || category.name,
-        text: category.description,
-        cta: `Shop ${category.name}`,
-        to: `/category/${category.slug}`,
-        image: category.image,
-      })),
-  ];
-
   return (
     <>
-      <HeroCarousel slides={carouselSlides} />
-
       <section className="showcase-section">
         <div className="container showcase-inner">
           <div className="showcase-copy">

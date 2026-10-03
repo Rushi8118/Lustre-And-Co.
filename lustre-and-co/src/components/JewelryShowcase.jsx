@@ -4,7 +4,11 @@ import { ContactShadows, Float, OrbitControls, Sparkles } from "@react-three/dre
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import * as THREE from "three";
 
-/** Round brilliant profile, revolved and faceted by a low segment count. */
+const BAND_RADIUS = 1.0;
+const BAND_TUBE = 0.09;
+const SEAT_Y = BAND_RADIUS + BAND_TUBE; // top of the band, where the setting sits
+
+/** Round-brilliant profile revolved around the Y axis. The point faces down into the setting. */
 function gemGeometry() {
   const profile = [
     new THREE.Vector2(0, -0.95),
@@ -15,21 +19,18 @@ function gemGeometry() {
     new THREE.Vector2(0.4, 0.42),
     new THREE.Vector2(0, 0.42),
   ];
-  const geometry = new THREE.LatheGeometry(profile, 16);
-  geometry.computeVertexNormals();
-  return geometry;
+  return new THREE.LatheGeometry(profile, 16);
 }
 
-/** Ring band with a slight taper toward the bottom, made from a tube along a closed curve. */
+/** Closed band standing upright in the XY plane, like a ring worn on a finger. */
 function bandGeometry() {
   const points = [];
-  const radius = 1.35;
-  for (let i = 0; i <= 96; i++) {
-    const angle = (i / 96) * Math.PI * 2;
-    points.push(new THREE.Vector3(Math.sin(angle) * radius, 0, Math.cos(angle) * radius));
+  for (let i = 0; i < 128; i++) {
+    const angle = (i / 128) * Math.PI * 2;
+    points.push(new THREE.Vector3(Math.sin(angle) * BAND_RADIUS, Math.cos(angle) * BAND_RADIUS, 0));
   }
   const curve = new THREE.CatmullRomCurve3(points, true);
-  return new THREE.TubeGeometry(curve, 240, 0.085, 48, true);
+  return new THREE.TubeGeometry(curve, 256, BAND_TUBE, 48, true);
 }
 
 function Ring() {
@@ -42,19 +43,13 @@ function Ring() {
       new THREE.MeshPhysicalMaterial({
         color: "#e3bf72",
         metalness: 1,
-        roughness: 0.2,
+        roughness: 0.22,
         clearcoat: 0.6,
         clearcoatRoughness: 0.12,
         envMapIntensity: 1.25,
       }),
     []
   );
-
-  const goldDouble = useMemo(() => {
-    const material = gold.clone();
-    material.side = THREE.DoubleSide;
-    return material;
-  }, [gold]);
 
   const diamond = useMemo(
     () =>
@@ -75,37 +70,41 @@ function Ring() {
 
   useFrame((state) => {
     if (!group.current) return;
-    group.current.rotation.y = state.clock.elapsedTime * 0.25;
+    group.current.rotation.y = state.clock.elapsedTime * 0.3;
   });
 
-  const prongs = [0, 1, 2, 3];
+  const prongCount = 4;
+  const prongRadius = 0.26;
+  const prongHeight = 0.42;
+  const gemScale = 0.5;
+  const gemY = SEAT_Y + 0.2 + 0.42 * gemScale; // flat top of the stone sits above the prongs
 
   return (
-    <group ref={group} rotation={[0.28, 0, 0.08]} position={[0, -0.1, 0]}>
+    <group ref={group} rotation={[0.2, 0, 0.12]}>
       <mesh geometry={band} material={gold} castShadow />
 
-      {/* Setting: a gold collar that holds the stone above the band */}
-      <mesh position={[0, 1.42, 0]} castShadow>
-        <cylinderGeometry args={[0.36, 0.5, 0.2, 32, 1, true]} />
-        <primitive object={goldDouble} attach="material" />
+      {/* Collar: an open gold cylinder the stone's pointed bottom sits in */}
+      <mesh position={[0, SEAT_Y + 0.08, 0]} castShadow>
+        <cylinderGeometry args={[0.3, 0.2, 0.16, 32, 1, true]} />
+        <meshPhysicalMaterial color="#e3bf72" metalness={1} roughness={0.22} side={THREE.DoubleSide} />
       </mesh>
 
-      {prongs.map((index) => {
-        const angle = (index / prongs.length) * Math.PI * 2 + Math.PI / 4;
+      {/* Prongs rise from the collar and hold the stone */}
+      {Array.from({ length: prongCount }, (_, index) => {
+        const angle = (index / prongCount) * Math.PI * 2 + Math.PI / 4;
         return (
           <mesh
             key={index}
-            position={[Math.cos(angle) * 0.42, 1.42, Math.sin(angle) * 0.42]}
-            rotation={[0, -angle, 0]}
+            position={[Math.cos(angle) * prongRadius, SEAT_Y + 0.08 + prongHeight / 2, Math.sin(angle) * prongRadius]}
             castShadow
           >
-            <cylinderGeometry args={[0.035, 0.035, 0.5, 12]} />
-            <primitive object={gold} attach="material" />
+            <cylinderGeometry args={[0.028, 0.028, prongHeight, 12]} />
+            <meshPhysicalMaterial color="#e3bf72" metalness={1} roughness={0.22} />
           </mesh>
         );
       })}
 
-      <mesh geometry={gem} material={diamond} position={[0, 1.78, 0]} scale={0.62} castShadow />
+      <mesh geometry={gem} material={diamond} position={[0, gemY, 0]} scale={gemScale} castShadow />
     </group>
   );
 }
@@ -128,29 +127,22 @@ function Scene() {
   return (
     <>
       <ambientLight intensity={0.25} />
-      <directionalLight
-        position={[3, 5, 4]}
-        intensity={2.2}
-        color="#fff8ee"
-        castShadow
-        shadow-mapSize={[1024, 1024]}
-      />
+      <directionalLight position={[3, 5, 4]} intensity={2.2} color="#fff8ee" castShadow shadow-mapSize={[1024, 1024]} />
       <spotLight position={[-4, 3, 2]} angle={0.5} penumbra={1} intensity={18} color="#ffe2a8" />
       <pointLight position={[2, -1, 3]} intensity={3} color="#f2c6bb" />
 
-      <Float speed={1.1} rotationIntensity={0.08} floatIntensity={0.25}>
+      <Float speed={1} rotationIntensity={0.05} floatIntensity={0.2}>
         <Ring />
       </Float>
 
       <Sparkles count={24} scale={[4, 3, 3]} size={2.2} speed={0.2} color="#e3bf72" opacity={0.7} />
 
-      <ContactShadows position={[0, -1.7, 0]} opacity={0.45} scale={6} blur={2.6} far={3} />
+      <ContactShadows position={[0, -1.45, 0]} opacity={0.45} scale={5} blur={2.6} far={2.5} />
 
       <OrbitControls
         enablePan={false}
         enableZoom={false}
-        autoRotate
-        autoRotateSpeed={0.6}
+        autoRotate={false}
         minPolarAngle={Math.PI / 2.6}
         maxPolarAngle={Math.PI / 1.9}
       />
@@ -165,7 +157,7 @@ export default function JewelryShowcase() {
       <Canvas
         dpr={[1, 2]}
         shadows
-        camera={{ position: [0, 0.6, 5.2], fov: 38 }}
+        camera={{ position: [0, 0.2, 4.6], fov: 36 }}
         gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.05 }}
         onCreated={({ gl }) => {
           gl.outputColorSpace = THREE.SRGBColorSpace;
