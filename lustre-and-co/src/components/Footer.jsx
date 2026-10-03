@@ -207,7 +207,7 @@ export default function Footer() {
             </div>
 
             <div className="footer-col">
-              <h3 className="footer-col-title">Customer Service</h3>
+              <h3 className="footer-col-title">Customer Care</h3>
               <ul className="footer-links-list">
                 <li>
                   <Link to="/track-order">Track Your Order</Link>
@@ -230,17 +230,8 @@ export default function Footer() {
                 <li>
                   <Link to="/contact">Help &amp; Support</Link>
                 </li>
-              </ul>
-            </div>
-
-            <div className="footer-col">
-              <h3 className="footer-col-title">About the Brand</h3>
-              <ul className="footer-links-list">
                 <li>
                   <Link to="/about">Our Story</Link>
-                </li>
-                <li>
-                  <Link to="/contact">Contact Us</Link>
                 </li>
                 <li>
                   <Link to="/privacy">Privacy Policy</Link>
