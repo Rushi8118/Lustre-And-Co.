@@ -30,7 +30,7 @@ import {
   toDocs,
   unwrap,
 } from '../../common/utils/db.js';
-import { getRazorpayCredentials } from '../../common/utils/payments.js';
+import { isOnlinePaymentAvailable } from '../../common/utils/payments.js';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -78,7 +78,7 @@ export class OrdersService {
     if (paymentMethod === 'cod' && !commerce.codEnabled) {
       throw new BadRequestException('Cash on delivery is currently unavailable.');
     }
-    if (paymentMethod === 'razorpay' && !getRazorpayCredentials(this.configService).configured) {
+    if (paymentMethod === 'razorpay' && !isOnlinePaymentAvailable(this.configService)) {
       throw new BadRequestException('Online payments are not available right now. Please choose cash on delivery.');
     }
 

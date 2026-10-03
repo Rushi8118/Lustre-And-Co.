@@ -1,4 +1,5 @@
 import type { ConfigService } from '@nestjs/config';
+import { isMockPaymentMode } from './payment-mode.js';
 
 const PLACEHOLDER_MARKERS = ['test_lustre2026', 'placeholder', 'mock'];
 
@@ -17,4 +18,9 @@ export function getRazorpayCredentials(config: ConfigService) {
     webhookSecret,
     configured: looksReal(keyId) && looksReal(keySecret),
   };
+}
+
+/** Whether online payment is offered at checkout: mock mode, or real Razorpay credentials. */
+export function isOnlinePaymentAvailable(config: ConfigService): boolean {
+  return isMockPaymentMode() || getRazorpayCredentials(config).configured;
 }

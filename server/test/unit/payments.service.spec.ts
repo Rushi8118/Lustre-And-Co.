@@ -174,6 +174,9 @@ describe('PaymentsService (Razorpay Webhook & Signature Verification)', () => {
           update: mockUpdate,
         };
       }
+      if (table === 'payments') {
+        return { update: mockUpdate };
+      }
       return { select: vi.fn() };
     });
 
