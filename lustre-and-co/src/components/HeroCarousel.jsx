@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { imageUrl } from "../utils/image";
 
 const AUTOPLAY_MS = 6000;
 
@@ -43,7 +44,7 @@ export default function HeroCarousel({ slides }) {
             aria-label={`${slideIndex + 1} of ${count}`}
             aria-hidden={slideIndex !== index}
           >
-            {slide.image && <img src={slide.image} alt="" loading={slideIndex === 0 ? "eager" : "lazy"} />}
+            {slide.image && <img src={imageUrl(slide.image, 2000, 88)} alt="" loading={slideIndex === 0 ? "eager" : "lazy"} />}
             <div className="hero-slide-shade" />
             <div className="hero-slide-copy container">
               {slide.eyebrow && <span className="hero-slide-eyebrow">{slide.eyebrow}</span>}

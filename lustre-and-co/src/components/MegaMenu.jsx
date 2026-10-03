@@ -2,6 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { Link, NavLink } from "react-router-dom";
 import { categoryMenuLinks, UTILITY_NAV } from "../data/menuConfig";
+import { imageUrl } from "../utils/image";
+
+/** Categories shown in the bar; the rest sit under More so the bar stays one short row. */
+const VISIBLE_CATEGORIES = 7;
 
 /**
  * One scrolling row of categories under the header. Hovering, focusing or tapping a
@@ -11,9 +15,11 @@ import { categoryMenuLinks, UTILITY_NAV } from "../data/menuConfig";
  */
 export default function MegaMenu({ categories, showAdmin = false }) {
   const [openSlug, setOpenSlug] = useState(null);
+  const [moreOpen, setMoreOpen] = useState(false);
   const barRef = useRef(null);
   const menuCategories = categories.filter((category) => category.showInMenu);
   const openCategory = menuCategories.find((category) => category.slug === openSlug);
+  const overflowCategories = menuCategories.slice(VISIBLE_CATEGORIES);
 
   useEffect(() => {
     function handleKey(event) {
@@ -39,7 +45,7 @@ export default function MegaMenu({ categories, showAdmin = false }) {
           </NavLink>
         </li>
 
-        {menuCategories.map((category) => {
+        {menuCategories.slice(0, VISIBLE_CATEGORIES).map((category) => {
           const isOpen = openSlug === category.slug;
           return (
             <li key={category.slug} onMouseEnter={() => setOpenSlug(category.slug)}>
@@ -58,6 +64,23 @@ export default function MegaMenu({ categories, showAdmin = false }) {
           );
         })}
 
+        {overflowCategories.length > 0 && (
+          <li>
+            <button
+              type="button"
+              className={`cat-bar-link cat-bar-trigger ${moreOpen ? "is-open" : ""}`}
+              aria-expanded={moreOpen}
+              onClick={() => {
+                setOpenSlug(null);
+                setMoreOpen((open) => !open);
+              }}
+            >
+              More
+              <ChevronDown size={13} aria-hidden="true" />
+            </button>
+          </li>
+        )}
+
         {UTILITY_NAV.map((item) => (
           <li key={item.to}>
             <NavLink className="cat-bar-link" to={item.to}>
@@ -74,6 +97,16 @@ export default function MegaMenu({ categories, showAdmin = false }) {
           </li>
         )}
       </ul>
+
+      {moreOpen && overflowCategories.length > 0 && (
+        <div className="cat-more-list" role="menu">
+          {overflowCategories.map((category) => (
+            <Link key={category.slug} to={`/category/${category.slug}`} role="menuitem" onClick={() => setMoreOpen(false)}>
+              {category.name}
+            </Link>
+          ))}
+        </div>
+      )}
 
       {openCategory && (
         <div className="cat-panel" id="cat-bar-panel">
@@ -93,7 +126,7 @@ export default function MegaMenu({ categories, showAdmin = false }) {
 
             {openCategory.image && (
               <Link to={`/category/${openCategory.slug}`} className="cat-panel-feature" onClick={() => setOpenSlug(null)}>
-                <img src={openCategory.image} alt="" loading="lazy" />
+                <img src={imageUrl(openCategory.image, 800)} alt="" loading="lazy" />
                 <div>
                   <strong>{openCategory.title || openCategory.name}</strong>
                   {openCategory.description && <span>{openCategory.description}</span>}

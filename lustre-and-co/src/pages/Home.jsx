@@ -7,6 +7,7 @@ import SectionHeading from "../components/SectionHeading";
 import ProductGrid from "../components/ProductGrid";
 import PromotionalBanner from "../components/PromotionalBanner";
 import HeroCarousel from "../components/HeroCarousel";
+import { imageUrl } from "../utils/image";
 import WhyShopWithUs from "../components/WhyShopWithUs";
 import { useSettings } from "../context/SettingsContext";
 import { useStore } from "../context/StoreContext";
@@ -42,6 +43,7 @@ export default function Home() {
     },
     ...homeCategories
       .filter((category) => category.image)
+      .slice(0, 5)
       .map((category) => ({
         key: category.slug,
         eyebrow: category.eyebrow,
@@ -147,7 +149,7 @@ export default function Home() {
                   transition={{ delay: index * 0.06 }}
                 >
                   <Link to={`/category/${category.slug}`}>
-                    {category.image && <img src={category.image} alt={category.name} loading="lazy" />}
+                    {category.image && <img src={imageUrl(category.image, 900)} alt={category.name} loading="lazy" />}
                     <div className="category-card-overlay">
                       <h3>{category.name}</h3>
                       <span>Explore collection →</span>
