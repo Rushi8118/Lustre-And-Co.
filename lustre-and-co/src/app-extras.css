@@ -3770,16 +3770,6 @@
 .hero-carousel-dot.is-active { background: var(--white); transform: scale(1.25); }
 @media (prefers-reduced-motion: reduce) { .hero-carousel-track { transition: none; } .mega-panel { animation: none; } }
 
-/* ---------- Footer layout ---------- */
-.footer-columns-grid { display: grid; grid-template-columns: 1.3fr 1fr 1fr 1.2fr; gap: 40px 32px; }
-.footer-bottom-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px 24px; padding-top: 22px; border-top: 1px solid var(--line-light); margin-top: 28px; }
-@media (max-width: 1023px) { .footer-columns-grid { grid-template-columns: 1fr 1fr; } }
-@media (max-width: 560px) {
-  .footer-columns-grid { grid-template-columns: 1fr; gap: 28px; }
-  .footer-bottom-bar { flex-direction: column; align-items: flex-start; }
-}
-
-
 /* ---------- Search dropdown ---------- */
 .search-panel {
   position: fixed;
@@ -3914,51 +3904,3 @@
 .jewelry-showcase-loading { width: 100%; height: clamp(360px, 42vw, 500px); }
 @media (max-width: 860px) { .showcase-inner { grid-template-columns: 1fr; } .showcase-copy { text-align: center; } .showcase-copy p { margin-inline: auto; } }
 
-
-/* ---------- Site footer (SiteFooter.jsx) ---------- */
-.sf { background: #1f1c18; color: #e9e3d8; font-size: 15px; line-height: 1.6; margin-top: 64px; }
-.sf a { color: inherit; text-decoration: none; }
-.sf a:hover { color: #d6b56d; }
-.sf-container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-.sf-visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-
-.sf-news { border-bottom: 1px solid rgba(233, 227, 216, 0.12); padding: 44px 0; }
-.sf-news-inner { display: flex; align-items: center; justify-content: space-between; gap: 32px; flex-wrap: wrap; }
-.sf-news-title { margin: 0 0 6px; font: 500 22px/1.2 "Playfair Display", Georgia, serif; color: #fff; }
-.sf-news-text { margin: 0; color: #b9b1a3; font-size: 14px; max-width: 480px; }
-.sf-news-form { display: flex; gap: 0; width: min(420px, 100%); }
-.sf-news-form input { flex: 1; min-width: 0; height: 46px; padding: 0 16px; border: 1px solid rgba(233, 227, 216, 0.25); border-right: 0; background: transparent; color: #fff; font: inherit; }
-.sf-news-form input::placeholder { color: #8f887a; }
-.sf-news-form button { height: 46px; padding: 0 22px; border: 1px solid #d6b56d; background: #d6b56d; color: #1f1c18; font-weight: 600; font-size: 13px; line-height: 1; font-family: inherit; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; }
-.sf-news-form button:hover { background: #e6c884; }
-.sf-news-form button:disabled { opacity: 0.6; cursor: wait; }
-.sf-news-done { margin: 0; color: #d6b56d; }
-
-.sf-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr 1.3fr; gap: 40px; padding-top: 56px; padding-bottom: 48px; }
-.sf-logo { display: inline-block; margin-bottom: 14px; font: 500 26px/1 "Playfair Display", Georgia, serif; color: #fff; }
-.sf-brand p { margin: 0 0 18px; color: #b9b1a3; font-size: 14px; max-width: 300px; }
-.sf-social { display: flex; gap: 10px; list-style: none; margin: 0; padding: 0; }
-.sf-social a { display: inline-grid; place-items: center; width: 36px; height: 36px; border: 1px solid rgba(233, 227, 216, 0.22); border-radius: 50%; }
-.sf-social a:hover { border-color: #d6b56d; color: #d6b56d; }
-.sf-col h3 { margin: 0 0 18px; font-weight: 600; font-size: 12px; line-height: 1; font-family: inherit; letter-spacing: 0.14em; text-transform: uppercase; color: #d6b56d; }
-.sf-col ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
-.sf-col li { display: flex; align-items: flex-start; gap: 10px; color: #cfc8ba; }
-.sf-col li svg { flex-shrink: 0; margin-top: 4px; color: #d6b56d; }
-.sf-contact li a, .sf-contact li span { overflow-wrap: anywhere; }
-.sf-note { margin: 18px 0 0; color: #b9b1a3; font-size: 13px; }
-
-.sf-bottom { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px; padding-top: 22px; padding-bottom: 28px; border-top: 1px solid rgba(233, 227, 216, 0.12); color: #8f887a; font-size: 13px; }
-.sf-bottom p { margin: 0; }
-.sf-tagline { font-style: italic; }
-
-@media (max-width: 1024px) {
-  .sf-grid { grid-template-columns: 1fr 1fr; }
-  .sf-brand, .sf-contact { grid-column: 1 / -1; }
-}
-@media (max-width: 560px) {
-  .sf-grid { grid-template-columns: 1fr; gap: 32px; }
-  .sf-news-form { flex-direction: column; gap: 10px; }
-  .sf-news-form input { border-right: 1px solid rgba(233, 227, 216, 0.25); }
-  .sf-news-form button { width: 100%; }
-  .sf-bottom { flex-direction: column; align-items: flex-start; }
-}
