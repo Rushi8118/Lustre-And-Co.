@@ -14,7 +14,8 @@
   --shadow-small: 0 12px 35px rgba(34, 34, 34, 0.08);
   --serif: "Playfair Display", Georgia, serif;
   --sans: "DM Sans", Arial, sans-serif;
-  --max-width: 1260px;
+  --max-width: 1280px;
+  --max-width-hero: 1800px;
   --ease: cubic-bezier(0.2, 0.75, 0.25, 1);
 }
 
@@ -68,7 +69,24 @@ textarea {
 
 .container {
   width: min(calc(100% - 48px), var(--max-width));
+  max-width: var(--max-width);
   margin: 0 auto;
+}
+
+.container-wide,
+.home-hero .container,
+.hero-carousel .container {
+  width: min(calc(100% - clamp(32px, 4vw, 80px)), var(--max-width-hero));
+  max-width: var(--max-width-hero);
+  margin: 0 auto;
+}
+
+.site-header .container,
+.header-inner.container {
+  width: 100% !important;
+  max-width: 100% !important;
+  padding-left: clamp(24px, 4vw, 64px) !important;
+  padding-right: clamp(24px, 4vw, 64px) !important;
 }
 
 .app-shell {
@@ -11851,9 +11869,49 @@ a.button,
 /* 7. Desktop Layout Refinements (>1200px) */
 @media (min-width: 1200px) {
   .container {
-    max-width: 1320px;
-    padding-left: 32px;
-    padding-right: 32px;
+    max-width: 1280px;
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  .site-header .container,
+  .header-inner.container {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: clamp(24px, 4vw, 64px) !important;
+    padding-right: clamp(24px, 4vw, 64px) !important;
+  }
+
+  .home-hero-grid,
+  .home-hero .container,
+  .hero-carousel .container,
+  .container-wide {
+    width: min(calc(100% - clamp(32px, 4vw, 80px)), 1800px) !important;
+    max-width: 1800px !important;
+    padding-left: 0;
+    padding-right: 0;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: clamp(40px, 4vw, 80px);
+    min-height: 760px;
+  }
+
+  .home-hero-copy {
+    max-width: 760px;
+  }
+
+  .home-hero-copy h1 {
+    max-width: 780px;
+    font-size: clamp(52px, 5vw, 90px);
+  }
+
+  .home-hero-copy > p {
+    max-width: 620px;
+    font-size: 18px;
+  }
+
+  .home-hero-visual {
+    min-height: 680px;
+    width: 100%;
   }
 
   .catalog-product-grid {
