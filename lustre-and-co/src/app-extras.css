@@ -3806,7 +3806,11 @@
   color: var(--black);
 }
 .search-panel-form input::-webkit-search-cancel-button { display: none; }
-.search-panel-form input:focus-visible { outline: none; }
+.search-panel-form input:focus,
+.search-panel-form input:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
 .search-panel-form:focus-within { border-color: var(--black); }
 .search-panel-icon { color: var(--muted); flex-shrink: 0; }
 .search-panel-spinner { color: var(--muted); animation: spin 1s linear infinite; }
@@ -4106,5 +4110,90 @@
   .footer-columns-grid > .footer-col + .footer-col {
     padding-left: 0;
     border-left: 0;
+  }
+}
+
+/* ---------- Category bar: travelling marker, notch, condensed header ---------- */
+
+/* The marker is positioned against the list, so it scrolls with the items. */
+.cat-bar-list {
+  position: relative;
+}
+
+.cat-bar-marker {
+  position: absolute;
+  left: 0;
+  bottom: 7px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold) 20%, var(--gold) 80%, transparent);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.45s var(--ease), width 0.45s var(--ease), opacity 0.25s var(--ease);
+}
+
+.cat-bar-marker.is-shown {
+  opacity: 1;
+}
+
+/* One marker now does the work, so individual links no longer draw their own
+   underline on hover. The current page keeps its underline as a location cue. */
+.cat-bar-link:hover::after,
+.cat-bar-trigger.is-open::after,
+.cat-bar-link:focus-visible::after {
+  left: 50%;
+  right: 50%;
+}
+
+.cat-bar-link.active::after {
+  left: 11px;
+  right: 11px;
+}
+
+/* A diamond on the panel edge points back at the open category. */
+.cat-panel-notch {
+  position: absolute;
+  top: -5px;
+  width: 9px;
+  height: 9px;
+  margin-left: -4.5px;
+  transform: rotate(45deg);
+  background: var(--white);
+  border-left: 1px solid rgba(214, 181, 109, 0.5);
+  border-top: 1px solid rgba(214, 181, 109, 0.5);
+  pointer-events: none;
+}
+
+/* Scrolling tightens the header and slims the bar. */
+.site-header {
+  transition: box-shadow 0.4s var(--ease);
+}
+
+.site-header .brand-logo,
+.cat-bar-link {
+  transition: font-size 0.35s var(--ease), padding 0.35s var(--ease), color 0.3s var(--ease);
+}
+
+.site-header.is-condensed {
+  box-shadow: 0 10px 30px rgba(34, 34, 34, 0.06);
+}
+
+.site-header.is-condensed .brand-logo {
+  font-size: 25px;
+}
+
+.site-header.is-condensed .cat-bar-link {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.site-header.is-condensed .cat-bar-marker {
+  bottom: 5px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cat-bar-marker,
+  .site-header .brand-logo,
+  .cat-bar-link {
+    transition: none;
   }
 }

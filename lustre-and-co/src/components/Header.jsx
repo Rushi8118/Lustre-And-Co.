@@ -34,6 +34,7 @@ export default function Header() {
   const { settings, categories } = useSettings();
 
   const [menuOpen, setMenuOpen] = useState(false);
+  const [condensed, setCondensed] = useState(false);
   const [shopOpen, setShopOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -61,6 +62,14 @@ export default function Header() {
   const announcement = settings.announcement;
   const messages = announcement?.enabled ? (announcement.messages || []).filter(Boolean) : [];
   const feature = settings.homepage?.editorial;
+
+  // The header tightens once the page scrolls, so the catalogue stays in reach.
+  useEffect(() => {
+    const onScroll = () => setCondensed(window.scrollY > 40);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
     document.body.classList.toggle("menu-is-open", menuOpen);
@@ -156,7 +165,7 @@ export default function Header() {
         </div>
       )}
 
-      <header className="site-header">
+      <header className={`site-header ${condensed ? "is-condensed" : ""}`}>
         <div className="header-inner container">
           <button
             className="mobile-menu-button icon-button"
