@@ -11594,9 +11594,9 @@ textarea {
 
 /* 1. Keyboard Accessibility & Focus States */
 :focus-visible {
-  outline: 2px solid var(--gold, #d6b56d) !important;
-  outline-offset: 3px !important;
-  box-shadow: 0 0 0 4px rgba(214, 181, 109, 0.28) !important;
+  outline: 2px solid var(--gold, #d6b56d);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 4px rgba(214, 181, 109, 0.28);
 }
 
 button:focus-visible,
@@ -11604,8 +11604,20 @@ a:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-  outline: 2px solid var(--gold, #d6b56d) !important;
-  outline-offset: 2px !important;
+  outline: 2px solid var(--gold, #d6b56d);
+  outline-offset: 2px;
+}
+
+/* Embedded inputs inside custom search and input wrappers */
+.search-panel-form input,
+.search-panel-form input:focus,
+.search-panel-form input:focus-visible,
+.auth-input-wrap input:focus,
+.auth-input-wrap input:focus-visible,
+.newsletter-input-group input:focus,
+.newsletter-input-group input:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 /* Screen reader only utility */
