@@ -1,15 +1,28 @@
 /* Admin panel additions: live-data states, detail views, editors. Uses tokens from admin.css. */
 
 .admin-nav-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-width: 20px;
+  height: 20px;
   margin-left: auto;
-  padding: 2px 7px;
-  border-radius: 10px;
-  background: var(--admin-rose);
-  color: #fff;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--admin-gold, #dfbe76);
+  color: #141311;
   font-size: 11px;
   font-weight: 700;
-  text-align: center;
+  line-height: 1;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
+}
+
+.admin-shell.admin-dark .admin-nav-badge {
+  background: rgba(223, 190, 118, 0.22);
+  color: var(--admin-gold, #dfbe76);
+  border: 1px solid rgba(223, 190, 118, 0.35);
+  box-shadow: 0 0 8px rgba(223, 190, 118, 0.2);
 }
 
 .admin-nav-badge + .admin-nav-arrow {

@@ -8,12 +8,26 @@ import React, {
   useState
 } from "react";
 import { Link } from "react-router-dom";
-import api, { getErrorMessage, hasSessionHint, setSessionHint } from "../services/api";
+import api, { getErrorMessage, hasSessionHint, setSessionHint, setAuthToken } from "../services/api";
 import { cartItemId, formatPrice, normalizeProduct } from "../data/products";
+import { DEFAULT_PRODUCTS } from "../data/defaultProducts";
 import { useSettings } from "./SettingsContext";
 import { identifyCart } from "../services/abandonedCarts";
 
 const StoreContext = createContext(null);
+
+const PRODUCTS_CACHE_KEY = "lustre_products_cache_v1";
+
+function readProductsCache() {
+  try {
+    const raw = localStorage.getItem(PRODUCTS_CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) && parsed.length > 0 ? parsed : null;
+  } catch {
+    return null;
+  }
+}
 
 const USER_KEY = "lustre-user";
 const GUEST_CART_KEY = "lustre-cart";
@@ -66,10 +80,16 @@ function stockError(product, quantity) {
 }
 
 export function StoreProvider({ children }) {
-  const { commerce } = useSettings();
+  const { commerce, serverOnline } = useSettings();
 
-  const [products, setProducts] = useState([]);
-  const [productsStatus, setProductsStatus] = useState("loading");
+  const cachedProducts = useRef(readProductsCache()).current;
+  const initialProducts = useMemo(() => {
+    const raw = cachedProducts || DEFAULT_PRODUCTS || [];
+    return raw.map(normalizeProduct);
+  }, [cachedProducts]);
+
+  const [products, setProducts] = useState(initialProducts);
+  const [productsStatus, setProductsStatus] = useState("ready");
   const [user, setUser] = useState(() => (hasSessionHint() ? readStorage(USER_KEY, null) : null));
   const [authReady, setAuthReady] = useState(false);
   const [cart, setCart] = useState([]);
@@ -80,6 +100,8 @@ export function StoreProvider({ children }) {
   const [lastOrder, setLastOrder] = useState(() => readStorage(LAST_ORDER_KEY, null));
   const [toast, setToast] = useState(null);
   const toastTimer = useRef(null);
+  const productRetryRef = useRef(0);
+  const productTimerRef = useRef(null);
 
   const showToast = useCallback((payload, type = "default") => {
     let message = "";
@@ -117,15 +139,40 @@ export function StoreProvider({ children }) {
         items = items.concat(next.data.items);
       }
       setProducts(items.map(normalizeProduct));
+      try {
+        localStorage.setItem(PRODUCTS_CACHE_KEY, JSON.stringify(items));
+      } catch {}
       setProductsStatus("ready");
+      productRetryRef.current = 0;
+      if (productTimerRef.current) clearTimeout(productTimerRef.current);
     } catch {
-      setProductsStatus((current) => (current === "ready" ? "ready" : "error"));
+      // If server is booting up, keep the fallback products and auto-retry
+      if (productRetryRef.current < 10) {
+        productRetryRef.current += 1;
+        const delay = Math.min(2500 * productRetryRef.current, 10000);
+        if (productTimerRef.current) clearTimeout(productTimerRef.current);
+        productTimerRef.current = setTimeout(() => {
+          refreshProducts();
+        }, delay);
+      } else {
+        setProductsStatus((current) => (current === "ready" ? "ready" : "error"));
+      }
     }
   }, []);
 
   useEffect(() => {
     refreshProducts();
+    return () => {
+      if (productTimerRef.current) clearTimeout(productTimerRef.current);
+    };
   }, [refreshProducts]);
+
+  // When server comes online, refresh products immediately
+  useEffect(() => {
+    if (serverOnline) {
+      refreshProducts();
+    }
+  }, [serverOnline, refreshProducts]);
 
   // ---------------------------------------------------------------------------
   // Session
@@ -147,6 +194,7 @@ export function StoreProvider({ children }) {
 
   const clearSession = useCallback(() => {
     setSessionHint(false);
+    setAuthToken(null);
     writeStorage(USER_KEY, null);
     setUser(null);
     setCart([]);
@@ -167,6 +215,9 @@ export function StoreProvider({ children }) {
       try {
         const { data } = await api.get("/auth/me");
         if (cancelled) return;
+        if (data?.token) {
+          setAuthToken(data.token);
+        }
         setUser(data.user);
         writeStorage(USER_KEY, data.user);
         await loadAccountCollections();
@@ -213,8 +264,10 @@ export function StoreProvider({ children }) {
   }, [cart, wishlist, user, authReady, productsStatus]);
 
   const completeSignIn = useCallback(async (data) => {
-    // The API has already set the httpOnly session cookies; only the flag and profile are kept here.
     setSessionHint(true);
+    if (data?.token) {
+      setAuthToken(data.token);
+    }
     writeStorage(USER_KEY, data.user);
     setUser(data.user);
 

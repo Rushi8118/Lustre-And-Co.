@@ -257,15 +257,24 @@ export default function AdminProducts() {
         <div className="admin-toolbar">
           <div className="admin-table-search">
             <Search size={16} />
-            <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search name, SKU, or slug…" />
+            <input
+              type="text"
+              autoComplete="off"
+              autoCorrect="off"
+              spellCheck="false"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search name, SKU, or slug…"
+            />
             {query && (
               <button
                 type="button"
                 className="admin-table-search-clear"
                 onClick={() => setQuery("")}
                 title="Clear search"
+                aria-label="Clear search"
               >
-                <X size={13} />
+                <X size={12} strokeWidth={2.5} />
               </button>
             )}
           </div>

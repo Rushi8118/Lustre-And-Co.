@@ -60,8 +60,9 @@ export function FormError({ message }) {
   );
 }
 
-export function StatusBadge({ tone = "warning", children }) {
-  return <span className={`admin-status-badge ${tone}`}>{children}</span>;
+export function StatusBadge({ tone = "warning", label, status, children }) {
+  const content = children ?? label ?? status;
+  return <span className={`admin-status-badge ${tone}`}>{content}</span>;
 }
 
 export function Tabs({ tabs = [], value, active, onChange }) {

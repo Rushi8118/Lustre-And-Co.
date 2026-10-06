@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import {
   Layers,
   Plus,
@@ -12,8 +12,11 @@ import {
   Calendar,
   DollarSign,
   Package,
+  Search,
+  X,
 } from "lucide-react";
 import AdminModal from "../components/AdminModal";
+import AdminDropdown from "../components/AdminDropdown";
 import {
   CheckboxField,
   EmptyState,
@@ -71,11 +74,25 @@ export default function AdminBundles() {
   const [bundles, setBundles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
+  const [typeFilter, setTypeFilter] = useState("all");
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(blankForm);
   const [formError, setFormError] = useState("");
   const [saving, setSaving] = useState(false);
+
+  const filteredBundles = useMemo(() => {
+    return bundles.filter((b) => {
+      const q = search.trim().toLowerCase();
+      const matchSearch =
+        !q ||
+        (b.name && b.name.toLowerCase().includes(q)) ||
+        (b.slug && b.slug.toLowerCase().includes(q));
+      const matchType = typeFilter === "all" || b.bundleType === typeFilter;
+      return matchSearch && matchType;
+    });
+  }, [bundles, search, typeFilter]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -307,6 +324,43 @@ export default function AdminBundles() {
 
       {!loading && !error && bundles.length > 0 && (
         <div className="admin-table-card">
+          <div className="admin-toolbar" style={{ padding: "16px 20px 0 20px" }}>
+            <div className="admin-table-search">
+              <Search size={16} />
+              <input
+                type="text"
+                autoComplete="off"
+                autoCorrect="off"
+                spellCheck="false"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search bundle name or slug…"
+              />
+              {search && (
+                <button
+                  type="button"
+                  className="admin-table-search-clear"
+                  onClick={() => setSearch("")}
+                  title="Clear search"
+                  aria-label="Clear search"
+                >
+                  <X size={12} strokeWidth={2.5} />
+                </button>
+              )}
+            </div>
+            <div className="admin-toolbar-group">
+              <AdminDropdown
+                value={typeFilter}
+                onChange={setTypeFilter}
+                options={[
+                  { value: "all", label: "All bundle types" },
+                  ...BUNDLE_TYPES,
+                ]}
+                ariaLabel="Filter by bundle type"
+              />
+            </div>
+          </div>
+
           <table className="admin-table">
             <thead>
               <tr>
@@ -320,7 +374,7 @@ export default function AdminBundles() {
               </tr>
             </thead>
             <tbody>
-              {bundles.map((bundle) => (
+              {filteredBundles.map((bundle) => (
                 <tr key={bundle.id}>
                   <td>
                     <div className="admin-product-cell">
@@ -347,7 +401,7 @@ export default function AdminBundles() {
                     </span>
                   </td>
                   <td>
-                    <strong style={{ color: "#276749" }}>
+                    <strong style={{ color: "var(--admin-green, #276749)" }}>
                       {discountBadgeText(bundle)}
                     </strong>
                   </td>
@@ -369,11 +423,11 @@ export default function AdminBundles() {
                     </span>
                   </td>
                   <td className="admin-table-align-right">
-                    <div className="admin-actions-inline">
+                    <div className="admin-row-actions">
                       <button
                         type="button"
                         onClick={() => openEdit(bundle)}
-                        className="admin-icon-button"
+                        className="admin-action-button"
                         title="Edit bundle"
                       >
                         <Edit3 size={15} />
@@ -381,7 +435,7 @@ export default function AdminBundles() {
                       <button
                         type="button"
                         onClick={() => remove(bundle)}
-                        className="admin-icon-button admin-icon-button-danger"
+                        className="admin-action-button danger"
                         title="Delete bundle"
                       >
                         <Trash2 size={15} />
@@ -390,6 +444,13 @@ export default function AdminBundles() {
                   </td>
                 </tr>
               ))}
+              {filteredBundles.length === 0 && (
+                <tr>
+                  <td colSpan={7} className="admin-table-empty">
+                    No bundles match your search or filter.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

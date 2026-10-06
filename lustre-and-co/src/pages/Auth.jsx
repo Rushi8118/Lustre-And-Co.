@@ -88,9 +88,21 @@ export default function Auth({ mode = "login" }) {
   const isLogin = mode === "login";
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, register, completeSignIn } = useStore();
+  const { user, authReady, login, register, completeSignIn } = useStore();
   const { settings } = useSettings();
   const storeName = settings.store.name;
+
+  // If already logged in, redirect immediately away from the auth page
+  useEffect(() => {
+    if (authReady && user) {
+      const role = user.role || "";
+      const isStaffOrAdmin = ["owner", "manager", "catalog-manager", "order-manager", "support-agent", "marketing-manager", "accountant", "admin"].includes(role);
+      const fallback = isStaffOrAdmin ? "/admin" : "/account";
+      const from = location.state?.from;
+      const target = from && !from.includes("/account/login") && !from.includes("/account/signup") ? from : fallback;
+      navigate(target, { replace: true });
+    }
+  }, [user, authReady, navigate, location.state]);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
@@ -99,10 +111,11 @@ export default function Auth({ mode = "login" }) {
     // The API set the session cookies during the Google redirect; load the profile with them.
     api
       .get("/auth/me")
-      .then(({ data }) => completeSignIn({ user: data.user }))
+      .then(({ data }) => completeSignIn({ user: data.user, token: data.token }))
       .then(() => {
-        const from = location.state?.from || "/account";
-        navigate(from, { replace: true });
+        const from = location.state?.from;
+        const target = from && !from.includes("/account/login") && !from.includes("/account/signup") ? from : "/account";
+        navigate(target, { replace: true });
       })
       .catch((err) => console.error("Google sign-in could not be completed:", err));
   }, [location.search, completeSignIn, navigate, location.state]);
@@ -169,7 +182,9 @@ export default function Auth({ mode = "login" }) {
       const role = signedIn?.role || "";
       const isStaffOrAdmin = ["owner", "manager", "catalog-manager", "order-manager", "support-agent", "marketing-manager", "accountant", "admin"].includes(role);
       const fallback = isStaffOrAdmin ? "/admin" : "/account";
-      navigate(location.state?.from || fallback, { replace: true });
+      const from = location.state?.from;
+      const target = from && !from.includes("/account/login") && !from.includes("/account/signup") ? from : fallback;
+      navigate(target, { replace: true });
     } catch (err) {
       setFormError(getErrorMessage(err, "Authentication failed. Please check your details."));
     } finally {
@@ -198,7 +213,9 @@ export default function Auth({ mode = "login" }) {
       const role = data.user?.role || "";
       const isStaffOrAdmin = ["owner", "manager", "catalog-manager", "order-manager", "support-agent", "marketing-manager", "accountant", "admin"].includes(role);
       const fallback = isStaffOrAdmin ? "/admin" : "/account";
-      navigate(location.state?.from || fallback, { replace: true });
+      const from = location.state?.from;
+      const target = from && !from.includes("/account/login") && !from.includes("/account/signup") ? from : fallback;
+      navigate(target, { replace: true });
     } catch (err) {
       setTwoFactorError(getErrorMessage(err, "Invalid or expired security code. Please check your email and try again."));
     } finally {

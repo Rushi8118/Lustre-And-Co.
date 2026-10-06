@@ -28,7 +28,7 @@ export const products = [
     dateAdded: "2026-09-14",
     tags: ["new", "bestseller", "bridal", "everyday"],
     image:
-      "https://images.unsplash.com/photo-1599643477877-530eb83abc8e?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1000&q=85",
     gallery: [
       "https://images.unsplash.com/photo-1599643477877-530eb83abc8e?auto=format&fit=crop&w=1200&q=85",
       "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=1200&q=85",
@@ -128,7 +128,7 @@ export const products = [
     dateAdded: "2026-09-01",
     tags: ["new", "bestseller", "bridal"],
     image:
-      "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=1000&q=85",
     gallery: [
       "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=1200&q=85",
       "https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=1200&q=85"
@@ -162,7 +162,7 @@ export const products = [
     dateAdded: "2026-09-12",
     tags: ["new", "bestseller"],
     image:
-      "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=1000&q=85",
     gallery: [
       "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=1200&q=85",
       "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1200&q=85"
@@ -196,7 +196,7 @@ export const products = [
     dateAdded: "2026-09-08",
     tags: ["new", "sale"],
     image:
-      "https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=1000&q=85",
     gallery: [
       "https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=1200&q=85",
       "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=1200&q=85"
@@ -230,7 +230,7 @@ export const products = [
     dateAdded: "2026-08-28",
     tags: ["bestseller", "sale", "bridal"],
     image:
-      "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1573408301185-9146fe634ad0?auto=format&fit=crop&w=1000&q=85",
     gallery: [
       "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1200&q=85",
       "https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=1200&q=85"
@@ -264,7 +264,7 @@ export const products = [
     dateAdded: "2026-08-15",
     tags: ["bridal", "bestseller"],
     image:
-      "https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1599643477877-530eb83abc8e?auto=format&fit=crop&w=1000&q=85",
     gallery: [
       "https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=1200&q=85",
       "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=1200&q=85"
@@ -298,7 +298,7 @@ export const products = [
     dateAdded: "2026-09-05",
     tags: ["bridal", "sale", "festive"],
     image:
-      "https://images.unsplash.com/photo-1596944924616-7b38e7cfac36?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1596944924616-7b38e7cfac36?auto=format&fit=crop&w=1000&q=85",
     gallery: [
       "https://images.unsplash.com/photo-1596944924616-7b38e7cfac36?auto=format&fit=crop&w=1200&q=85",
       "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=1200&q=85"
@@ -332,7 +332,7 @@ export const products = [
     dateAdded: "2026-08-20",
     tags: ["bridal", "new", "festive"],
     image:
-      "https://images.unsplash.com/photo-1585960622850-ed33c41d6418?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1614713568397-b31b779d0499?auto=format&fit=crop&w=1000&q=85",
     gallery: [
       "https://images.unsplash.com/photo-1585960622850-ed33c41d6418?auto=format&fit=crop&w=1200&q=85",
       "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1200&q=85"
@@ -366,7 +366,7 @@ export const products = [
     dateAdded: "2026-09-11",
     tags: ["new", "sale"],
     image:
-      "https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1611591475152-47eac9806830?auto=format&fit=crop&w=1000&q=85",
     gallery: [
       "https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=1200&q=85",
       "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1200&q=85"
@@ -400,7 +400,7 @@ export const products = [
     dateAdded: "2026-09-03",
     tags: ["bestseller", "sale"],
     image:
-      "https://images.unsplash.com/photo-1630019852942-f89202989a59?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1630019852942-f89202989a59?auto=format&fit=crop&w=1000&q=85",
     gallery: [
       "https://images.unsplash.com/photo-1630019852942-f89202989a59?auto=format&fit=crop&w=1200&q=85",
       "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=1200&q=85"
@@ -434,7 +434,7 @@ export const products = [
     dateAdded: "2026-08-25",
     tags: ["sale"],
     image:
-      "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?auto=format&fit=crop&w=1000&q=85",
     gallery: [
       "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=1200&q=85",
       "https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=1200&q=85"
@@ -468,7 +468,7 @@ export const products = [
     dateAdded: "2026-09-13",
     tags: ["new", "party"],
     image:
-      "https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=1000&q=85",
     gallery: [
       "https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?auto=format&fit=crop&w=1200&q=85",
       "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=1200&q=85"
@@ -502,7 +502,7 @@ export const products = [
     dateAdded: "2026-08-10",
     tags: ["festive", "sale"],
     image:
-      "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1598560917505-59a3ad559071?auto=format&fit=crop&w=1000&q=85",
     gallery: [
       "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?auto=format&fit=crop&w=1200&q=85",
       "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=1200&q=85"
@@ -536,7 +536,7 @@ export const products = [
     dateAdded: "2026-09-10",
     tags: ["new", "party"],
     image:
-      "https://images.unsplash.com/photo-1601121141418-c1caa10a2a0b?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1611042553365-9b101441c135?auto=format&fit=crop&w=1000&q=85",
     gallery: [
       "https://images.unsplash.com/photo-1601121141418-c1caa10a2a0b?auto=format&fit=crop&w=1200&q=85",
       "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1200&q=85"
@@ -570,7 +570,7 @@ export const products = [
     dateAdded: "2026-08-18",
     tags: ["festive", "bestseller", "bridal"],
     image:
-      "https://images.unsplash.com/photo-1721807644561-9efcabee5c42?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1611652022419-a9419f74343e?auto=format&fit=crop&w=1000&q=85",
     gallery: [
       "https://images.unsplash.com/photo-1721807644561-9efcabee5c42?auto=format&fit=crop&w=1200&q=85",
       "https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=1200&q=85"
@@ -604,7 +604,7 @@ export const products = [
     dateAdded: "2026-09-02",
     tags: ["everyday", "sale"],
     image:
-      "https://images.unsplash.com/photo-1682823544433-aae34df4e3da?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=1000&q=85",
     gallery: [
       "https://images.unsplash.com/photo-1682823544433-aae34df4e3da?auto=format&fit=crop&w=1200&q=85",
       "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=1200&q=85"
@@ -638,7 +638,7 @@ export const products = [
     dateAdded: "2026-08-29",
     tags: ["everyday", "sale"],
     image:
-      "https://images.unsplash.com/photo-1650455221359-3aebf920bcc5?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1506630448388-4e683c67ddb0?auto=format&fit=crop&w=1000&q=85",
     gallery: [
       "https://images.unsplash.com/photo-1650455221359-3aebf920bcc5?auto=format&fit=crop&w=1200&q=85",
       "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1200&q=85"
@@ -672,7 +672,7 @@ export const products = [
     dateAdded: "2026-09-04",
     tags: ["bridal", "festive"],
     image:
-      "https://images.unsplash.com/photo-1611107683227-e9060eccd846?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1590548784585-643d2b9f2925?auto=format&fit=crop&w=1000&q=85",
     gallery: [
       "https://images.unsplash.com/photo-1611107683227-e9060eccd846?auto=format&fit=crop&w=1200&q=85",
       "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1200&q=85"
@@ -706,7 +706,7 @@ export const products = [
     dateAdded: "2026-08-22",
     tags: ["bridal", "festive", "sale"],
     image:
-      "https://images.unsplash.com/photo-1651160670627-2896ddf7822f?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1608042314453-ae338d80c428?auto=format&fit=crop&w=1000&q=85",
     gallery: [
       "https://images.unsplash.com/photo-1651160670627-2896ddf7822f?auto=format&fit=crop&w=1200&q=85",
       "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1200&q=85"

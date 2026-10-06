@@ -54,12 +54,15 @@ export function SettingsProvider({ children }) {
   const cached = useRef(readCache()).current;
   const [settings, setSettings] = useState(cached?.settings || null);
   const [categories, setCategories] = useState(cached?.categories || null);
+  const [serverOnline, setServerOnline] = useState(false);
   const [error, setError] = useState("");
+  const retryCountRef = useRef(0);
+  const retryTimerRef = useRef(null);
 
   const effectiveSettings = settings || DEFAULT_SETTINGS;
   const effectiveCategories = categories || DEFAULT_CATEGORIES;
 
-  const reload = useCallback(async (isRetry = false) => {
+  const reload = useCallback(async () => {
     try {
       const [settingsRes, categoriesRes] = await Promise.all([
         api.get("/settings"),
@@ -72,19 +75,27 @@ export function SettingsProvider({ children }) {
       applySeo(nextSettings?.seo);
       writeCache({ settings: nextSettings, categories: nextCategories });
       setError("");
+      setServerOnline(true);
+      retryCountRef.current = 0;
+      if (retryTimerRef.current) clearTimeout(retryTimerRef.current);
     } catch (err) {
-      if (!isRetry) {
-        // Give the backend a moment in case it was still starting up.
-        setTimeout(() => reload(true), 1500);
-        return;
-      }
-      // Nothing is blocked: the cached or bundled values stay on screen.
+      setServerOnline(false);
       setError(getErrorMessage(err, "The store could not be loaded."));
+      // Auto-retry in background up to 10 times with backoff while server boots
+      if (retryCountRef.current < 10) {
+        retryCountRef.current += 1;
+        const delay = Math.min(2000 * retryCountRef.current, 10000);
+        if (retryTimerRef.current) clearTimeout(retryTimerRef.current);
+        retryTimerRef.current = setTimeout(() => reload(), delay);
+      }
     }
   }, []);
 
   useEffect(() => {
     reload();
+    return () => {
+      if (retryTimerRef.current) clearTimeout(retryTimerRef.current);
+    };
   }, [reload]);
 
   // Prices must format correctly before the API answers.
@@ -97,10 +108,11 @@ export function SettingsProvider({ children }) {
       settings: effectiveSettings,
       categories: effectiveCategories,
       commerce: effectiveSettings?.commerce,
+      serverOnline,
       error,
       reload
     }),
-    [effectiveSettings, effectiveCategories, error, reload]
+    [effectiveSettings, effectiveCategories, serverOnline, error, reload]
   );
 
   return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>;

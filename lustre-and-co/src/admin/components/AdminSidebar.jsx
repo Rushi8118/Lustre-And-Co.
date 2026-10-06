@@ -49,7 +49,7 @@ export default function AdminSidebar({ sidebarOpen, setSidebarOpen, attention })
     {
       label: "Catalog",
       items: [
-        { label: "Products", path: "/admin/products", icon: Package, badge: attention.lowStock },
+        { label: "Products", path: "/admin/products", icon: Package },
         { label: "Bundles & Sets", path: "/admin/bundles", icon: Layers },
         { label: "Categories", path: "/admin/categories", icon: FolderTree },
         { label: "Reviews", path: "/admin/reviews", icon: Star, badge: attention.pendingReviews }

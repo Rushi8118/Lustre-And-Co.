@@ -48,11 +48,11 @@ export class AuthController {
   }
 
   @Throttle({ default: { limit: 5, ttl: 900_000 } })
-  /** Sets the session cookies and strips the raw tokens from the response body. */
+  /** Sets the session cookies and returns tokens alongside user data. */
   private issueSession<T extends { token?: string; refreshToken?: string }>(res: Response, result: T) {
     const { token, refreshToken, ...body } = result;
     setAuthCookies(res, { token, refreshToken });
-    return body;
+    return { token, refreshToken, ...body };
   }
 
   @Post('register')

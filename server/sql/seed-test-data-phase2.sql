@@ -724,23 +724,28 @@ DECLARE
   v_prod2 record;
   v_cart record;
 BEGIN
-  FOR v_i IN 11..30 LOOP
-    INSERT INTO product_bundles (
-      name, slug, description, bundle_type, discount_type, discount_value, min_items, is_active, is_featured
-    )
-    VALUES (
-      'Royal Sovereign Bridal Suite #' || v_i,
-      'royal-bridal-suite-' || v_i,
-      'Harmonious suite comprising 18K yellow gold bridal necklace, matching earrings, and maang tikka.',
-      'gift_set',
-      'percentage',
-      12.50,
-      2,
-      true,
-      (v_i % 3 = 0)
-    )
-    ON CONFLICT (slug) DO NOTHING;
-  END LOOP;
+  INSERT INTO product_bundles (name, slug, description, bundle_type, discount_type, discount_value, min_items, is_active, is_featured, image) VALUES
+    ('The Imperial Kundan Bridal Suite', 'the-imperial-kundan-bridal-suite', 'Grand heritage suite featuring uncut kundan choker, matching jhumkas, and royal maang tikka.', 'gift_set', 'percentage', 20.00, 2, true, true, 'https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=1000&q=85'),
+    ('Starlight Solitaire Diamond Trio', 'starlight-solitaire-diamond-trio', 'A coordinated ensemble of our best-selling solitaire pendant, pavé stud earrings, and eternity ring.', 'fixed_bundle', 'percentage', 15.00, 3, true, true, 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1000&q=85'),
+    ('Celestial Emerald Gala Set', 'celestial-emerald-gala-set', 'Vibrant emerald teardrop pendant paired with sculpted emerald cascade drop earrings.', 'gift_set', 'percentage', 18.00, 2, true, false, 'https://images.unsplash.com/photo-1590548784585-643d2b9f2925?auto=format&fit=crop&w=1000&q=85'),
+    ('Maharani Heritage Polki Suite', 'maharani-heritage-polki-suite', 'Traditional Rajasthani polki necklace paired with matching openable temple bangles.', 'gift_set', 'percentage', 25.00, 2, true, true, 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=1000&q=85'),
+    ('Vintage Rose Gold Evening Edit', 'vintage-rose-gold-evening-edit', 'Warm 18K rose gold necklace, cocktail ring, and sculpted hoop earrings for special evenings.', 'gift_set', 'percentage', 15.00, 3, true, false, 'https://images.unsplash.com/photo-1589128777073-263566ae5e4d?auto=format&fit=crop&w=1000&q=85'),
+    ('Elysian Freshwater Pearl Ensemble', 'elysian-freshwater-pearl-ensemble', 'Lustrous freshwater pearl strand necklace paired with matching pearl huggie earrings.', 'gift_set', 'percentage', 12.00, 2, true, true, 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=1000&q=85'),
+    ('Modern Minimalist Gold Stacking Duo', 'modern-minimalist-gold-stacking-duo', 'Refined everyday gold herringbone chain necklace with matching curb chain bracelet.', 'fixed_bundle', 'percentage', 10.00, 2, true, false, 'https://images.unsplash.com/photo-1602173574767-37ac01994b2a?auto=format&fit=crop&w=1000&q=85'),
+    ('Royal Rajputana Temple Collection', 'royal-rajputana-temple-collection', 'Hand-finished antique matte gold temple necklace with carved peacock kadas.', 'gift_set', 'percentage', 20.00, 2, true, true, 'https://images.unsplash.com/photo-1508296695146-257a814070b4?auto=format&fit=crop&w=1000&q=85'),
+    ('Gilded Lotus Festivity Set', 'gilded-lotus-festivity-set', 'Lotus petal stud earrings paired with gold floral cocktail ring and kada.', 'gift_set', 'percentage', 15.00, 3, true, false, 'https://images.unsplash.com/photo-1526045612212-70caf35c14df?auto=format&fit=crop&w=1000&q=85'),
+    ('Noor Diamond Tennis & Studs Duo', 'noor-diamond-tennis-studs-duo', 'Timeless micro-pavé crystal tennis bracelet accompanied by brilliant solitaire studs.', 'fixed_bundle', 'percentage', 15.00, 2, true, true, 'https://images.unsplash.com/photo-1611591475152-47eac9806830?auto=format&fit=crop&w=1000&q=85'),
+    ('Sunburst Champagne Cocktail Suite', 'sunburst-champagne-cocktail-suite', 'Champagne crystal cluster ring paired with dramatic chandelier drops for soirees.', 'gift_set', 'percentage', 18.00, 2, true, false, 'https://images.unsplash.com/photo-1596944924616-7b38e7cfac36?auto=format&fit=crop&w=1000&q=85'),
+    ('Kashi Filigree Heritage Ensemble', 'kashi-filigree-heritage-ensemble', 'Delicate wirework filigree bangles with matching intricate pendant necklace.', 'gift_set', 'percentage', 15.00, 2, true, false, 'https://images.unsplash.com/photo-1614713568397-b31b779d0499?auto=format&fit=crop&w=1000&q=85'),
+    ('Zari Gold Bangle & Choker Pairing', 'zari-gold-bangle-choker-pairing', 'A glamorous pairing of textured gold choker and stackable wedding bangles.', 'gift_set', 'percentage', 20.00, 2, true, true, 'https://images.unsplash.com/photo-1600003014755-ba31aa59c4b6?auto=format&fit=crop&w=1000&q=85'),
+    ('Sapphire Velvet Red Carpet Edit', 'sapphire-velvet-red-carpet-edit', 'Deep blue royal sapphire halo ring with complementary sapphire drop necklace.', 'gift_set', 'percentage', 22.00, 2, true, false, 'https://images.unsplash.com/photo-1539185441755-769473a23570?auto=format&fit=crop&w=1000&q=85'),
+    ('Princess Cut Eternity Bridal Duo', 'princess-cut-eternity-bridal-duo', 'Princess cut solitaire engagement ring paired with matching eternity diamond band.', 'fixed_bundle', 'percentage', 15.00, 2, true, true, 'https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?auto=format&fit=crop&w=1000&q=85'),
+    ('Aura Micro-Pavé Daily Luxe Set', 'aura-micro-pave-daily-luxe-set', 'Dainty micro-pavé huggie hoops, stacking ring, and paperclip charm bracelet.', 'fixed_bundle', 'percentage', 15.00, 3, true, false, 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=1000&q=85'),
+    ('Sultana Emerald Cascade Collection', 'sultana-emerald-cascade-collection', 'Heirloom Colombian emerald choker with multi-tiered emerald waterfall earrings.', 'gift_set', 'percentage', 25.00, 2, true, true, 'https://images.unsplash.com/photo-1622398925373-3f91b1e275f5?auto=format&fit=crop&w=1000&q=85'),
+    ('Chandra Pearl Crescent Suite', 'chandra-pearl-crescent-suite', 'Hand-strung pearl choker with crescent-moon pendant and matching pearl drop earrings.', 'gift_set', 'percentage', 15.00, 2, true, false, 'https://images.unsplash.com/photo-1594913785162-e67852c0f2ee?auto=format&fit=crop&w=1000&q=85'),
+    ('The Renaissance Antique Gold Set', 'the-renaissance-antique-gold-set', 'Carved antique gold cuff bracelet, heritage signet ring, and twisted rope necklace.', 'gift_set', 'percentage', 20.00, 3, true, false, 'https://images.unsplash.com/photo-1588444837495-c6cfeb53f32d?auto=format&fit=crop&w=1000&q=85'),
+    ('Opulent Wedding Day Grand Trousseau', 'opulent-wedding-day-grand-trousseau', 'The complete bridal ensemble: bridal kundan choker, haar, jhumkas, maang tikka, and kadas.', 'gift_set', 'percentage', 30.00, 5, true, true, 'https://images.unsplash.com/photo-1615655406736-b37c4fabf923?auto=format&fit=crop&w=1000&q=85')
+  ON CONFLICT (slug) DO NOTHING;
 
   -- Bundle Items (Add items to reach at least 35)
   FOR v_i IN 1..35 LOOP
