@@ -22,6 +22,7 @@ import {
   sendRecoveryEmail,
 } from "../../services/abandonedCarts";
 import { formatPrice } from "../../data/products";
+import SafeImage from "../../components/SafeImage";
 
 const STATUS_TONES = {
   abandoned: "warning",
@@ -275,7 +276,7 @@ export default function AdminAbandonedCarts() {
                       {(cart.items || []).slice(0, 3).map((item, idx) => (
                         <div key={idx} style={{ fontSize: 13, display: "flex", alignItems: "center", gap: 6 }}>
                           {item.image && (
-                            <img
+                            <SafeImage
                               src={item.image}
                               alt=""
                               style={{ width: 24, height: 24, borderRadius: 4, objectFit: "cover" }}

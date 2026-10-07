@@ -4,6 +4,7 @@ import { useOutletContext } from "react-router-dom";
 import { EmptyState, ErrorState, LoadingState, StatusBadge, Tabs } from "../components/AdminUi";
 import { formatDate } from "../utils";
 import { useStore } from "../../context/StoreContext";
+import SafeImage from "../../components/SafeImage";
 import api, { getErrorMessage } from "../../services/api";
 
 const TONES = { pending: "warning", approved: "success", rejected: "danger" };
@@ -131,7 +132,14 @@ export default function AdminReviews() {
             <article className="admin-review-card" key={review._id}>
               <div className="admin-card-row">
                 <div className="admin-product-cell">
-                  {review.product?.image && <img src={review.product.image} alt="" />}
+                  {review.product?.image && (
+                    <SafeImage
+                      src={review.product.image}
+                      alt={review.product?.name || ""}
+                      category={review.product?.category}
+                      className="admin-product-thumb"
+                    />
+                  )}
                   <div>
                     <strong>{review.product?.name || "Deleted product"}</strong>
                     <small>

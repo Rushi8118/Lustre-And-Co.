@@ -166,7 +166,7 @@ export default function AdminShipping() {
       ) : (
         <form onSubmit={save} style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
           {/* Section 1: Carrier & Routing */}
-          <div style={{ background: "#ffffff", padding: "1.5rem", borderRadius: "10px", border: "1px solid #e2e8f0" }}>
+          <div style={{ background: "var(--admin-surface)", padding: "1.5rem", borderRadius: "10px", border: "1px solid var(--admin-border)" }}>
             <h3 style={{ fontSize: "1.05rem", fontWeight: 600, margin: "0 0 1rem 0", display: "flex", alignItems: "center", gap: "0.5rem" }}>
               <Truck size={18} color="#b8860b" /> Primary &amp; Fallback Providers
             </h3>
@@ -219,7 +219,7 @@ export default function AdminShipping() {
           </div>
 
           {/* Section 2: Automation Rules */}
-          <div style={{ background: "#ffffff", padding: "1.5rem", borderRadius: "10px", border: "1px solid #e2e8f0" }}>
+          <div style={{ background: "var(--admin-surface)", padding: "1.5rem", borderRadius: "10px", border: "1px solid var(--admin-border)" }}>
             <h3 style={{ fontSize: "1.05rem", fontWeight: 600, margin: "0 0 1rem 0", display: "flex", alignItems: "center", gap: "0.5rem" }}>
               <Sliders size={18} color="#b8860b" /> Automation &amp; Sync
             </h3>
@@ -268,7 +268,7 @@ export default function AdminShipping() {
           </div>
 
           {/* Section 3: Pricing Rules */}
-          <div style={{ background: "#ffffff", padding: "1.5rem", borderRadius: "10px", border: "1px solid #e2e8f0" }}>
+          <div style={{ background: "var(--admin-surface)", padding: "1.5rem", borderRadius: "10px", border: "1px solid var(--admin-border)" }}>
             <h3 style={{ fontSize: "1.05rem", fontWeight: 600, margin: "0 0 1rem 0" }}>
               Pricing &amp; Free Shipping Threshold
             </h3>
@@ -284,9 +284,9 @@ export default function AdminShipping() {
                   placeholder="e.g. 10000 (leave blank to disable)"
                   value={settings.freeShippingThreshold}
                   onChange={(event) => update("freeShippingThreshold", event.target.value)}
-                  style={{ width: "100%", padding: "0.6rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+                  style={{ width: "100%", padding: "0.6rem 0.8rem", borderRadius: "6px", border: "1px solid var(--admin-border)", background: "var(--admin-bg)", color: "var(--admin-text)" }}
                 />
-                <small style={{ color: "#64748b", display: "block", marginTop: "0.25rem" }}>
+                <small style={{ color: "var(--admin-muted)", display: "block", marginTop: "0.25rem" }}>
                   Orders with cart value at or above this amount automatically receive complimentary insured shipping.
                 </small>
               </div>
@@ -300,9 +300,9 @@ export default function AdminShipping() {
                   min="0"
                   value={settings.flatShippingRate}
                   onChange={(event) => update("flatShippingRate", event.target.value)}
-                  style={{ width: "100%", padding: "0.6rem 0.8rem", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+                  style={{ width: "100%", padding: "0.6rem 0.8rem", borderRadius: "6px", border: "1px solid var(--admin-border)", background: "var(--admin-bg)", color: "var(--admin-text)" }}
                 />
-                <small style={{ color: "#64748b", display: "block", marginTop: "0.25rem" }}>
+                <small style={{ color: "var(--admin-muted)", display: "block", marginTop: "0.25rem" }}>
                   Fallback rate charged if live rates cannot be reached.
                 </small>
               </div>
@@ -310,7 +310,7 @@ export default function AdminShipping() {
           </div>
 
           {/* Section 4: Origin / Pickup Address */}
-          <div style={{ background: "#ffffff", padding: "1.5rem", borderRadius: "10px", border: "1px solid #e2e8f0" }}>
+          <div style={{ background: "var(--admin-surface)", padding: "1.5rem", borderRadius: "10px", border: "1px solid var(--admin-border)" }}>
             <h3 style={{ fontSize: "1.05rem", fontWeight: 600, margin: "0 0 1rem 0", display: "flex", alignItems: "center", gap: "0.5rem" }}>
               <Building size={18} color="#b8860b" /> Origin / Warehouse Pickup Address
             </h3>

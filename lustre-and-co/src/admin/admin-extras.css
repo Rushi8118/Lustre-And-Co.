@@ -140,39 +140,52 @@
 }
 
 .admin-tabs {
-  display: flex;
-  flex-wrap: wrap;
+  display: inline-flex;
+  align-items: center;
   gap: 6px;
-  margin-bottom: 18px;
+  margin-bottom: 22px;
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  padding: 5px;
+  border-radius: 8px;
 }
 
 .admin-tab {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  min-height: 34px;
-  padding: 0 12px;
-  border: 1px solid var(--admin-border);
-  background: var(--admin-surface);
+  gap: 8px;
+  min-height: 36px;
+  padding: 0 16px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: transparent;
   color: var(--admin-muted);
-  font-size: 11px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.admin-tab.active {
-  border-color: var(--admin-text);
-  background: var(--admin-text);
-  color: var(--admin-surface);
+.admin-tab:hover {
+  color: var(--admin-text);
+  background: var(--admin-bg);
+}
+
+.admin-tab.active,
+.admin-tab.is-active {
+  border-color: rgba(223, 190, 118, 0.35);
+  background: var(--admin-bg);
+  color: var(--admin-gold);
+  font-weight: 600;
 }
 
 .admin-tab-count {
-  padding: 0 6px;
-  border-radius: 8px;
-  background: rgba(0, 0, 0, 0.08);
-  font-size: 10px;
-}
-
-.admin-tab.active .admin-tab-count {
-  background: rgba(255, 255, 255, 0.2);
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(223, 190, 118, 0.15);
+  color: var(--admin-gold);
+  font-size: 11px;
+  font-weight: 700;
 }
 
 .admin-toolbar {

@@ -815,10 +815,10 @@
 }
 
 .admin-loyalty-section {
-  background: #fff;
+  background: var(--admin-surface, #fff);
   border-radius: 12px;
-  border: 1px solid #ebe5dc;
-  padding: 24px;
+  border: 1px solid var(--admin-border, #ebe5dc);
+  padding: 28px;
   margin-bottom: 24px;
 }
 
@@ -829,7 +829,7 @@
   align-items: center;
   gap: 8px;
   margin: 0 0 16px;
-  color: #1a1714;
+  color: var(--admin-text, #1a1714);
 }
 
 .admin-loyalty-sub-title {
@@ -839,18 +839,18 @@
   align-items: center;
   gap: 6px;
   margin: 16px 0 12px;
-  color: #444;
+  color: var(--admin-gold, #c5a059);
 }
 
 .admin-loyalty-section-desc {
   font-size: 13px;
-  color: #666;
+  color: var(--admin-muted, #666);
   margin: -8px 0 16px;
 }
 
 .admin-loyalty-divider {
   height: 1px;
-  background: #f0ebe4;
+  background: var(--admin-border, #f0ebe4);
   margin: 20px 0;
 }
 
@@ -858,8 +858,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 0;
-  border-bottom: 1px solid #f6f3ef;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--admin-border, #f6f3ef);
   gap: 16px;
 }
 
@@ -870,17 +870,17 @@
 .loyalty-admin-row-label {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
 }
 
 .loyalty-admin-row-label strong {
   font-size: 13.5px;
-  color: #222;
+  color: var(--admin-text, #222);
 }
 
 .loyalty-admin-hint {
   font-size: 12px;
-  color: #888;
+  color: var(--admin-muted, #888);
 }
 
 .loyalty-toggle {
@@ -935,10 +935,10 @@
 }
 
 .admin-tier-card {
-  border: 1px solid #ebe5dc;
+  border: 1px solid var(--admin-border, #ebe5dc);
   border-radius: 10px;
   padding: 18px;
-  background: #faf9f7;
+  background: var(--admin-surface, #faf9f7);
   display: flex;
   flex-direction: column;
   gap: 14px;

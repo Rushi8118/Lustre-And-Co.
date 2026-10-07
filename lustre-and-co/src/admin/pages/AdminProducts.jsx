@@ -7,6 +7,7 @@ import { CheckboxField, EmptyState, ErrorState, Field, FormError, LoadingState, 
 import { arrayToLines, csvToArray, formatAdminPrice, linesToArray } from "../utils";
 import { useSettings } from "../../context/SettingsContext";
 import { useStore } from "../../context/StoreContext";
+import SafeImage from "../../components/SafeImage";
 import api, { getErrorMessage } from "../../services/api";
 
 const blankForm = {
@@ -334,7 +335,7 @@ export default function AdminProducts() {
                     <tr key={product._id}>
                       <td>
                         <div className="admin-product-cell">
-                          <img src={product.image} alt={product.name} />
+                          <SafeImage src={product.image} alt={product.name} category={product.category} />
                           <div>
                             <strong>{product.name}</strong>
                             <small>

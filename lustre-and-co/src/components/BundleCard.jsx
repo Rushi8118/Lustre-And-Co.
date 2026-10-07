@@ -4,6 +4,7 @@ import { ShoppingBag, Check, Sparkles, Layers, ArrowRight } from "lucide-react";
 import { formatPrice } from "../data/products";
 import { addBundleToCart } from "../services/bundles";
 import { useStore } from "../context/StoreContext";
+import SafeImage from "./SafeImage";
 
 export default function BundleCard({ bundle, cartId: propCartId, onAdded }) {
   const { cartId: storeCartId, showToast } = useStore();
@@ -83,7 +84,7 @@ export default function BundleCard({ bundle, cartId: propCartId, onAdded }) {
   return (
     <article className="bundle-card">
       <div className="bundle-card-media">
-        <img
+        <SafeImage
           src={coverImage}
           alt={bundle.name}
           className="bundle-card-image"

@@ -7,6 +7,7 @@ import SectionHeading from "../components/SectionHeading";
 import ProductGrid from "../components/ProductGrid";
 import PromotionalBanner from "../components/PromotionalBanner";
 import WhyShopWithUs from "../components/WhyShopWithUs";
+import SafeImage from "../components/SafeImage";
 import { useSettings } from "../context/SettingsContext";
 import { useStore } from "../context/StoreContext";
 
@@ -121,7 +122,7 @@ export default function Home() {
                   transition={{ delay: index * 0.06 }}
                 >
                   <Link to={`/category/${category.slug}`}>
-                    {category.image && <img src={category.image} alt={category.name} loading="lazy" />}
+                    {category.image && <SafeImage src={category.image} alt={category.name} category={category.slug} loading="lazy" />}
                     <div className="category-card-overlay">
                       <h3>{category.name}</h3>
                       <span>Explore collection →</span>
@@ -164,7 +165,7 @@ export default function Home() {
 
             {editorial.image && (
               <div className="editorial-banner-image">
-                <img src={editorial.image} alt={editorial.eyebrow} loading="lazy" />
+                <SafeImage src={editorial.image} alt={editorial.eyebrow} loading="lazy" />
               </div>
             )}
           </div>

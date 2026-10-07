@@ -5,6 +5,7 @@ import AdminTable from "../components/AdminTable";
 import { CheckboxField, ErrorState, Field, FormError, LoadingState, StatusBadge } from "../components/AdminUi";
 import { useSettings } from "../../context/SettingsContext";
 import { useStore } from "../../context/StoreContext";
+import SafeImage from "../../components/SafeImage";
 import api, { getErrorMessage } from "../../services/api";
 
 const blank = {
@@ -107,7 +108,15 @@ export default function AdminCategories() {
       label: "Category",
       render: (row) => (
         <div className="admin-product-cell">
-          {row.image ? <img src={row.image} alt={row.name} /> : <span className="customer-initial">{row.name[0]}</span>}
+          {row.image ? (
+            <SafeImage
+              src={row.image}
+              alt={row.name}
+              className="admin-product-thumb"
+            />
+          ) : (
+            <span className="customer-initial">{row.name[0]}</span>
+          )}
           <div>
             <strong>{row.name}</strong>
             <small>/category/{row.slug}</small>

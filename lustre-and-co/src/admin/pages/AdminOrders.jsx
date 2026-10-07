@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useOutletContext, useSearchParams } from "react-router-dom";
 import AdminTable from "../components/AdminTable";
 import AdminModal from "../components/AdminModal";
+import SafeImage from "../../components/SafeImage";
 import AdminDropdown from "../components/AdminDropdown";
 import { ErrorState, FormError, LoadingState, StatusBadge, Tabs } from "../components/AdminUi";
 import {
@@ -144,7 +145,7 @@ function OrderDetail({ orderId, onClose, onChanged }) {
               <div className="admin-line-items">
                 {order.items.map((item, index) => (
                   <div className="admin-line-item" key={index}>
-                    <img src={item.image} alt={item.name} />
+                    <SafeImage src={item.image} alt={item.name} />
                     <div>
                       <strong>{item.name}</strong>
                       <small>

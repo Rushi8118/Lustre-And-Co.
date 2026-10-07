@@ -28,6 +28,7 @@ import {
 } from "../components/AdminUi";
 import { formatAdminPrice, formatDate } from "../utils";
 import { useStore } from "../../context/StoreContext";
+import SafeImage from "../../components/SafeImage";
 import {
   getAdminBundles,
   createBundle,
@@ -379,7 +380,7 @@ export default function AdminBundles() {
                   <td>
                     <div className="admin-product-cell">
                       {bundle.image ? (
-                        <img
+                        <SafeImage
                           src={bundle.image}
                           alt={bundle.name}
                           className="admin-product-thumb"
@@ -686,7 +687,7 @@ export default function AdminBundles() {
                           onChange={() => toggleItemProduct(p.id)}
                         />
                         {p.image && (
-                          <img
+                          <SafeImage
                             src={p.image}
                             alt=""
                             className="admin-product-thumb"

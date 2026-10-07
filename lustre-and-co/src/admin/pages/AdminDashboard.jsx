@@ -8,6 +8,7 @@ import { ErrorState, LoadingState, StatusBadge } from "../components/AdminUi";
 import AdminDropdown from "../components/AdminDropdown";
 import { formatAdminPrice, formatDate, orderStatusTone, paymentTone } from "../utils";
 import { useStore } from "../../context/StoreContext";
+import SafeImage from "../../components/SafeImage";
 import api, { getErrorMessage } from "../../services/api";
 
 function greeting() {
@@ -195,7 +196,7 @@ export default function AdminDashboard() {
                 ) : (
                   data.lowStockAlerts.map((product) => (
                     <div className="low-stock-item" key={product.id}>
-                      <img src={product.image} alt={product.name} />
+                      <SafeImage src={product.image} alt={product.name} />
                       <div>
                         <strong>{product.name}</strong>
                         <span>{product.stock} units remaining</span>
