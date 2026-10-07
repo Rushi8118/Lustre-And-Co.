@@ -10932,6 +10932,7 @@ textarea {
     0 20px 50px rgba(0, 0, 0, 0.4),
     inset 0 1px 0 rgba(255, 253, 248, 0.1);
   overflow: hidden;
+  color-scheme: dark;
 }
 
 .newsletter-glow {
@@ -11007,6 +11008,7 @@ textarea {
   padding: 4px 5px 4px 14px;
   transition: all 0.25s ease;
   box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.3);
+  color-scheme: dark;
 }
 
 .newsletter-input-group:focus-within {
@@ -11025,17 +11027,42 @@ textarea {
 
 .newsletter-input-group input {
   flex: 1;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  color: #fffdf8;
+  border: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  color: #fffdf8 !important;
   font-family: var(--sans, sans-serif);
   font-size: 13.5px;
   min-height: 44px;
+  color-scheme: dark;
+  caret-color: #d6b56d;
 }
 
 .newsletter-input-group input::placeholder {
   color: #726b63;
+}
+
+/* Fix autofill / autocomplete white background in Chrome, Edge, Safari, Firefox */
+.newsletter-input-group input:-webkit-autofill,
+.newsletter-input-group input:-webkit-autofill:hover,
+.newsletter-input-group input:-webkit-autofill:focus,
+.newsletter-input-group input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #141312 inset !important;
+  box-shadow: 0 0 0 1000px #141312 inset !important;
+  -webkit-text-fill-color: #fffdf8 !important;
+  color: #fffdf8 !important;
+  caret-color: #d6b56d !important;
+  background-color: transparent !important;
+  transition: background-color 999999s ease-in-out 0s !important;
+}
+
+.newsletter-input-group input:autofill,
+.newsletter-input-group input:-moz-autofill {
+  box-shadow: 0 0 0 1000px #141312 inset !important;
+  -webkit-text-fill-color: #fffdf8 !important;
+  color: #fffdf8 !important;
+  filter: none !important;
 }
 
 .newsletter-submit-btn {

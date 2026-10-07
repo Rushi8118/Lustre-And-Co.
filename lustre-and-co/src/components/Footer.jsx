@@ -88,6 +88,10 @@ export default function Footer() {
                       <Mail size={18} className="newsletter-mail-icon" />
                       <input
                         type="email"
+                        id="newsletter-email"
+                        name="email"
+                        autoComplete="email"
+                        spellCheck="false"
                         required
                         placeholder="Enter your email address"
                         value={email}
