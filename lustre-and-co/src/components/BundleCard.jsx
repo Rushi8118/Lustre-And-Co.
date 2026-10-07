@@ -4,6 +4,7 @@ import { ShoppingBag, Check, Sparkles, Layers, ArrowRight } from "lucide-react";
 import { formatPrice } from "../data/products";
 import { addBundleToCart } from "../services/bundles";
 import { useStore } from "../context/StoreContext";
+import SmartImage from "./SmartImage";
 
 export default function BundleCard({ bundle, cartId: propCartId, onAdded }) {
   const { cartId: storeCartId, showToast } = useStore();
@@ -78,14 +79,15 @@ export default function BundleCard({ bundle, cartId: propCartId, onAdded }) {
   const coverImage =
     bundle.image ||
     products[0]?.product?.image ||
-    "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=800&q=80";
+    "https://images.unsplash.com/photo-1650455221359-3aebf920bcc5?auto=format&fit=crop&w=800&q=80";
 
   return (
     <article className="bundle-card">
       <div className="bundle-card-media">
-        <img
+        <SmartImage
           src={coverImage}
           alt={bundle.name}
+          width={600}
           className="bundle-card-image"
           loading="lazy"
         />

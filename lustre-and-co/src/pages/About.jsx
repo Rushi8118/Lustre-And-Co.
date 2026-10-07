@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import PageIntro from "../components/PageIntro";
 import CmsPageState from "../components/CmsPageState";
 import useCmsPage, { toParagraphs } from "../hooks/useCmsPage";
+import SmartImage from "../components/SmartImage";
 
 export default function About() {
   const { page, status, error } = useCmsPage("about");
@@ -24,7 +25,7 @@ export default function About() {
           <div className="container about-story-grid">
             {story.image && (
               <div className="about-story-image">
-                <img src={story.image} alt={story.heading || page.title} />
+                <SmartImage src={story.image} alt="" width={900} />
               </div>
             )}
 

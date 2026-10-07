@@ -12,6 +12,7 @@ import api, { getErrorMessage, hasSessionHint, setSessionHint } from "../service
 import { cartItemId, formatPrice, normalizeProduct } from "../data/products";
 import { useSettings } from "./SettingsContext";
 import { identifyCart } from "../services/abandonedCarts";
+import SmartImage from "../components/SmartImage";
 
 const StoreContext = createContext(null);
 
@@ -715,7 +716,7 @@ export function StoreProvider({ children }) {
         >
           {toast.product ? (
             <div className="toast-rich-inner">
-              <img src={toast.product.image} alt="" className="toast-thumbnail" />
+              <SmartImage src={toast.product.image} alt="" width={120} className="toast-thumbnail" />
               <div className="toast-rich-body">
                 <span className="toast-headline">{toast.title || "Added to Bag"}</span>
                 <strong className="toast-product-name">{toast.message}</strong>

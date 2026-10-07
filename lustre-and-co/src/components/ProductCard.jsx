@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { formatPrice } from "../data/products";
 import { useStore } from "../context/StoreContext";
 import QuickViewModal from "./QuickViewModal";
+import SmartImage from "./SmartImage";
 
 export default function ProductCard({
   product,
@@ -87,10 +88,11 @@ export default function ProductCard({
             aria-label={`View ${product.name}`}
           >
             {/* Primary Product Image with Zoom on Hover */}
-            <img
+            <SmartImage
               src={product.image}
               alt={product.name}
-              loading="lazy"
+              width={600}
+              priority={index < 4}
               className={`product-card-main-img ${
                 isHovered && secondaryImage ? "has-secondary" : ""
               }`}
@@ -98,10 +100,10 @@ export default function ProductCard({
 
             {/* Secondary Lifestyle Hover Image */}
             {secondaryImage && (
-              <img
+              <SmartImage
                 src={secondaryImage}
-                alt={`${product.name} styled`}
-                loading="lazy"
+                alt=""
+                width={600}
                 className={`product-card-secondary-img ${
                   isHovered ? "is-visible" : ""
                 }`}

@@ -21,6 +21,7 @@ import api, { getErrorMessage } from "../services/api";
 import { payOrderOnline } from "../services/payments";
 import useInventoryReservation from "../hooks/useInventoryReservation";
 import ShippingRateSelector from "../components/ShippingRateSelector";
+import SmartImage from "../components/SmartImage";
 
 const COUNTRIES = ["India", "United States", "United Kingdom", "Canada", "Australia", "United Arab Emirates", "Singapore"];
 
@@ -410,7 +411,7 @@ export default function Checkout() {
                     <div className="checkout-summary-items-list">
                       {cart.map((item) => (
                         <div key={item.id} className="checkout-mini-item">
-                          <img src={item.product.image} alt={item.product.name} />
+                          <SmartImage src={item.product.image} alt={item.product.name} width={160} />
                           <div className="checkout-mini-item-info">
                             <h5>{item.product.name}</h5>
                             <span>
@@ -819,7 +820,7 @@ export default function Checkout() {
                         <div className="review-items-list">
                           {cart.map((item) => (
                             <div key={item.id} className="review-item-row">
-                              <img src={item.product.image} alt={item.product.name} />
+                              <SmartImage src={item.product.image} alt={item.product.name} width={160} />
                               <div className="review-item-details">
                                 <h5>{item.product.name}</h5>
                                 <span>
@@ -939,7 +940,7 @@ export default function Checkout() {
                       {cart.map((item) => (
                         <div key={item.id} className="checkout-sidebar-item">
                           <div className="item-thumb-wrap">
-                            <img src={item.product.image} alt={item.product.name} />
+                            <SmartImage src={item.product.image} alt={item.product.name} width={160} />
                             <span className="item-qty-badge">{item.quantity}</span>
                           </div>
                           <div className="item-info">
