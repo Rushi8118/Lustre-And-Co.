@@ -19,7 +19,7 @@ import {
 import type { Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service.js';
-import { REFRESH_COOKIE, clearAuthCookies, setAuthCookies } from './auth-cookies.js';
+import { ACCESS_COOKIE, REFRESH_COOKIE, clearAuthCookies, setAuthCookies } from './auth-cookies.js';
 import { RegisterDto } from './dto/register.dto.js';
 import { LoginDto } from './dto/login.dto.js';
 import { ForgotPasswordDto } from './dto/forgot-password.dto.js';
@@ -145,19 +145,73 @@ export class AuthController {
   @UseGuards(GoogleAuthGuard)
   @ApiOperation({ summary: 'Google OAuth callback' })
   async googleCallback(@Req() req: any, @Res() res: Response) {
-    const meta = this.getRequestMeta(req);
-    const result = await this.authService.googleLogin(req.user, meta);
-    setAuthCookies(res, { token: result.token, refreshToken: result.refreshToken });
-    const frontendUrl = (
-      this.configService.get<string>('FRONTEND_URL') ||
-      'https://lustre-and-co.vercel.app'
-    )
-      .split(',')[0]
-      .trim()
-      .replace(/\/+$/, '');
+    let frontendOrigin = '';
+    let redirectPath = '/';
+    if (req.query?.state) {
+      try {
+        const decoded = JSON.parse(Buffer.from(req.query.state as string, 'base64').toString('utf8'));
+        if (decoded.origin) frontendOrigin = decoded.origin;
+        if (decoded.redirect) redirectPath = decoded.redirect;
+      } catch {}
+    }
+    const targetFrontend = this.resolveFrontendOrigin(req, frontendOrigin);
 
-    // Tokens travel in cookies only; the page fetches the profile from /auth/me.
-    return res.redirect(`${frontendUrl}/account/login?google=success`);
+    if (!req.user) {
+      const redirectUrl = new URL(`${targetFrontend}/account/login`);
+      redirectUrl.searchParams.set('google', 'error');
+      redirectUrl.searchParams.set('message', 'Google sign-in was cancelled or failed.');
+      return res.redirect(redirectUrl.toString());
+    }
+
+    try {
+      const meta = this.getRequestMeta(req);
+      const result = await this.authService.googleLogin(req.user, meta);
+      setAuthCookies(res, { token: result.token, refreshToken: result.refreshToken });
+
+      const redirectUrl = new URL(`${targetFrontend}/account/login`);
+      redirectUrl.searchParams.set('google', 'success');
+      redirectUrl.searchParams.set('token', result.token);
+      if (
+        redirectPath &&
+        redirectPath !== '/' &&
+        !redirectPath.includes('/account/login') &&
+        !redirectPath.includes('/account/signup')
+      ) {
+        redirectUrl.searchParams.set('target', redirectPath);
+      }
+      return res.redirect(redirectUrl.toString());
+    } catch (err: any) {
+      const redirectUrl = new URL(`${targetFrontend}/account/login`);
+      redirectUrl.searchParams.set('google', 'error');
+      redirectUrl.searchParams.set('message', err?.message || 'Google sign-in failed.');
+      return res.redirect(redirectUrl.toString());
+    }
+  }
+
+  private resolveFrontendOrigin(req: any, preferredOrigin?: string): string {
+    const rawFrontend = this.configService.get<string>('FRONTEND_URL') || 'https://lustre-and-co.vercel.app';
+    const allowedOrigins = rawFrontend
+      .split(',')
+      .map((u) => u.trim().replace(/\/+$/, ''))
+      .filter(Boolean);
+
+    if (preferredOrigin) {
+      const cleanPreferred = preferredOrigin.trim().replace(/\/+$/, '');
+      if (allowedOrigins.includes(cleanPreferred)) {
+        return cleanPreferred;
+      }
+      if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(cleanPreferred)) {
+        return cleanPreferred;
+      }
+    }
+
+    const host = req.headers?.host || '';
+    if (host.includes('localhost') || host.includes('127.0.0.1')) {
+      const localAllowed = allowedOrigins.find((u) => u.includes('localhost') || u.includes('127.0.0.1'));
+      return localAllowed || 'http://localhost:5177';
+    }
+
+    return allowedOrigins[0] || 'https://lustre-and-co.vercel.app';
   }
 
   @Get('me')
@@ -165,8 +219,12 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Get profile of the current authenticated user' })
   @ApiResponse({ status: 401, description: 'Unauthorized / expired token.' })
-  async me(@CurrentUser() user: UserDocument) {
-    return { user: this.authService.sanitizeUser(user) };
+  async me(@CurrentUser() user: UserDocument, @Req() req: Request) {
+    const token =
+      req.cookies?.[ACCESS_COOKIE] ||
+      req.headers?.authorization?.replace(/^Bearer\s+/i, '') ||
+      undefined;
+    return { user: this.authService.sanitizeUser(user), token };
   }
 
   @Throttle({ default: { limit: 3, ttl: 900_000 } })

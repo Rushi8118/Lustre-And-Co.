@@ -56,7 +56,14 @@ export default function AdminApp() {
   }
 
   if (!user) {
-    return <Navigate to="/account/login" replace state={{ from: location.pathname }} />;
+    const currentPath = location.pathname + location.search;
+    return (
+      <Navigate
+        to={`/account/login?redirect=${encodeURIComponent(currentPath)}`}
+        replace
+        state={{ from: currentPath }}
+      />
+    );
   }
 
   if (!ADMIN_ROLES.includes(user.role)) {

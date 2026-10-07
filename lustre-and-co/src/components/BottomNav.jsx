@@ -1,10 +1,20 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { Heart, Home, ShoppingBag, Sparkles, UserRound } from "lucide-react";
 import { useStore } from "../context/StoreContext";
 
 export default function BottomNav() {
   const { cartCount, wishlist, user } = useStore();
+  const location = useLocation();
+
+  const currentPathWithSearch = location.pathname + location.search;
+  const isAuthPage = location.pathname.startsWith("/account/login") || location.pathname.startsWith("/account/signup");
+  const accountTo = user
+    ? "/account"
+    : isAuthPage
+    ? "/account/login"
+    : `/account/login?redirect=${encodeURIComponent(currentPathWithSearch)}`;
+  const accountState = !user && !isAuthPage ? { from: currentPathWithSearch } : undefined;
 
   const navItems = [
     {
@@ -32,7 +42,8 @@ export default function BottomNav() {
     },
     {
       label: "Account",
-      to: user ? "/account" : "/account/login",
+      to: accountTo,
+      state: accountState,
       icon: UserRound
     }
   ];
@@ -50,6 +61,7 @@ export default function BottomNav() {
             <NavLink
               key={item.to}
               to={item.to}
+              state={item.state}
               end={item.end}
               className={({ isActive }) =>
                 `bottom-nav-item ${isActive ? "is-active" : ""}`

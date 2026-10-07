@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { ArrowRight, LockKeyhole, Sparkles } from "lucide-react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { useSettings } from "../context/SettingsContext";
 import api, { getErrorMessage } from "../services/api";
 
 export default function ResetPassword() {
   const [searchParams] = useSearchParams();
+  const location = useLocation();
   const token = searchParams.get("token") || "";
   const { settings } = useSettings();
 
@@ -68,7 +69,7 @@ export default function ResetPassword() {
             <Link to="/" className="auth-mobile-logo">
               {settings.store.name}
             </Link>
-            <Link to="/account/login" className="auth-form-switch">
+            <Link to={`/account/login${location.search}`} state={location.state} className="auth-form-switch">
               Return to sign in
             </Link>
           </div>
@@ -87,7 +88,7 @@ export default function ResetPassword() {
                 <div className="auth-success-icon">✓</div>
                 <h2>Password updated.</h2>
                 <p>You can now sign in with your new password.</p>
-                <Link to="/account/login" className="button button-dark">
+                <Link to={`/account/login${location.search}`} state={location.state} className="button button-dark">
                   Sign in
                 </Link>
               </div>

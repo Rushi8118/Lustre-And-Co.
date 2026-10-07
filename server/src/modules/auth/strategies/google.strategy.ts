@@ -66,7 +66,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
     const hashedPassword = await bcrypt.hash(`${googleId}-${Date.now()}`, 10);
 
     return this.usersService.create({
-      name: name || `${firstName} ${lastName}`.trim(),
+      name: (name || `${firstName} ${lastName}`.trim() || email.split('@')[0] || 'Customer').trim(),
       email: email.toLowerCase().trim(),
       googleId,
       provider: 'google',

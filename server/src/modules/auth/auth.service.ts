@@ -21,7 +21,7 @@ import { Verify2faDto } from './dto/verify-2fa.dto.js';
 import type { UserDocument } from '../users/schemas/user.schema.js';
 import { SmtpService } from './smtp/smtp.service.js';
 import { SupabaseService } from '../../database/supabase.service.js';
-import { toDoc, unwrap } from '../../common/utils/db.js';
+import { isUuid, toDoc, unwrap } from '../../common/utils/db.js';
 import { AuditLogService } from '../audit/audit.service.js';
 import {
   ADMIN_ROLES,
@@ -564,11 +564,17 @@ export class AuthService {
     profile: any,
     meta?: { ip?: string; userAgent?: string },
   ): Promise<{ user: any; token: string; refreshToken: string }> {
-    const googleId = profile?.googleId || profile?.id;
-    const row = googleId
-      ? unwrap(await this.db.from('users').select('*').eq('googleId', googleId).maybeSingle())
-      : null;
-    const user = toDoc<any>(row) as UserDocument | null;
+    let user: UserDocument | null = null;
+
+    if (profile?.id && isUuid(profile.id)) {
+      user = profile as UserDocument;
+    } else {
+      const googleId = profile?.googleId || profile?.id;
+      const row = googleId
+        ? unwrap(await this.db.from('users').select('*').eq('googleId', googleId).maybeSingle())
+        : null;
+      user = row ? (toDoc<any>(row) as UserDocument) : null;
+    }
 
     if (!user || user.isActive === false) {
       throw new UnauthorizedException('Google account not found or deactivated.');

@@ -498,7 +498,7 @@ export default function Checkout() {
                             <strong>Checking out as a guest</strong>
                             <span>
                               You can track this order with your email.{" "}
-                              <Link to="/account/login" state={{ from: "/checkout" }}>
+                              <Link to="/account/login?redirect=%2Fcheckout" state={{ from: "/checkout" }}>
                                 Sign in
                               </Link>{" "}
                               to save it to your account.

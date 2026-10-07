@@ -312,6 +312,7 @@ export function StoreProvider({ children }) {
     } catch {
       // The account is signed in even if merging fails; the bag reloads on next visit.
     }
+    return data.user;
   }, []);
 
   const login = useCallback(

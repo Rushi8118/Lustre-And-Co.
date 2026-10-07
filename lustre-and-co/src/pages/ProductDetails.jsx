@@ -857,7 +857,10 @@ export default function ProductDetails() {
                         </button>
                       ) : (
                         <p className="review-login-note">
-                          <Link to="/account/login" state={{ from: location.pathname }}>
+                          <Link
+                            to={`/account/login?redirect=${encodeURIComponent(location.pathname + location.search)}`}
+                            state={{ from: location.pathname + location.search }}
+                          >
                             Sign in
                           </Link>{" "}
                           to write a review.

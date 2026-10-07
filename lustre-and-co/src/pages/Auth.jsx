@@ -4,7 +4,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useStore } from "../context/StoreContext";
 import { useSettings } from "../context/SettingsContext";
-import api, { getErrorMessage } from "../services/api";
+import api, { getErrorMessage, setAuthToken } from "../services/api";
 
 const benefits = ["Save your favorite pieces", "Track orders effortlessly", "Enjoy a faster checkout"];
 
@@ -84,6 +84,49 @@ function GoogleIcon() {
   );
 }
 
+export function resolveRedirectTarget(location, isStaffOrAdmin = false) {
+  const searchParams = new URLSearchParams(location?.search || "");
+  const param =
+    searchParams.get("redirect") ||
+    searchParams.get("from") ||
+    searchParams.get("returnUrl") ||
+    searchParams.get("target") ||
+    searchParams.get("next");
+
+  const stateFrom = location?.state?.from;
+
+  let sessionTarget = null;
+  try {
+    sessionTarget = sessionStorage.getItem("auth_redirect_target");
+  } catch {}
+
+  const rawCandidate = param || stateFrom || sessionTarget;
+
+  if (rawCandidate && typeof rawCandidate === "string") {
+    let candidate = rawCandidate.trim();
+    try {
+      if (candidate.startsWith("%2F") || candidate.startsWith("%2f")) {
+        candidate = decodeURIComponent(candidate);
+      }
+    } catch {}
+
+    if (
+      candidate.startsWith("/") &&
+      !candidate.startsWith("//") &&
+      !candidate.startsWith("/\\") &&
+      !candidate.includes("/account/login") &&
+      !candidate.includes("/account/signup")
+    ) {
+      try {
+        sessionStorage.removeItem("auth_redirect_target");
+      } catch {}
+      return candidate;
+    }
+  }
+
+  return isStaffOrAdmin ? "/admin" : "/";
+}
+
 export default function Auth({ mode = "login" }) {
   const isLogin = mode === "login";
   const navigate = useNavigate();
@@ -92,33 +135,85 @@ export default function Auth({ mode = "login" }) {
   const { settings } = useSettings();
   const storeName = settings.store.name;
 
-  // If already logged in, redirect immediately away from the auth page
+  // Persist any target found in query or router state so it survives OAuth or toggling
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const param =
+      searchParams.get("redirect") ||
+      searchParams.get("from") ||
+      searchParams.get("returnUrl") ||
+      searchParams.get("target") ||
+      searchParams.get("next");
+    const stateFrom = location.state?.from;
+    const raw = param || stateFrom;
+
+    if (raw && typeof raw === "string") {
+      let candidate = raw.trim();
+      try {
+        if (candidate.startsWith("%2F") || candidate.startsWith("%2f")) {
+          candidate = decodeURIComponent(candidate);
+        }
+      } catch {}
+
+      if (
+        candidate.startsWith("/") &&
+        !candidate.startsWith("//") &&
+        !candidate.startsWith("/\\") &&
+        !candidate.includes("/account/login") &&
+        !candidate.includes("/account/signup")
+      ) {
+        try {
+          sessionStorage.setItem("auth_redirect_target", candidate);
+        } catch {}
+      }
+    }
+  }, [location.search, location.state]);
+
+  // If already logged in, redirect immediately to targeted page or home
   useEffect(() => {
     if (authReady && user) {
       const role = user.role || "";
       const isStaffOrAdmin = ["owner", "manager", "catalog-manager", "order-manager", "support-agent", "marketing-manager", "accountant", "admin"].includes(role);
-      const fallback = isStaffOrAdmin ? "/admin" : "/account";
-      const from = location.state?.from;
-      const target = from && !from.includes("/account/login") && !from.includes("/account/signup") ? from : fallback;
+      const target = resolveRedirectTarget(location, isStaffOrAdmin);
       navigate(target, { replace: true });
     }
-  }, [user, authReady, navigate, location.state]);
+  }, [user, authReady, navigate, location]);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
-    if (searchParams.get("google") !== "success") return;
+    const googleStatus = searchParams.get("google");
 
-    // The API set the session cookies during the Google redirect; load the profile with them.
+    if (googleStatus === "error") {
+      setFormError(searchParams.get("message") || "Google sign-in was cancelled or failed.");
+      return;
+    }
+
+    if (googleStatus !== "success") return;
+
+    const tokenFromQuery = searchParams.get("token");
+    if (tokenFromQuery) {
+      setAuthToken(tokenFromQuery);
+    }
+    const targetFromQuery = searchParams.get("target");
+
+    // Load user profile with cookies / Bearer token
     api
       .get("/auth/me")
-      .then(({ data }) => completeSignIn({ user: data.user, token: data.token }))
-      .then(() => {
-        const from = location.state?.from;
-        const target = from && !from.includes("/account/login") && !from.includes("/account/signup") ? from : "/account";
+      .then(({ data }) => completeSignIn({ user: data.user, token: tokenFromQuery || data.token }))
+      .then((signedInUser) => {
+        const role = signedInUser?.role || "";
+        const isStaffOrAdmin = ["owner", "manager", "catalog-manager", "order-manager", "support-agent", "marketing-manager", "accountant", "admin"].includes(role);
+        const target =
+          targetFromQuery && !targetFromQuery.includes("/account/login") && !targetFromQuery.includes("/account/signup")
+            ? targetFromQuery
+            : resolveRedirectTarget(location, isStaffOrAdmin);
         navigate(target, { replace: true });
       })
-      .catch((err) => console.error("Google sign-in could not be completed:", err));
-  }, [location.search, completeSignIn, navigate, location.state]);
+      .catch((err) => {
+        console.error("Google sign-in could not be completed:", err);
+        setFormError(getErrorMessage(err, "Google sign-in could not be completed. Please try again."));
+      });
+  }, [location.search, completeSignIn, navigate, location]);
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -181,9 +276,7 @@ export default function Auth({ mode = "login" }) {
 
       const role = signedIn?.role || "";
       const isStaffOrAdmin = ["owner", "manager", "catalog-manager", "order-manager", "support-agent", "marketing-manager", "accountant", "admin"].includes(role);
-      const fallback = isStaffOrAdmin ? "/admin" : "/account";
-      const from = location.state?.from;
-      const target = from && !from.includes("/account/login") && !from.includes("/account/signup") ? from : fallback;
+      const target = resolveRedirectTarget(location, isStaffOrAdmin);
       navigate(target, { replace: true });
     } catch (err) {
       setFormError(getErrorMessage(err, "Authentication failed. Please check your details."));
@@ -212,9 +305,7 @@ export default function Auth({ mode = "login" }) {
 
       const role = data.user?.role || "";
       const isStaffOrAdmin = ["owner", "manager", "catalog-manager", "order-manager", "support-agent", "marketing-manager", "accountant", "admin"].includes(role);
-      const fallback = isStaffOrAdmin ? "/admin" : "/account";
-      const from = location.state?.from;
-      const target = from && !from.includes("/account/login") && !from.includes("/account/signup") ? from : fallback;
+      const target = resolveRedirectTarget(location, isStaffOrAdmin);
       navigate(target, { replace: true });
     } catch (err) {
       setTwoFactorError(getErrorMessage(err, "Invalid or expired security code. Please check your email and try again."));
@@ -287,7 +378,7 @@ export default function Auth({ mode = "login" }) {
             </Link>
             <div className="auth-form-switch">
               <span>{isLogin ? "New here?" : "Already a member?"}</span>
-              <Link to={isLogin ? "/account/signup" : "/account/login"} state={location.state}>
+              <Link to={(isLogin ? "/account/signup" : "/account/login") + location.search} state={location.state}>
                 {isLogin ? "Create an account" : "Sign in"}
               </Link>
             </div>
@@ -494,8 +585,21 @@ export default function Auth({ mode = "login" }) {
                     type="button"
                     className="social-login-button"
                     onClick={() => {
+                      const target = resolveRedirectTarget(location, false);
+                      try {
+                        sessionStorage.setItem("auth_redirect_target", target);
+                      } catch {}
                       const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
-                      window.location.href = `${apiBase.replace(/\/+$/, '')}/auth/google`;
+                      const url = new URL(
+                        apiBase.startsWith('http')
+                          ? `${apiBase.replace(/\/+$/, '')}/auth/google`
+                          : `${window.location.origin}${apiBase.replace(/\/+$/, '')}/auth/google`
+                      );
+                      url.searchParams.set("origin", window.location.origin);
+                      if (target && !target.includes('/account/login') && !target.includes('/account/signup')) {
+                        url.searchParams.set("redirect", target);
+                      }
+                      window.location.href = url.toString();
                     }}
                   >
                     <GoogleIcon />
@@ -507,14 +611,14 @@ export default function Auth({ mode = "login" }) {
                   {isLogin ? (
                     <>
                       New to {storeName}?{" "}
-                      <Link to="/account/signup" state={location.state}>
+                      <Link to={`/account/signup${location.search}`} state={location.state}>
                         Create an account
                       </Link>
                     </>
                   ) : (
                     <>
                       Already have an account?{" "}
-                      <Link to="/account/login" state={location.state}>
+                      <Link to={`/account/login${location.search}`} state={location.state}>
                         Sign in here
                       </Link>
                     </>

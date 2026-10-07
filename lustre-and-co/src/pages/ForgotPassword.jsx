@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { ArrowLeft, ArrowRight, Mail, Sparkles } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useSettings } from "../context/SettingsContext";
 import api, { getErrorMessage } from "../services/api";
 
 export default function ForgotPassword() {
   const { settings } = useSettings();
+  const location = useLocation();
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -60,7 +61,7 @@ export default function ForgotPassword() {
             <Link to="/" className="auth-mobile-logo">
               {settings.store.name}
             </Link>
-            <Link to="/account/login" className="auth-form-switch">
+            <Link to={`/account/login${location.search}`} state={location.state} className="auth-form-switch">
               Return to sign in
             </Link>
           </div>
@@ -107,7 +108,7 @@ export default function ForgotPassword() {
                   If an account exists for <strong>{email}</strong>, a password reset link has been issued. It is valid
                   for one hour.
                 </p>
-                <Link to="/account/login" className="button button-dark">
+                <Link to={`/account/login${location.search}`} state={location.state} className="button button-dark">
                   <ArrowLeft size={16} />
                   Return to sign in
                 </Link>

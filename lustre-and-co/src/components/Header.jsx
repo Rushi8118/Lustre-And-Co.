@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { Heart, Menu, Search, ShoppingBag, UserRound, X, ChevronDown, Clock, TrendingUp, Sparkles, ArrowRight, Loader2 } from "lucide-react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useStore } from "../context/StoreContext";
 import { useSettings } from "../context/SettingsContext";
 import api from "../services/api";
@@ -30,8 +30,18 @@ const DEFAULT_POPULAR_SEARCHES = [
 
 export default function Header() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { cartCount, wishlist, user } = useStore();
   const { settings, categories } = useSettings();
+
+  const currentPathWithSearch = location.pathname + location.search;
+  const isAuthPage = location.pathname.startsWith("/account/login") || location.pathname.startsWith("/account/signup");
+  const accountLinkTo = user
+    ? "/account"
+    : isAuthPage
+    ? "/account/login"
+    : `/account/login?redirect=${encodeURIComponent(currentPathWithSearch)}`;
+  const accountLinkState = !user && !isAuthPage ? { from: currentPathWithSearch } : undefined;
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [condensed, setCondensed] = useState(false);
@@ -199,7 +209,8 @@ export default function Header() {
 
             <Link
               className="icon-button"
-              to={user ? "/account" : "/account/login"}
+              to={accountLinkTo}
+              state={accountLinkState}
               aria-label={user ? "Your account" : "Sign in"}
             >
               <UserRound size={19} />
