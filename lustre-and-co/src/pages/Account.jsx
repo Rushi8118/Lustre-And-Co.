@@ -35,6 +35,7 @@ import { useStore } from "../context/StoreContext";
 import { useSettings } from "../context/SettingsContext";
 import { formatPrice } from "../data/products";
 import api, { getErrorMessage } from "../services/api";
+import SmartImage from "../components/SmartImage";
 
 const blankAddress = {
   fullName: "",
@@ -258,7 +259,7 @@ export default function Account() {
             <div className="order-thumbnails-group">
               {order.items.map((item, idx) => (
                 <div key={idx} className="order-thumb-wrap" title={item.name}>
-                  <img src={item.image} alt={item.name} />
+                  <SmartImage src={item.image} alt={item.name} width={180} />
                   {item.quantity > 1 && <span className="order-qty-pill">x{item.quantity}</span>}
                 </div>
               ))}
@@ -292,7 +293,7 @@ export default function Account() {
             <div className="order-full-items-table">
               {order.items.map((item, idx) => (
                 <div key={idx} className="order-item-row">
-                  <img src={item.image} alt={item.name} className="order-item-thumb" />
+                  <SmartImage src={item.image} alt={item.name} width={180} className="order-item-thumb" />
                   <div className="order-item-info">
                     <h4>{item.name}</h4>
                     <span className="order-item-variant">
@@ -557,7 +558,7 @@ export default function Account() {
                         {wishlist.slice(0, 4).map((piece) => (
                           <div key={piece.slug} className="account-wishlist-item">
                             <div className="wishlist-thumb-box">
-                              <img src={piece.image} alt={piece.name} />
+                              <SmartImage src={piece.image} alt={piece.name} width={300} />
                             </div>
                             <div className="wishlist-item-meta">
                               <h4 className="wishlist-piece-name">{piece.name}</h4>
@@ -632,7 +633,7 @@ export default function Account() {
                     {wishlist.map((piece) => (
                       <div key={piece.slug} className="account-card wishlist-full-card">
                         <Link to={`/product/${piece.slug}`}>
-                          <img src={piece.image} alt={piece.name} className="wishlist-card-img" />
+                          <SmartImage src={piece.image} alt={piece.name} width={400} className="wishlist-card-img" />
                         </Link>
                         <div className="wishlist-card-body">
                           <h4>{piece.name}</h4>

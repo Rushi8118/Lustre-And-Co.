@@ -29,6 +29,7 @@ import { trackView, getProductRecommendations } from "../services/recommendation
 import RecommendationSection from "../components/RecommendationSection";
 import BackInStockForm from "../components/BackInStockForm";
 import SizeGuideModal from "../components/SizeGuideModal";
+import SmartImage from "../components/SmartImage";
 
 function parseDayRange(text, fallback) {
   const numbers = String(text || "").match(/\d+/g);
@@ -101,7 +102,12 @@ export default function ProductDetails() {
   async function loadReviews(productSlug) {
     try {
       const { data } = await api.get(`/products/${productSlug}/reviews`);
-      setReviewData(data);
+      // Normalise here so every consumer below can assume arrays; an unexpected
+      // payload must not take the whole product page down with it.
+      setReviewData({
+        reviews: Array.isArray(data?.reviews) ? data.reviews : [],
+        distribution: Array.isArray(data?.distribution) ? data.distribution : []
+      });
     } catch {
       setReviewData({ reviews: [], distribution: [] });
     }
@@ -114,6 +120,8 @@ export default function ProductDetails() {
     setQuantity(1);
     setReviewMessage(null);
 
+    let productLoaded = false;
+
     (async () => {
       try {
         const { data } = await api.get(`/products/${slug}`);
@@ -123,6 +131,7 @@ export default function ProductDetails() {
         setSelectedColor(loaded.availableColors?.[0] || "Gold");
         setSelectedSize(loaded.availableSizes?.[0] || "");
         setStatus("ready");
+        productLoaded = true;
 
         // Track view and load secondary data in parallel
         const [relatedRes, recsRes] = await Promise.allSettled([
@@ -144,13 +153,19 @@ export default function ProductDetails() {
         trackView(loaded.id);
 
         if (!active) return;
-        if (relatedRes.status === "fulfilled") {
+        // Related products are a nice-to-have. A missing or oddly shaped response
+        // must not throw here, because the catch below would discard the product
+        // that already loaded and show the error page instead.
+        if (relatedRes.status === "fulfilled" && Array.isArray(relatedRes.value?.data)) {
           const items = relatedRes.value.data.map(normalizeProduct);
           setRelated(items);
           setSelectedBundleIds(items.slice(0, 3).map((item) => item.slug));
         }
       } catch (err) {
-        if (active) setStatus(err.response?.status === 404 ? "not-found" : "error");
+        // Once the product itself is on screen, keep it there; only a failure to
+        // fetch the product at all should surface the not-found/error states.
+        if (!active || productLoaded) return;
+        setStatus(err.response?.status === 404 ? "not-found" : "error");
       }
     })();
 
@@ -166,6 +181,15 @@ export default function ProductDetails() {
     const to = new Date(Date.now() + end * 86400000).toLocaleDateString("en-US", opts);
     return `${from} – ${to}`;
   }, [commerce.standardDelivery]);
+
+  // `material` and `finish` are both optional on the admin product form, so a piece
+  // created without them must still render this panel instead of white-screening.
+  const materialSummary = [
+    product?.material,
+    product?.finish ? `with a ${product.finish.toLowerCase()} finish` : null
+  ]
+    .filter(Boolean)
+    .join(" ") || "Material details coming soon.";
 
   if (status === "loading") {
     return (
@@ -347,9 +371,11 @@ export default function ProductDetails() {
                 )}
 
                 <div className="pdp-zoom-viewport">
-                  <img
+                  <SmartImage
                     src={gallery[activeImage]}
-                    alt={`${product.name} - View ${activeImage + 1}`}
+                    alt={`${product.name} - View ${activeImage + 1} of ${gallery.length}`}
+                    width={1200}
+                    priority
                     className="pdp-main-image"
                     style={{
                       transform: isZoomed ? "scale(2.2)" : "scale(1)",
@@ -406,7 +432,7 @@ export default function ProductDetails() {
                       onClick={() => setActiveImage(index)}
                       aria-label={`View image ${index + 1}`}
                     >
-                      <img src={imgUrl} alt={`${product.name} thumbnail ${index + 1}`} />
+                      <SmartImage src={imgUrl} alt="" width={160} />
                     </button>
                   ))}
                 </div>
@@ -757,7 +783,7 @@ export default function ProductDetails() {
 
                 <Accordion title="Material and Care" open={openAccordions.material} onToggle={() => toggleAccordion("material")}>
                   <p className="pdp-care-intro">
-                    {product.material} with a {product.finish.toLowerCase()} finish.
+                    {materialSummary}
                   </p>
                   {product.care?.length > 0 ? (
                     <ul className="pdp-care-list">
@@ -970,7 +996,7 @@ export default function ProductDetails() {
               <div className="pdp-bundle-items-grid">
                 <div className="pdp-bundle-card is-anchor">
                   <div className="pdp-bundle-thumb">
-                    <img src={gallery[0]} alt={product.name} />
+                    <SmartImage src={gallery[0]} alt={product.name} width={300} />
                     <span className="pdp-bundle-tag">This Piece</span>
                   </div>
                   <div className="pdp-bundle-info">
@@ -993,7 +1019,7 @@ export default function ProductDetails() {
                       onClick={() => toggleBundleItem(item.slug)}
                     >
                       <div className="pdp-bundle-thumb">
-                        <img src={item.image} alt={item.name} />
+                        <SmartImage src={item.image} alt={item.name} width={300} />
                         <button
                           type="button"
                           className={`pdp-bundle-checkbox ${isSelected ? "checked" : ""}`}
@@ -1092,7 +1118,7 @@ export default function ProductDetails() {
       <aside className="pdp-sticky-mobile-bar" aria-label="Quick Add to Bag">
         <div className="sticky-bar-inner">
           <div className="sticky-product-info">
-            <img src={gallery[0]} alt={product.name} className="sticky-product-thumb" />
+            <SmartImage src={gallery[0]} alt="" width={140} className="sticky-product-thumb" />
             <div className="sticky-product-text">
               <span className="sticky-product-title">{product.name}</span>
               <div className="sticky-price-row">

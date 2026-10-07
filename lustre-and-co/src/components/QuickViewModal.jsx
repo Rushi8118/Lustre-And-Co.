@@ -13,6 +13,7 @@ import {
   Sparkles
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import SmartImage from "./SmartImage";
 import { formatPrice } from "../data/products";
 import { useStore } from "../context/StoreContext";
 
@@ -139,7 +140,7 @@ export default function QuickViewModal({ product, isOpen, onClose }) {
                         onClick={() => setActiveImageIndex(idx)}
                         aria-label={`View image ${idx + 1}`}
                       >
-                        <img src={img} alt="" />
+                        <SmartImage src={img} alt="" width={700} />
                       </button>
                     ))}
                   </div>

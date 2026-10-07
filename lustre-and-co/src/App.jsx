@@ -1,8 +1,9 @@
 import { lazy, Suspense } from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ScrollToTop from "./components/ScrollToTop";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 const Home = lazy(() => import("./pages/Home"));
 const CatalogPage = lazy(() => import("./pages/CatalogPage"));
@@ -32,9 +33,12 @@ import useAnalyticsTracking from "./hooks/useAnalyticsTracking";
 export default function App() {
   useReferralTracking();
   useAnalyticsTracking();
+  const location = useLocation();
   return (
     <>
       <ScrollToTop />
+      {/* Keyed on the path so navigating away from a broken page clears the notice. */}
+      <ErrorBoundary resetKey={location.pathname}>
       <Suspense fallback={<div className="route-loading" aria-busy="true" />}>
       <Routes>
         <Route element={<Layout />}>
@@ -83,6 +87,7 @@ export default function App() {
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
       </Suspense>
+      </ErrorBoundary>
     </>
   );
 }

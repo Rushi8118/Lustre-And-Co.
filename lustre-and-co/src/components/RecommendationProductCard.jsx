@@ -1,6 +1,7 @@
 // lustre-and-co/src/components/RecommendationProductCard.jsx
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import SmartImage from "./SmartImage";
 import { ShoppingBag, Heart, Eye } from "lucide-react";
 import { formatPrice } from "../data/products";
 import { trackRecommendationEvent } from "../services/recommendations";
@@ -72,9 +73,10 @@ export default function RecommendationProductCard({
       >
         <div className="rec-card-image-wrap">
           {product.image ? (
-            <img
+            <SmartImage
               src={product.image}
               alt={product.name}
+              width={400}
               className="rec-card-image"
               loading="lazy"
             />

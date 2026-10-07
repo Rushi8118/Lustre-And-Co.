@@ -28,12 +28,12 @@ export const products = [
     dateAdded: "2026-09-14",
     tags: ["new", "bestseller", "bridal", "everyday"],
     image:
-      "https://images.unsplash.com/photo-1599643477877-530eb83abc8e?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1620291699655-d958150a3ff8?auto=format&fit=crop&w=1200&q=85",
     gallery: [
-      "https://images.unsplash.com/photo-1599643477877-530eb83abc8e?auto=format&fit=crop&w=1200&q=85",
-      "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=1200&q=85",
-      "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1200&q=85",
-      "https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=1200&q=85"
+      "https://images.unsplash.com/photo-1620291699655-d958150a3ff8?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1669814697728-17d16bcfd80a?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1616837874254-8d5aaa63e273?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1631050165155-421c47e306f7?auto=format&fit=crop&w=1200&q=85"
     ],
     description:
       "The Aurora Gold-Plated Necklace captures luminous warmth with an elegantly sculpted pendant on a delicate chain. Finished with a protective 18K micro-gold coating, it brings effortless poise to both daily styling and special celebrations.",
@@ -128,10 +128,12 @@ export const products = [
     dateAdded: "2026-09-01",
     tags: ["new", "bestseller", "bridal"],
     image:
-      "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1611653842967-39eb011b2ca3?auto=format&fit=crop&w=1200&q=85",
     gallery: [
-      "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=1200&q=85",
-      "https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=1200&q=85"
+      "https://images.unsplash.com/photo-1611653842967-39eb011b2ca3?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1590166223826-12dee1677420?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1615197419794-52a6f5da9df0?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1682823544433-aae34df4e3da?auto=format&fit=crop&w=1200&q=85"
     ],
     description:
       "A graceful pair of pearl drop earrings designed to add soft shine to everyday outfits and occasion looks.",
@@ -162,10 +164,12 @@ export const products = [
     dateAdded: "2026-09-12",
     tags: ["new", "bestseller"],
     image:
-      "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1200&q=85",
     gallery: [
-      "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=1200&q=85",
-      "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1200&q=85"
+      "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1635767798638-3e25273a8236?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1601821765780-754fa98637c1?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1585960622850-ed33c41d6418?auto=format&fit=crop&w=1200&q=85"
     ],
     description:
       "A refined layered necklace that creates an effortless styling moment with a single convenient clasp.",
@@ -196,10 +200,12 @@ export const products = [
     dateAdded: "2026-09-08",
     tags: ["new", "sale"],
     image:
-      "https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?auto=format&fit=crop&w=1200&q=85",
     gallery: [
-      "https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=1200&q=85",
-      "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=1200&q=85"
+      "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1561812350-932aed735105?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1612285127323-1837364f9da0?auto=format&fit=crop&w=1200&q=85"
     ],
     description:
       "A softly sculpted ring with a rose-gold finish and a luminous brilliant-cut center stone.",
@@ -230,10 +236,12 @@ export const products = [
     dateAdded: "2026-08-28",
     tags: ["bestseller", "sale", "bridal"],
     image:
-      "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1763029513623-37d488cb97b1?auto=format&fit=crop&w=1200&q=85",
     gallery: [
-      "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1200&q=85",
-      "https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=1200&q=85"
+      "https://images.unsplash.com/photo-1763029513623-37d488cb97b1?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1663568675454-ecd65012d8f0?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1570891836868-673ee4818f81?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1643047888248-a1d943df1c33?auto=format&fit=crop&w=1200&q=85"
     ],
     description:
       "A luminous tennis bracelet with closely prong-set stones for a sophisticated celebration aesthetic.",
@@ -264,10 +272,12 @@ export const products = [
     dateAdded: "2026-08-15",
     tags: ["bridal", "bestseller"],
     image:
-      "https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?auto=format&fit=crop&w=1200&q=85",
     gallery: [
-      "https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=1200&q=85",
-      "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=1200&q=85"
+      "https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1601121141418-c1caa10a2a0b?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1617633150878-7df1d12a9a57?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1594140700783-f9e70c7abc25?auto=format&fit=crop&w=1200&q=85"
     ],
     description:
       "A regal bridal choker featuring intricate foil-set kundan stonework and clustered pearl droplets.",
@@ -298,10 +308,12 @@ export const products = [
     dateAdded: "2026-09-05",
     tags: ["bridal", "sale", "festive"],
     image:
-      "https://images.unsplash.com/photo-1596944924616-7b38e7cfac36?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1651160670627-2896ddf7822f?auto=format&fit=crop&w=1200&q=85",
     gallery: [
-      "https://images.unsplash.com/photo-1596944924616-7b38e7cfac36?auto=format&fit=crop&w=1200&q=85",
-      "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=1200&q=85"
+      "https://images.unsplash.com/photo-1651160670627-2896ddf7822f?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1778148046574-c1509f5a40d4?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1714733831162-0a6e849141be?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1652374968229-a66a1c170c04?auto=format&fit=crop&w=1200&q=85"
     ],
     description:
       "Sculpted crescent chandbali earrings adorned with rhythmic pearl fringing and sparkling stones.",
@@ -332,10 +344,12 @@ export const products = [
     dateAdded: "2026-08-20",
     tags: ["bridal", "new", "festive"],
     image:
-      "https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1611107683227-e9060eccd846?auto=format&fit=crop&w=1200&q=85",
     gallery: [
-      "https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=1200&q=85",
-      "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1200&q=85"
+      "https://images.unsplash.com/photo-1611107683227-e9060eccd846?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1690175867343-2af70ea57537?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1655707063473-3ee2e5b5eeb8?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1655707063092-5c4509de41b8?auto=format&fit=crop&w=1200&q=85"
     ],
     description:
       "A coordinated set of four slim textured bangles that shimmer with every wrist movement.",
@@ -366,10 +380,12 @@ export const products = [
     dateAdded: "2026-09-11",
     tags: ["new", "sale"],
     image:
-      "https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1727859350557-3e4bd9bf1827?auto=format&fit=crop&w=1200&q=85",
     gallery: [
-      "https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=1200&q=85",
-      "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1200&q=85"
+      "https://images.unsplash.com/photo-1727859350557-3e4bd9bf1827?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1618713041735-adb0de8316ea?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1721103428054-6bcf4f655594?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1704203355458-b36cb43eacf8?auto=format&fit=crop&w=1200&q=85"
     ],
     description:
       "A delicate station bracelet alternating lustrous imitation pearls with warm rose-gold links.",
@@ -400,10 +416,12 @@ export const products = [
     dateAdded: "2026-09-03",
     tags: ["bestseller", "sale"],
     image:
-      "https://images.unsplash.com/photo-1630019852942-f89202989a59?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=1200&q=85",
     gallery: [
-      "https://images.unsplash.com/photo-1630019852942-f89202989a59?auto=format&fit=crop&w=1200&q=85",
-      "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=1200&q=85"
+      "https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1631982681280-8ca46226a5c9?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1671644730555-916aa8d8157f?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1698259947669-82602bc3a702?auto=format&fit=crop&w=1200&q=85"
     ],
     description:
       "Tubular sculpted chunky hoops that transition effortlessly from day styling to dinner dates.",
@@ -434,10 +452,12 @@ export const products = [
     dateAdded: "2026-08-25",
     tags: ["sale"],
     image:
-      "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1705326455036-0fab8ecba04d?auto=format&fit=crop&w=1200&q=85",
     gallery: [
-      "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=1200&q=85",
-      "https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=1200&q=85"
+      "https://images.unsplash.com/photo-1705326455036-0fab8ecba04d?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1636834669718-ef9228592ac7?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1612285127323-1837364f9da0?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1758362197676-228703a17e69?auto=format&fit=crop&w=1200&q=85"
     ],
     description:
       "A minimalist oval-face signet ring with a lustrous flat plate ready to stack or wear solo.",
@@ -468,10 +488,12 @@ export const products = [
     dateAdded: "2026-09-13",
     tags: ["new", "party"],
     image:
-      "https://images.unsplash.com/photo-1599643477877-530eb83abc8e?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1583937443351-f2f669fbe2cf?auto=format&fit=crop&w=1200&q=85",
     gallery: [
+      "https://images.unsplash.com/photo-1583937443351-f2f669fbe2cf?auto=format&fit=crop&w=1200&q=85",
       "https://images.unsplash.com/photo-1599643477877-530eb83abc8e?auto=format&fit=crop&w=1200&q=85",
-      "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=1200&q=85"
+      "https://images.unsplash.com/photo-1705575554647-4dfba6d7cdd5?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1632325707710-2bce161b7642?auto=format&fit=crop&w=1200&q=85"
     ],
     description:
       "A rich emerald-green simulated gem surrounded by a brilliant halo of micro-pave stones on a rhodium-toned chain.",
@@ -502,10 +524,12 @@ export const products = [
     dateAdded: "2026-08-10",
     tags: ["festive", "sale"],
     image:
-      "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1611955167811-4711904bb9f8?auto=format&fit=crop&w=1200&q=85",
     gallery: [
-      "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?auto=format&fit=crop&w=1200&q=85",
-      "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=1200&q=85"
+      "https://images.unsplash.com/photo-1611955167811-4711904bb9f8?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1758362197676-228703a17e69?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1636834669718-ef9228592ac7?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1561812350-932aed735105?auto=format&fit=crop&w=1200&q=85"
     ],
     description:
       "An ornate dome ring showcasing intricate jaali filigree work inspired by heritage royal jewelry.",
@@ -536,10 +560,12 @@ export const products = [
     dateAdded: "2026-09-10",
     tags: ["new", "party"],
     image:
-      "https://images.unsplash.com/photo-1611591475152-4783113828af?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1681091639096-a7b2eb1d4990?auto=format&fit=crop&w=1200&q=85",
     gallery: [
-      "https://images.unsplash.com/photo-1611591475152-4783113828af?auto=format&fit=crop&w=1200&q=85",
-      "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1200&q=85"
+      "https://images.unsplash.com/photo-1681091639096-a7b2eb1d4990?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1724896728449-fae038f93e59?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1659806403693-97e7df5e8770?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1607599015062-15f00bc68fa8?auto=format&fit=crop&w=1200&q=85"
     ],
     description:
       "A modern sculpted open cuff featuring textured hammer marks that capture and bounce the light.",
@@ -570,10 +596,12 @@ export const products = [
     dateAdded: "2026-08-18",
     tags: ["festive", "bestseller", "bridal"],
     image:
-      "https://images.unsplash.com/photo-1596944924616-7b38e7cfac36?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1728381031272-ba3f537feadd?auto=format&fit=crop&w=1200&q=85",
     gallery: [
-      "https://images.unsplash.com/photo-1596944924616-7b38e7cfac36?auto=format&fit=crop&w=1200&q=85",
-      "https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=1200&q=85"
+      "https://images.unsplash.com/photo-1728381031272-ba3f537feadd?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1679156271456-d6068c543ee7?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1611598935678-c88dca238fce?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1690175867343-2af70ea57537?auto=format&fit=crop&w=1200&q=85"
     ],
     description:
       "Substantial antique-toned temple kadas featuring floral motifs and ruby-colored cabochon stones.",
@@ -604,10 +632,12 @@ export const products = [
     dateAdded: "2026-09-02",
     tags: ["everyday", "sale"],
     image:
-      "https://images.unsplash.com/photo-1630019852942-f89202989a59?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1588444650733-d0767b753fc8?auto=format&fit=crop&w=1200&q=85",
     gallery: [
-      "https://images.unsplash.com/photo-1630019852942-f89202989a59?auto=format&fit=crop&w=1200&q=85",
-      "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=1200&q=85"
+      "https://images.unsplash.com/photo-1588444650733-d0767b753fc8?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1693212793204-bcea856c75fe?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1632525230528-ec17c49bc168?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1630019852942-f89202989a59?auto=format&fit=crop&w=1200&q=85"
     ],
     description:
       "Crisp round brilliant studs with sparkling simulated diamonds set in a secure basket setting.",
@@ -638,10 +668,12 @@ export const products = [
     dateAdded: "2026-08-29",
     tags: ["everyday", "sale"],
     image:
-      "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1625908733875-efa9c75c084d?auto=format&fit=crop&w=1200&q=85",
     gallery: [
-      "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=1200&q=85",
-      "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1200&q=85"
+      "https://images.unsplash.com/photo-1625908733875-efa9c75c084d?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1602173574767-37ac01994b2a?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1616837874254-8d5aaa63e273?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1635767798638-3e25273a8236?auto=format&fit=crop&w=1200&q=85"
     ],
     description:
       "A classic French rope chain with fluid movement, diamond-cut spirals, and a bold stand-alone silhouette.",
@@ -672,10 +704,12 @@ export const products = [
     dateAdded: "2026-09-04",
     tags: ["bridal", "festive"],
     image:
-      "https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1652374968229-a66a1c170c04?auto=format&fit=crop&w=1200&q=85",
     gallery: [
-      "https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=1200&q=85",
-      "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1200&q=85"
+      "https://images.unsplash.com/photo-1652374968229-a66a1c170c04?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1610276347467-2f3a6053d297?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1721807644561-9efcabee5c42?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1600685890506-593fdf55949b?auto=format&fit=crop&w=1200&q=85"
     ],
     description:
       "A magnificent bridal choker set with uncut polki imitation stones, emerald glass drops, and matching earrings.",
@@ -706,10 +740,12 @@ export const products = [
     dateAdded: "2026-08-22",
     tags: ["bridal", "festive", "sale"],
     image:
-      "https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1617191880362-aac615de3c26?auto=format&fit=crop&w=1200&q=85",
     gallery: [
-      "https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=1200&q=85",
-      "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1200&q=85"
+      "https://images.unsplash.com/photo-1617191880362-aac615de3c26?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1611598935678-c88dca238fce?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1599475704929-b544d0afe078?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1679156271456-d6068c543ee7?auto=format&fit=crop&w=1200&q=85"
     ],
     description:
       "Festive wedding bangles studded with floral kundan rosettes and tiny maroon micro-beads.",

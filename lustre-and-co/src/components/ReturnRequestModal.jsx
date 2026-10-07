@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { checkReturnEligibility, createReturnRequest } from "../services/returns";
 import { formatPrice } from "../data/products";
+import SmartImage from "./SmartImage";
 
 export default function ReturnRequestModal({
   orderId,
@@ -405,9 +406,10 @@ export default function ReturnRequestModal({
                         />
 
                         {item.image && (
-                          <img
+                          <SmartImage
                             src={item.image}
                             alt={item.name}
+                            width={120}
                             style={{
                               width: "56px",
                               height: "56px",
@@ -625,7 +627,7 @@ export default function ReturnRequestModal({
                       >
                         <img
                           src={src}
-                          alt="Proof"
+                          alt={`Uploaded photo ${idx + 1} supporting this return`}
                           style={{ width: "100%", height: "100%", objectFit: "cover" }}
                         />
                         <button

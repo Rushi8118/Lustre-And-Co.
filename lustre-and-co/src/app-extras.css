@@ -4216,3 +4216,15 @@
     transition: none;
   }
 }
+
+/* ---------------------------------------------------------------
+   SmartImage fallback
+   A placeholder stands in when a product image is missing or fails
+   to load. `contain` keeps the mark centred instead of cropping it
+   the way `cover` does for real photography.
+   --------------------------------------------------------------- */
+.is-image-fallback {
+  object-fit: contain !important;
+  background: var(--beige, #f4efe9);
+  padding: 8%;
+}

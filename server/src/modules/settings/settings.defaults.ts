@@ -72,7 +72,7 @@ export const DEFAULT_SETTINGS = {
       ctaLabel: 'Explore bridal',
       ctaLink: '/collections/bridal',
       image:
-        'https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=1300&q=85',
+        'https://images.unsplash.com/photo-1617633150878-7df1d12a9a57?auto=format&fit=crop&w=1300&q=85',
     },
     promo: {
       enabled: true,
@@ -83,7 +83,7 @@ export const DEFAULT_SETTINGS = {
       ctaLabel: 'Shop the Offer',
       ctaLink: '/shop',
       image:
-        'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=1200&q=85',
+        'https://images.unsplash.com/photo-1585960622850-ed33c41d6418?auto=format&fit=crop&w=1200&q=85',
       tagTitle: 'LUSTRE20',
       tagText: '20% off orders above ₹1,999',
     },

@@ -3,6 +3,7 @@ import { ArrowRight, Truck, RotateCcw, ShieldCheck, Sparkles, Gift } from "lucid
 import { motion } from "framer-motion";
 import { useSettings } from "../context/SettingsContext";
 import { formatPrice } from "../data/products";
+import SmartImage from "./SmartImage";
 
 export default function PromotionalBanner({ className = "" }) {
   const { settings } = useSettings();
@@ -89,7 +90,7 @@ export default function PromotionalBanner({ className = "" }) {
 
             <div className="promo-banner-visual">
               <div className="promo-image-wrapper">
-                <img src={promo.image} alt={promo.heading} className="promo-image" loading="lazy" />
+                <SmartImage src={promo.image} alt="" width={900} className="promo-image" />
 
                 {promo.tagTitle && (
                   <div className="promo-floating-tag">
