@@ -21,11 +21,7 @@ import api, { getErrorMessage } from "../services/api";
 import { payOrderOnline } from "../services/payments";
 import useInventoryReservation from "../hooks/useInventoryReservation";
 import ShippingRateSelector from "../components/ShippingRateSelector";
-<<<<<<< HEAD
-import SafeImage from "../components/SafeImage";
-=======
 import SmartImage from "../components/SmartImage";
->>>>>>> origin/main
 
 const COUNTRIES = ["India", "United States", "United Kingdom", "Canada", "Australia", "United Arab Emirates", "Singapore"];
 
@@ -415,11 +411,7 @@ export default function Checkout() {
                     <div className="checkout-summary-items-list">
                       {cart.map((item) => (
                         <div key={item.id} className="checkout-mini-item">
-<<<<<<< HEAD
-                          <SafeImage src={item.product.image} alt={item.product.name} category={item.product.category} />
-=======
                           <SmartImage src={item.product.image} alt={item.product.name} width={160} />
->>>>>>> origin/main
                           <div className="checkout-mini-item-info">
                             <h5>{item.product.name}</h5>
                             <span>
@@ -828,11 +820,7 @@ export default function Checkout() {
                         <div className="review-items-list">
                           {cart.map((item) => (
                             <div key={item.id} className="review-item-row">
-<<<<<<< HEAD
-                              <SafeImage src={item.product.image} alt={item.product.name} category={item.product.category} />
-=======
                               <SmartImage src={item.product.image} alt={item.product.name} width={160} />
->>>>>>> origin/main
                               <div className="review-item-details">
                                 <h5>{item.product.name}</h5>
                                 <span>
@@ -952,11 +940,7 @@ export default function Checkout() {
                       {cart.map((item) => (
                         <div key={item.id} className="checkout-sidebar-item">
                           <div className="item-thumb-wrap">
-<<<<<<< HEAD
-                            <SafeImage src={item.product.image} alt={item.product.name} category={item.product.category} />
-=======
                             <SmartImage src={item.product.image} alt={item.product.name} width={160} />
->>>>>>> origin/main
                             <span className="item-qty-badge">{item.quantity}</span>
                           </div>
                           <div className="item-info">
@@ -1057,4 +1041,3 @@ export function CheckoutRecoveryEmail({
     </div>
   );
 }
-

@@ -7,11 +7,7 @@ import SectionHeading from "../components/SectionHeading";
 import ProductGrid from "../components/ProductGrid";
 import PromotionalBanner from "../components/PromotionalBanner";
 import WhyShopWithUs from "../components/WhyShopWithUs";
-<<<<<<< HEAD
-import SafeImage from "../components/SafeImage";
-=======
 import SmartImage from "../components/SmartImage";
->>>>>>> origin/main
 import { useSettings } from "../context/SettingsContext";
 import { useStore } from "../context/StoreContext";
 
@@ -129,11 +125,7 @@ export default function Home() {
                   transition={{ delay: index * 0.06 }}
                 >
                   <Link to={`/category/${category.slug}`}>
-<<<<<<< HEAD
-                    {category.image && <SafeImage src={category.image} alt={category.name} category={category.slug} loading="lazy" />}
-=======
-                    <SmartImage src={category.image} alt="" width={520} priority={index < 3} />
->>>>>>> origin/main
+                    {category.image && <SmartImage src={category.image} alt={category.name} width={520} priority={index < 3} />}
                     <div className="category-card-overlay">
                       <h3>{category.name}</h3>
                       <span>Explore collection →</span>
@@ -176,11 +168,7 @@ export default function Home() {
 
             {editorial.image && (
               <div className="editorial-banner-image">
-<<<<<<< HEAD
-                <SafeImage src={editorial.image} alt={editorial.eyebrow} loading="lazy" />
-=======
-                <SmartImage src={editorial.image} alt="" width={900} />
->>>>>>> origin/main
+                <SmartImage src={editorial.image} alt={editorial.eyebrow} width={900} />
               </div>
             )}
           </div>

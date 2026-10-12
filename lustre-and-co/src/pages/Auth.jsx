@@ -134,6 +134,9 @@ export default function Auth({ mode = "login" }) {
   const { user, authReady, login, register, completeSignIn } = useStore();
   const { settings } = useSettings();
   const storeName = settings.store.name;
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isVerifying2FA, setIsVerifying2FA] = useState(false);
+  const googleStatus = new URLSearchParams(location.search).get("google");
 
   // Persist any target found in query or router state so it survives OAuth or toggling
   useEffect(() => {
@@ -171,17 +174,22 @@ export default function Auth({ mode = "login" }) {
 
   // If already logged in, redirect immediately to targeted page or home
   useEffect(() => {
-    if (authReady && user) {
+    if (
+      authReady &&
+      user &&
+      !isSubmitting &&
+      !isVerifying2FA &&
+      googleStatus !== "success"
+    ) {
       const role = user.role || "";
       const isStaffOrAdmin = ["owner", "manager", "catalog-manager", "order-manager", "support-agent", "marketing-manager", "accountant", "admin"].includes(role);
       const target = resolveRedirectTarget(location, isStaffOrAdmin);
       navigate(target, { replace: true });
     }
-  }, [user, authReady, navigate, location]);
+  }, [user, authReady, navigate, location, isSubmitting, isVerifying2FA, googleStatus]);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
-    const googleStatus = searchParams.get("google");
 
     if (googleStatus === "error") {
       setFormError(searchParams.get("message") || "Google sign-in was cancelled or failed.");
@@ -217,16 +225,13 @@ export default function Auth({ mode = "login" }) {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState("");
   const [agreed, setAgreed] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "" });
   const [touched, setTouched] = useState({});
-
   // 2FA state
   const [twoFactorData, setTwoFactorData] = useState(null);
   const [twoFactorCode, setTwoFactorCode] = useState("");
-  const [isVerifying2FA, setIsVerifying2FA] = useState(false);
   const [twoFactorError, setTwoFactorError] = useState("");
 
   const strength = useMemo(() => getPasswordStrength(form.password), [form.password]);
