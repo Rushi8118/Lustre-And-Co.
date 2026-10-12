@@ -8,6 +8,7 @@ import { useSettings } from "../context/SettingsContext";
 import api, { getErrorMessage } from "../services/api";
 import { payOrderOnline } from "../services/payments";
 import { getInvoiceHtmlUrl, openDocumentInNewTab } from "../services/documents";
+import SmartImage from "../components/SmartImage";
 
 export default function OrderConfirmation() {
   const { orderId } = useParams();
@@ -168,7 +169,7 @@ export default function OrderConfirmation() {
                   {order.items.map((item, idx) => (
                     <div className="confirmation-item-row" key={`${item.productId}-${idx}`}>
                       <div className="item-image-frame">
-                        <img src={item.image} alt={item.name} />
+                        <SmartImage src={item.image} alt={item.name} width={180} />
                         <span className="item-quantity-pill">×{item.quantity}</span>
                       </div>
                       <div className="item-details-box">

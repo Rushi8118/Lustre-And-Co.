@@ -20,7 +20,11 @@ import { useSettings } from "../context/SettingsContext";
 import ProductCard from "../components/ProductCard";
 import RecommendationSection from "../components/RecommendationSection";
 import { getCartRecommendations } from "../services/recommendations";
+<<<<<<< HEAD
 import SafeImage from "../components/SafeImage";
+=======
+import SmartImage from "../components/SmartImage";
+>>>>>>> origin/main
 
 export default function Cart() {
   const navigate = useNavigate();
@@ -192,12 +196,16 @@ export default function Cart() {
                       return (
                         <article className="cart-item-card" key={item.id} id={`cart-item-${item.id}`}>
                           <Link to={`/product/${prod.slug}`} className="cart-item-image-wrap">
+<<<<<<< HEAD
                             <SafeImage
                               src={prod.image}
                               alt={prod.name}
                               category={prod.category}
                               className="cart-item-image"
                             />
+=======
+                            <SmartImage src={prod.image} alt={prod.name} width={200} className="cart-item-image" />
+>>>>>>> origin/main
                           </Link>
 
                           <div className="cart-item-content">

@@ -3,6 +3,7 @@ import { Check, Sparkles, AlertCircle, ShoppingBag, Calculator } from "lucide-re
 import { formatPrice } from "../data/products";
 import { addBundleToCart, validateBundle } from "../services/bundles";
 import { useStore } from "../context/StoreContext";
+import SmartImage from "./SmartImage";
 
 export default function MixAndMatchBundle({ bundle, cartId: propCartId, onAdded }) {
   const { cartId: storeCartId, showToast } = useStore();
@@ -150,9 +151,10 @@ export default function MixAndMatchBundle({ bundle, cartId: propCartId, onAdded 
 
               {item.product?.image ? (
                 <div className="mix-img-wrapper">
-                  <img
+                  <SmartImage
                     src={item.product.image}
                     alt={item.product.name}
+                    width={240}
                     className="mix-product-image"
                   />
                 </div>

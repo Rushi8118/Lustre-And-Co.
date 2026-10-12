@@ -14,6 +14,7 @@ import { formatPrice } from "../data/products";
 import { getBundle, addBundleToCart } from "../services/bundles";
 import { useStore } from "../context/StoreContext";
 import MixAndMatchBundle from "../components/MixAndMatchBundle";
+import SmartImage from "../components/SmartImage";
 
 export default function BundleDetails() {
   const { slug } = useParams();
@@ -108,7 +109,7 @@ export default function BundleDetails() {
   const coverImage =
     bundle.image ||
     items[0]?.product?.image ||
-    "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=800&q=80";
+    "https://images.unsplash.com/photo-1650455221359-3aebf920bcc5?auto=format&fit=crop&w=800&q=80";
 
   async function handleAddToCart() {
     setBusy(true);
@@ -151,9 +152,11 @@ export default function BundleDetails() {
         {/* Media column */}
         <div className="bundle-media-col">
           <div className="bundle-hero-img-wrap">
-            <img
+            <SmartImage
               src={coverImage}
               alt={bundle.name}
+              width={900}
+              priority
               className="bundle-hero-img"
             />
             <div className="bundle-detail-badges">
@@ -211,9 +214,10 @@ export default function BundleDetails() {
               {items.map((item) => (
                 <div key={item.productId || item.id} className="bundle-product-row">
                   {item.product?.image && (
-                    <img
+                    <SmartImage
                       src={item.product.image}
                       alt={item.product.name}
+                      width={240}
                       className="bundle-item-thumb"
                     />
                   )}

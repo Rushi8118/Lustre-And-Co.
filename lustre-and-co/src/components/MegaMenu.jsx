@@ -3,7 +3,7 @@ import { ChevronDown } from "lucide-react";
 import { Link, NavLink } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import { categoryMenuLinks, UTILITY_NAV } from "../data/menuConfig";
-import { imageUrl } from "../utils/image";
+import SmartImage from "./SmartImage";
 
 /** Categories shown in the bar; the rest sit under More so the bar stays one short row. */
 const VISIBLE_CATEGORIES = 7;
@@ -193,7 +193,7 @@ export default function MegaMenu({ categories, showAdmin = false }) {
                 transition={{ duration: 0.4, delay: reduceMotion ? 0 : 0.1 }}
               >
                 <Link to={`/category/${openCategory.slug}`} className="cat-panel-feature" onClick={closeAll}>
-                  <img src={imageUrl(openCategory.image, 800)} alt="" loading="lazy" />
+                  <SmartImage src={openCategory.image} alt="" width={800} />
                   <div>
                     <strong>{openCategory.title || openCategory.name}</strong>
                     {openCategory.description && <span>{openCategory.description}</span>}

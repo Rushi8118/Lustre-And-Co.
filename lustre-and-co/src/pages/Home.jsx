@@ -7,7 +7,11 @@ import SectionHeading from "../components/SectionHeading";
 import ProductGrid from "../components/ProductGrid";
 import PromotionalBanner from "../components/PromotionalBanner";
 import WhyShopWithUs from "../components/WhyShopWithUs";
+<<<<<<< HEAD
 import SafeImage from "../components/SafeImage";
+=======
+import SmartImage from "../components/SmartImage";
+>>>>>>> origin/main
 import { useSettings } from "../context/SettingsContext";
 import { useStore } from "../context/StoreContext";
 
@@ -25,7 +29,10 @@ export default function Home() {
     settings.homepage;
   const { stats, commerce } = settings;
 
-  const homeCategories = categories.filter((category) => category.showOnHome);
+  // The catalog now flags ~30 categories as "show on home", which buries the rest
+  // of the page under a wall of tiles. Show the highest-priority few (sortOrder is
+  // already applied upstream); "Shop all jewelry" in the heading covers the tail.
+  const homeCategories = categories.filter((category) => category.showOnHome).slice(0, 8);
   const newProducts = products.filter((product) => product.tags.includes("new")).slice(0, 4);
   const tagged = products.filter((product) => product.tags.includes("bestseller"));
   const bestProducts = (tagged.length ? tagged : [...products].sort((a, b) => b.salesCount - a.salesCount)).slice(0, 4);
@@ -122,7 +129,11 @@ export default function Home() {
                   transition={{ delay: index * 0.06 }}
                 >
                   <Link to={`/category/${category.slug}`}>
+<<<<<<< HEAD
                     {category.image && <SafeImage src={category.image} alt={category.name} category={category.slug} loading="lazy" />}
+=======
+                    <SmartImage src={category.image} alt="" width={520} priority={index < 3} />
+>>>>>>> origin/main
                     <div className="category-card-overlay">
                       <h3>{category.name}</h3>
                       <span>Explore collection →</span>
@@ -165,7 +176,11 @@ export default function Home() {
 
             {editorial.image && (
               <div className="editorial-banner-image">
+<<<<<<< HEAD
                 <SafeImage src={editorial.image} alt={editorial.eyebrow} loading="lazy" />
+=======
+                <SmartImage src={editorial.image} alt="" width={900} />
+>>>>>>> origin/main
               </div>
             )}
           </div>

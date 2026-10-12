@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Clock, Loader2, Search, Sparkles, TrendingUp, X } from "lucide-react";
 import { Link } from "react-router-dom";
-import { imageUrl } from "../utils/image";
+import SmartImage from "./SmartImage";
 
 /**
  * Search dropdown under the header. Shows product matches, suggestions, recent and
@@ -88,7 +88,7 @@ export default function SearchPanel({
                   <li key={product.id}>
                     <Link to={`/product/${product.slug || product.id}`} onClick={onClose}>
                       {image ? (
-                        <img src={imageUrl(image, 160)} alt="" loading="lazy" />
+                        <SmartImage src={image} alt="" width={160} />
                       ) : (
                         <span className="search-product-thumb-empty" />
                       )}
