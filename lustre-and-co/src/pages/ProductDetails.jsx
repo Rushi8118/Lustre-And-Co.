@@ -27,7 +27,6 @@ import ProductCard from "../components/ProductCard";
 import api, { getErrorMessage } from "../services/api";
 import { trackView, getProductRecommendations } from "../services/recommendations";
 import RecommendationSection from "../components/RecommendationSection";
-import SafeImage from "../components/SafeImage";
 import BackInStockForm from "../components/BackInStockForm";
 import SizeGuideModal from "../components/SizeGuideModal";
 import SmartImage from "../components/SmartImage";
@@ -372,18 +371,11 @@ export default function ProductDetails() {
                 )}
 
                 <div className="pdp-zoom-viewport">
-<<<<<<< HEAD
-                  <SafeImage
-                    src={gallery[activeImage]}
-                    alt={`${product.name} - View ${activeImage + 1}`}
-                    category={product.category}
-=======
                   <SmartImage
                     src={gallery[activeImage]}
                     alt={`${product.name} - View ${activeImage + 1} of ${gallery.length}`}
                     width={1200}
                     priority
->>>>>>> origin/main
                     className="pdp-main-image"
                     style={{
                       transform: isZoomed ? "scale(2.2)" : "scale(1)",
@@ -440,15 +432,7 @@ export default function ProductDetails() {
                       onClick={() => setActiveImage(index)}
                       aria-label={`View image ${index + 1}`}
                     >
-<<<<<<< HEAD
-                      <SafeImage
-                        src={imgUrl}
-                        alt={`${product.name} thumbnail ${index + 1}`}
-                        category={product.category}
-                      />
-=======
-                      <SmartImage src={imgUrl} alt="" width={160} />
->>>>>>> origin/main
+                      <SmartImage src={imgUrl} alt={`${product.name} thumbnail ${index + 1}`} width={160} />
                     </button>
                   ))}
                 </div>
@@ -1015,11 +999,7 @@ export default function ProductDetails() {
               <div className="pdp-bundle-items-grid">
                 <div className="pdp-bundle-card is-anchor">
                   <div className="pdp-bundle-thumb">
-<<<<<<< HEAD
-                    <SafeImage src={gallery[0]} alt={product.name} category={product.category} />
-=======
                     <SmartImage src={gallery[0]} alt={product.name} width={300} />
->>>>>>> origin/main
                     <span className="pdp-bundle-tag">This Piece</span>
                   </div>
                   <div className="pdp-bundle-info">
@@ -1042,11 +1022,7 @@ export default function ProductDetails() {
                       onClick={() => toggleBundleItem(item.slug)}
                     >
                       <div className="pdp-bundle-thumb">
-<<<<<<< HEAD
-                        <SafeImage src={item.image} alt={item.name} category={item.category} />
-=======
                         <SmartImage src={item.image} alt={item.name} width={300} />
->>>>>>> origin/main
                         <button
                           type="button"
                           className={`pdp-bundle-checkbox ${isSelected ? "checked" : ""}`}
@@ -1145,11 +1121,7 @@ export default function ProductDetails() {
       <aside className="pdp-sticky-mobile-bar" aria-label="Quick Add to Bag">
         <div className="sticky-bar-inner">
           <div className="sticky-product-info">
-<<<<<<< HEAD
-            <SafeImage src={gallery[0]} alt={product.name} category={product.category} className="sticky-product-thumb" />
-=======
-            <SmartImage src={gallery[0]} alt="" width={140} className="sticky-product-thumb" />
->>>>>>> origin/main
+            <SmartImage src={gallery[0]} alt={product.name} width={140} className="sticky-product-thumb" />
             <div className="sticky-product-text">
               <span className="sticky-product-title">{product.name}</span>
               <div className="sticky-price-row">

@@ -6,7 +6,6 @@ import { ShoppingBag, Heart, Eye } from "lucide-react";
 import { formatPrice } from "../data/products";
 import { trackRecommendationEvent } from "../services/recommendations";
 import { useStore } from "../context/StoreContext";
-import SafeImage from "./SafeImage";
 
 export default function RecommendationProductCard({
   product,
@@ -74,17 +73,10 @@ export default function RecommendationProductCard({
       >
         <div className="rec-card-image-wrap">
           {product.image ? (
-<<<<<<< HEAD
-            <SafeImage
-              src={product.image}
-              alt={product.name}
-              category={product.category}
-=======
             <SmartImage
               src={product.image}
               alt={product.name}
               width={400}
->>>>>>> origin/main
               className="rec-card-image"
               loading="lazy"
             />

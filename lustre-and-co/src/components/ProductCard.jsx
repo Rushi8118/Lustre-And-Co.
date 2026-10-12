@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { formatPrice } from "../data/products";
 import { useStore } from "../context/StoreContext";
-import SafeImage from "./SafeImage";
 import QuickViewModal from "./QuickViewModal";
 import SmartImage from "./SmartImage";
 
@@ -89,19 +88,11 @@ export default function ProductCard({
             aria-label={`View ${product.name}`}
           >
             {/* Primary Product Image with Zoom on Hover */}
-<<<<<<< HEAD
-            <SafeImage
-              src={product.image}
-              alt={product.name}
-              category={product.category}
-              loading="lazy"
-=======
             <SmartImage
               src={product.image}
               alt={product.name}
               width={600}
               priority={index < 4}
->>>>>>> origin/main
               className={`product-card-main-img ${
                 isHovered && secondaryImage ? "has-secondary" : ""
               }`}
@@ -109,18 +100,10 @@ export default function ProductCard({
 
             {/* Secondary Lifestyle Hover Image */}
             {secondaryImage && (
-<<<<<<< HEAD
-              <SafeImage
-                src={secondaryImage}
-                alt={`${product.name} styled`}
-                category={product.category}
-                loading="lazy"
-=======
               <SmartImage
                 src={secondaryImage}
-                alt=""
+                alt={`${product.name} styled`}
                 width={600}
->>>>>>> origin/main
                 className={`product-card-secondary-img ${
                   isHovered ? "is-visible" : ""
                 }`}

@@ -8713,7 +8713,7 @@ textarea {
 
   position: relative;
   min-height: 100vh;
-  overflow: hidden;
+  overflow-x: clip;
   background:
     radial-gradient(circle at 72% 18%,
       rgba(214, 181, 109, 0.12),
@@ -8891,10 +8891,11 @@ textarea {
 .auth-visual-scene {
   position: absolute;
   z-index: 1;
-  right: -3%;
-  bottom: 8%;
-  width: min(540px, 62vw);
-  height: 440px;
+  left: 50%;
+  top: clamp(72px, 10vh, 120px);
+  width: min(440px, 62vw);
+  height: min(320px, 46vh);
+  transform: translateX(-50%);
   pointer-events: none;
 }
 
@@ -8981,7 +8982,7 @@ textarea {
   position: absolute;
   z-index: 2;
   top: 11%;
-  right: 22%;
+  left: calc(50% - 105px);
   width: 210px;
   height: 285px;
   overflow: hidden;
@@ -9087,12 +9088,10 @@ textarea {
 }
 
 .auth-scene-caption {
+  display: none;
   position: absolute;
   right: 9%;
   bottom: -1%;
-  display: flex;
-  align-items: center;
-  gap: 8px;
   color: rgba(255, 253, 248, 0.56);
   font-size: 10px;
   letter-spacing: 0.08em;
@@ -9503,12 +9502,13 @@ textarea {
   }
 
   .auth-visual-scene {
-    right: -25%;
-    width: 500px;
+    left: 50%;
+    right: auto;
+    width: min(440px, 100%);
   }
 
   .auth-jewelry-card {
-    right: 20%;
+    left: calc(50% - 105px);
   }
 }
 

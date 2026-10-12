@@ -28,7 +28,6 @@ import PageIntro from "../components/PageIntro";
 import LoyaltyAccountCard from "../components/LoyaltyAccountCard";
 import LoyaltyLedger from "../components/LoyaltyLedger";
 import ReferralCard from "../components/ReferralCard";
-import SafeImage from "../components/SafeImage";
 import ReturnRequestModal from "../components/ReturnRequestModal";
 import ReturnsHistoryTab from "../components/ReturnsHistoryTab";
 import { getInvoiceHtmlUrl, openDocumentInNewTab } from "../services/documents";
@@ -260,11 +259,7 @@ export default function Account() {
             <div className="order-thumbnails-group">
               {order.items.map((item, idx) => (
                 <div key={idx} className="order-thumb-wrap" title={item.name}>
-<<<<<<< HEAD
-                  <SafeImage src={item.image} alt={item.name} />
-=======
                   <SmartImage src={item.image} alt={item.name} width={180} />
->>>>>>> origin/main
                   {item.quantity > 1 && <span className="order-qty-pill">x{item.quantity}</span>}
                 </div>
               ))}
@@ -298,11 +293,7 @@ export default function Account() {
             <div className="order-full-items-table">
               {order.items.map((item, idx) => (
                 <div key={idx} className="order-item-row">
-<<<<<<< HEAD
-                  <SafeImage src={item.image} alt={item.name} className="order-item-thumb" />
-=======
                   <SmartImage src={item.image} alt={item.name} width={180} className="order-item-thumb" />
->>>>>>> origin/main
                   <div className="order-item-info">
                     <h4>{item.name}</h4>
                     <span className="order-item-variant">
@@ -567,11 +558,7 @@ export default function Account() {
                         {wishlist.slice(0, 4).map((piece) => (
                           <div key={piece.slug} className="account-wishlist-item">
                             <div className="wishlist-thumb-box">
-<<<<<<< HEAD
-                              <SafeImage src={piece.image} alt={piece.name} />
-=======
                               <SmartImage src={piece.image} alt={piece.name} width={300} />
->>>>>>> origin/main
                             </div>
                             <div className="wishlist-item-meta">
                               <h4 className="wishlist-piece-name">{piece.name}</h4>
@@ -646,11 +633,7 @@ export default function Account() {
                     {wishlist.map((piece) => (
                       <div key={piece.slug} className="account-card wishlist-full-card">
                         <Link to={`/product/${piece.slug}`}>
-<<<<<<< HEAD
-                          <SafeImage src={piece.image} alt={piece.name} className="wishlist-card-img" />
-=======
                           <SmartImage src={piece.image} alt={piece.name} width={400} className="wishlist-card-img" />
->>>>>>> origin/main
                         </Link>
                         <div className="wishlist-card-body">
                           <h4>{piece.name}</h4>
